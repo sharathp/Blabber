@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/iv_retweet_image"
+        android:layout_width="@dimen/retweet_icon_width"
+        android:layout_height="@dimen/retweet_icon_height"
+        android:layout_alignRight="@+id/iv_profile_image"
+        android:layout_alignTop="@+id/tv_retweeted"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@id/tv_retweeted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_content"
+        android:layout_above="@+id/tv_name"
+        android:textSize="@dimen/text_retweeted"
+        android:textColor="@color/text_retweeted"
+        android:visibility="gone"/>
+    
+    <com.sharathp.blabber.views.DynamicHeightImageView
+        android:id="@id/iv_profile_image"
+        android:layout_width="@dimen/profile_width"
+        android:layout_height="@dimen/profile_height"
+        android:layout_marginLeft="@dimen/margin_normal"
+        android:layout_below="@id/iv_retweet_image"/>
+
+    <TextView
+        android:id="@id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/tv_retweeted"
+        android:layout_alignTop="@id/iv_profile_image"
+        android:ellipsize="end"
+        android:textSize="@dimen/text_name"
+        android:textColor="@color/text_name"/>
+
+    <TextView
+        android:id="@+id/tv_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_content"
+        android:layout_alignBaseline="@id/tv_name"
+        android:layout_toLeftOf="@id/tv_name"
+        android:layout_toRightOf="@+id/tv_time"
+        android:ellipsize="end"
+        android:textSize="@dimen/text_name"
+        android:textColor="@color/text_name"/>
+
+    <TextView
+        android:id="@id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_content"
+        android:layout_marginRight="@dimen/margin_content"
+        android:layout_alignBaseline="@id/tv_name"
+        android:layout_alignParentRight="true"
+        android:textSize="@dimen/text_time"
+        android:textColor="@color/text_time"/>
+
+    <TextView
+        android:id="@+id/tv_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/tv_name"
+        android:layout_below="@id/tv_name"
+        android:textSize="@dimen/text_content"
+        android:textColor="@color/text_content"/>
+
+
+</RelativeLayout>
