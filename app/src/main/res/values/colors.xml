@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="color_primary">#3F51B5</color>
+    <color name="color_primary_dark">#303F9F</color>
+    <color name="color_primary_light">#0084B4</color>
+    <color name="color_accent">#FF4081</color>
+
+    <color name="text_retweeted">#899AA7</color>
+    <color name="text_name">#292F33</color>
+    <color name="text_user_name">#899AA7</color>
+    <color name="text_hash_tags">#0084B4</color>
+    <color name="text_embedded_user_name">#0084B4</color>
+    <color name="text_content">#292F33</color>
+    <color name="text_time">#899AA7</color>
 </resources>

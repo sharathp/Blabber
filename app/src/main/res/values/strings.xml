@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Blabber</string>
     <string name="login_label">Log in</string>
+    <string name="message_end_of_tweets">End of Tweets</string>
 </resources>
