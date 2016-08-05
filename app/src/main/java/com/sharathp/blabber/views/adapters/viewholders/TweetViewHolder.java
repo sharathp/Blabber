@@ -5,8 +5,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.models.Tweet;
+import com.sharathp.blabber.util.DateUtils;
 import com.sharathp.blabber.views.DynamicHeightImageView;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 
@@ -54,6 +56,19 @@ public class TweetViewHolder extends RecyclerView.ViewHolder {
     }
 
     public final void bind(final Tweet tweet) {
-        
+        mTweet = tweet;
+        mUserNameTextView.setText(tweet.getUserName());
+        mNameTextView.setText(tweet.getUserScreenName());
+        mTimeTextView.setText(DateUtils.getRelativeTime(tweet.getCreatedAt()));
+        mContentTextView.setText(tweet.getText());
+
+        Glide.clear(mProfileImageView);
+
+        Glide.with(itemView.getContext())
+                .load(tweet.getUserProfileImageUrl())
+                .fitCenter()
+                .placeholder(R.drawable.ic_progress_indeterminate)
+                .error(R.drawable.ic_error)
+                .into(mProfileImageView);
     }
 }
