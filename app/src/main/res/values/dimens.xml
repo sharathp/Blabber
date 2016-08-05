@@ -24,5 +24,6 @@
     <dimen name="loading_indicator_width">40dp</dimen>
     <dimen name="loading_indicator_inner_radius">15dp</dimen>
     <dimen name="loading_indicator_thickness">3dp</dimen>
+    <dimen name="fab_elevation">4dp</dimen>
 
 </resources>
