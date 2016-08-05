@@ -1,7 +1,6 @@
 package com.sharathp.blabber.repositories.rest.resources;
 
 import com.google.gson.annotations.SerializedName;
-import com.sharathp.blabber.models.Tweet;
 
 import java.util.Date;
 
@@ -126,28 +125,5 @@ public class TweetResource {
 
     public void setRetweetedStatus(TweetResource retweetedStatus) {
         this.retweetedStatus = retweetedStatus;
-    }
-
-    public Tweet convertToTweet() {
-        final Tweet tweet = new Tweet();
-        tweet.setCreatedAt(createdAt);
-        tweet.setFavoriteCount(favoriteCount);
-        tweet.setFavorited(favorited);
-        tweet.setId(id);
-        tweet.setInReplyToScreenName(inReplyToScreenName);
-        tweet.setInReplyToStatusId(inReplyToStatusId);
-        if (retweetedStatus != null) {
-            tweet.setRetweetedStatus(retweetedStatus.convertToTweet());
-        }
-        tweet.setRetweeted(retweeted);
-        tweet.setRetweetCount(retweetCount);
-        tweet.setText(text);
-        if (user != null) {
-            tweet.setUserId(user.getId());
-            tweet.setUserName(user.getName());
-            tweet.setUserProfileImageUrl(user.getProfileImageUrl());
-            tweet.setUserScreenName(user.getScreenName());
-        }
-        return tweet;
     }
 }

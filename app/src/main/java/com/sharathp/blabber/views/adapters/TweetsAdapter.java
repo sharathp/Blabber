@@ -1,33 +1,31 @@
 package com.sharathp.blabber.views.adapters;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.sharathp.blabber.R;
-import com.sharathp.blabber.models.Tweet;
+import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.views.adapters.viewholders.LoadingItemHolder;
 import com.sharathp.blabber.views.adapters.viewholders.TweetViewHolder;
+import com.yahoo.squidb.recyclerview.SquidRecyclerAdapter;
+import com.yahoo.squidb.recyclerview.SquidViewHolder;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 
-public class TweetListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class TweetsAdapter extends SquidRecyclerAdapter<TweetWithUser, SquidViewHolder<TweetWithUser>> {
     private static final int TYPE_TWEET = 0;
     private static final int TYPE_LOADING = 1;
 
+    private final TweetCallback mTweetCallback;
     private boolean mIsEndReached;
 
     // weak reference to not avoid garbage collection the instance..
     private WeakReference<LoadingItemHolder> mLoadingItemHolder;
 
-    private List<Tweet> mTweets;
-    private final TweetCallback mTweetCallback;
-
-    public TweetListAdapter(final List<Tweet> tweets, final TweetCallback tweetCallback) {
-        mTweets = tweets;
+    public TweetsAdapter(final TweetCallback tweetCallback) {
+        super(TweetWithUser.ID);
         mTweetCallback = tweetCallback;
     }
 
@@ -41,7 +39,7 @@ public class TweetListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
+    public SquidViewHolder<TweetWithUser> onCreateViewHolder(final ViewGroup parent, final int viewType) {
         final Context context = parent.getContext();
 
         final LayoutInflater inflater = LayoutInflater.from(context);
@@ -62,10 +60,17 @@ public class TweetListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
-        // this is loading indicator, so, do nothing
+    public void onBindSquidViewHolder(final SquidViewHolder<TweetWithUser> holder, final int position) {
+        // if we are here, it should be always TweetViewHolder
+        ((TweetViewHolder)holder).bindTweet();
+    }
+
+    // over-ridden to "handle" the LoadingItemHolder, if not simply calls the super class
+    @Override
+    public void onBindViewHolder(final SquidViewHolder<TweetWithUser> holder, final int position) {
+        // this is refresh indicator, so, do nothing
         if (isPositionForLoadingIndicator(position)) {
-            // maintain a reference to holder to handle the case where mEndOfFeedReached is set
+            // maintain a weak reference to holder to handle the edge case where mEndOfFeedReached is set
             // after the view is bound here
             mLoadingItemHolder = new WeakReference<>((LoadingItemHolder)holder);
             // bind it here since the cursor is already exhausted at this point and super class would complain about it..
@@ -75,37 +80,17 @@ public class TweetListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             return;
         }
 
-        final Tweet tweet = mTweets.get(position);
-        ((TweetViewHolder)holder).bind(tweet);
+        super.onBindViewHolder(holder, position);
     }
 
     @Override
     public int getItemCount() {
-        if (mTweets == null || mTweets.isEmpty()) {
-            return 0;
+        final int actualCount = super.getItemCount();
+        if (actualCount == 0) {
+            return actualCount;
         }
-
-        // to show the spinner
-        return mTweets.size() + 1;
-    }
-
-    private boolean isPositionForLoadingIndicator(final int position) {
-        // last item is the loading indicator
-        return (position == mTweets.size());
-    }
-
-    public void setArticles(final List<Tweet> tweets) {
-        if (tweets != null) {
-            mTweets = tweets;
-        } else {
-            tweets.clear();
-        }
-        notifyDataSetChanged();
-    }
-
-    public void addTweets(final List<Tweet> tweets) {
-        mTweets.addAll(tweets);
-        notifyDataSetChanged();
+        // last item is for the loading indicator or end-of-feed indicator
+        return actualCount + 1;
     }
 
     public void setEndReached() {
@@ -129,5 +114,9 @@ public class TweetListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             return null;
         }
         return mLoadingItemHolder.get();
+    }
+
+    private boolean isPositionForLoadingIndicator(final int position) {
+        return (position == super.getItemCount());
     }
 }

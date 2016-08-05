@@ -1,5 +1,6 @@
 package com.sharathp.blabber;
 
+import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
@@ -8,7 +9,7 @@ import com.sharathp.blabber.di.ApplicationComponent;
 import com.sharathp.blabber.di.DaggerApplicationComponent;
 import com.sharathp.blabber.di.modules.ApplicationModule;
 
-public class BlabberApplication extends com.activeandroid.app.Application {
+public class BlabberApplication extends Application {
 	private ApplicationComponent mComponent;
 
 	@Override

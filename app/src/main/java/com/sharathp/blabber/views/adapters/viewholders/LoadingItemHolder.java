@@ -1,16 +1,17 @@
 package com.sharathp.blabber.views.adapters.viewholders;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.sharathp.blabber.R;
+import com.sharathp.blabber.models.TweetWithUser;
+import com.yahoo.squidb.recyclerview.SquidViewHolder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class LoadingItemHolder extends RecyclerView.ViewHolder {
+public class LoadingItemHolder extends SquidViewHolder<TweetWithUser> {
 
     @BindView(R.id.pb_loading_progress_bar)
     ProgressBar mLoadingProgressBar;
@@ -19,7 +20,7 @@ public class LoadingItemHolder extends RecyclerView.ViewHolder {
     TextView mEndOfArticlesTextView;
 
     public LoadingItemHolder(final View itemView) {
-        super(itemView);
+        super(itemView, new TweetWithUser());
         ButterKnife.bind(this, itemView);
     }
 
