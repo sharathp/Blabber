@@ -1,8 +1,16 @@
 <resources>
     <string name="app_name">Blabber</string>
     <string name="login_label">Log in</string>
+
+    <string name="label_new_tweet">Compose Tweet</string>
+
     <string name="message_end_of_tweets">End of Tweets</string>
     <string name="message_no_tweets">No Tweets</string>
-    <string name="label_new_tweet">Compose Tweet</string>
+    <string name="message_no_internet">Cannot connect to Internet</string>
+    <string name="message_refresh_failed">Tweets refresh failed</string>
+    <string name="message_past_tweets_failed">Unable to retrieve Past Tweets</string>
+
     <string name="drawer_label_home">Home</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 </resources>

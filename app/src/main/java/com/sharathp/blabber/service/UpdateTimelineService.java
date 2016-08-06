@@ -17,7 +17,8 @@ import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
-import com.sharathp.blabber.events.TweetsRetrievalEvent;
+import com.sharathp.blabber.events.TweetsPastRetrievedEvent;
+import com.sharathp.blabber.events.TweetsRefreshedEvent;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.repositories.TwitterDAO;
@@ -48,21 +49,6 @@ public class UpdateTimelineService extends Service {
     private static final int UPDATE_TYPE_LATEST = 1;
     private static final int UPDATE_TYPE_PAST = 2;
 
-    public static Intent createIntentForLatestItems(final Context context, final Long after) {
-        return createIntent(context, UPDATE_TYPE_LATEST);
-    }
-
-    public static Intent createIntentForPastItems(final Context context, final Long until, final int count) {
-        return createIntent(context, UPDATE_TYPE_PAST);
-    }
-
-    // from and to are exclusive
-    private static Intent createIntent(final Context context, @UpdateType final int updateType) {
-        final Intent intent = new Intent(context, UpdateTimelineService.class);
-        intent.putExtra(EXTRA_UPDATE_TYPE, updateType);
-        return intent;
-    }
-
     private volatile HandlerThread mHandlerThread;
     private ServiceHandler mServiceHandler;
 
@@ -77,6 +63,21 @@ public class UpdateTimelineService extends Service {
 
     @Inject
     Gson mGson;
+
+    public static Intent createIntentForLatestItems(final Context context) {
+        return createIntent(context, UPDATE_TYPE_LATEST);
+    }
+
+    public static Intent createIntentForPastItems(final Context context) {
+        return createIntent(context, UPDATE_TYPE_PAST);
+    }
+
+    // from and to are exclusive
+    private static Intent createIntent(final Context context, @UpdateType final int updateType) {
+        final Intent intent = new Intent(context, UpdateTimelineService.class);
+        intent.putExtra(EXTRA_UPDATE_TYPE, updateType);
+        return intent;
+    }
 
     @Override
     public void onCreate() {
@@ -144,7 +145,7 @@ public class UpdateTimelineService extends Service {
             if (tweet != null) {
                 maxId = tweet.getId();
             }
-            mTwitterClient.getPastTweets(maxId, getTweetsResponseHandler());
+            mTwitterClient.getPastTweets(maxId, getPastTweetsResponseHandler());
         }
 
         private void retrieveLatestTweets() {
@@ -153,7 +154,7 @@ public class UpdateTimelineService extends Service {
             if (tweet != null) {
                 sinceId = tweet.getId();
             }
-            mTwitterClient.getLatestTweets(sinceId, getTweetsResponseHandler());
+            mTwitterClient.getLatestTweets(sinceId, getRefreshTweetsResponseHandler());
         }
 
         private boolean saveTweets(final List<TweetResource> tweetResources) {
@@ -173,14 +174,14 @@ public class UpdateTimelineService extends Service {
             return mTwitterDAO.checkAndInsertUsers(userMap.values());
         }
 
-        private AsyncHttpResponseHandler getTweetsResponseHandler() {
+        private AsyncHttpResponseHandler getRefreshTweetsResponseHandler() {
             return new TextHttpResponseHandler() {
                 @Override
                 public void onFailure(final int statusCode, final Header[] headers,
                                       final String responseString, final Throwable throwable) {
                     Log.e(TAG, "Error retrieving tweets: " + responseString, throwable);
-                    final TweetsRetrievalEvent tweetsRetrievalEvent = new TweetsRetrievalEvent(0, false);
-                    mEventBus.post(tweetsRetrievalEvent);
+                    final TweetsRefreshedEvent tweetsRefreshedEvent = new TweetsRefreshedEvent(0, false);
+                    mEventBus.post(tweetsRefreshedEvent);
                 }
 
                 @Override
@@ -199,8 +200,40 @@ public class UpdateTimelineService extends Service {
                         Log.i(TAG, "Unable to save tweets");
                     }
 
-                    final TweetsRetrievalEvent tweetsRetrievalEvent = new TweetsRetrievalEvent(tweetResources.size(), success);
-                    mEventBus.post(tweetsRetrievalEvent);
+                    final TweetsRefreshedEvent tweetsRefreshedEvent = new TweetsRefreshedEvent(tweetResources.size(), success);
+                    mEventBus.post(tweetsRefreshedEvent);
+                }
+            };
+        }
+
+        private AsyncHttpResponseHandler getPastTweetsResponseHandler() {
+            return new TextHttpResponseHandler() {
+                @Override
+                public void onFailure(final int statusCode, final Header[] headers,
+                                      final String responseString, final Throwable throwable) {
+                    Log.e(TAG, "Error retrieving tweets: " + responseString, throwable);
+                    final TweetsPastRetrievedEvent tweetsPastRetrievedEvent = new TweetsPastRetrievedEvent(0, false);
+                    mEventBus.post(tweetsPastRetrievedEvent);
+                }
+
+                @Override
+                public void onSuccess(final int statusCode, final Header[] headers,
+                                      final String responseString) {
+                    final Type responseType = new TypeToken<List<TweetResource>>(){}.getType();
+                    final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
+                    Log.i(TAG, "Retrieved tweets: " + tweetResources.size());
+
+                    boolean success = saveUsers(tweetResources);
+                    if (success) {
+                        success = saveTweets(tweetResources);
+                    }
+
+                    if (! success) {
+                        Log.i(TAG, "Unable to save tweets");
+                    }
+
+                    final TweetsPastRetrievedEvent tweetsPastRetrievedEvent = new TweetsPastRetrievedEvent(tweetResources.size(), success);
+                    mEventBus.post(tweetsPastRetrievedEvent);
                 }
             };
         }
