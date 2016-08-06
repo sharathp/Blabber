@@ -1,6 +1,7 @@
 package com.sharathp.blabber.repositories.rest.resources;
 
 import com.google.gson.annotations.SerializedName;
+import com.sharathp.blabber.models.User;
 
 public class UserResource {
 
@@ -101,5 +102,19 @@ public class UserResource {
 
     public void setFollowing(boolean following) {
         this.following = following;
+    }
+
+    public User convertToUser() {
+        final User user = new User();
+        user.setId(id);
+        user.setName(name);
+        user.setScreenName(screenName);
+        user.setProfileImageUrl(profileImageUrl);
+        user.setFollowersCount(followersCount);
+        user.setDescription(description);
+        user.setProfileBackgroundImageUrl(profileBackgroundImageUrl);
+        user.setFriendsCount(friendsCount);
+        user.setIsFollowing(following);
+        return user;
     }
 }

@@ -6,6 +6,8 @@ import com.sharathp.blabber.models.User;
 import com.yahoo.squidb.sql.Query;
 import com.yahoo.squidb.support.SquidSupportCursorLoader;
 
+import java.util.Collection;
+
 public interface TwitterDAO {
 
     // even though this seems unnecessary, this helps keep track of all clients easily..
@@ -13,5 +15,9 @@ public interface TwitterDAO {
 
     Tweet getLatestTweet();
 
-    boolean insertTweet(Tweet tweet, User user);
+    Tweet getEarliestTweet();
+
+    boolean checkAndInsertUsers(Collection<User> users);
+
+    boolean checkAndInsertTweets(Collection<Tweet> tweets);
 }
