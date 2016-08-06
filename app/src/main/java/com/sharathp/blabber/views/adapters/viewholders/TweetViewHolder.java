@@ -29,11 +29,11 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
     @BindView(R.id.iv_profile_image)
     DynamicHeightImageView mProfileImageView;
 
-    @BindView(R.id.tv_name)
-    TextView mNameTextView;
+    @BindView(R.id.tv_screen_name)
+    TextView mScreenNameTextView;
 
-    @BindView(R.id.tv_user_name)
-    TextView mUserNameTextView;
+    @BindView(R.id.tv_real_name)
+    TextView mRealNameTextView;
 
     @BindView(R.id.tv_time)
     TextView mTimeTextView;
@@ -59,8 +59,8 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
     }
 
     public final void bindTweet() {
-        mUserNameTextView.setText(item.getUserName());
-        mNameTextView.setText(item.getUserScreenName());
+        mRealNameTextView.setText(item.getUserRealName());
+        mScreenNameTextView.setText("@" + item.getUserScreenName());
         mTimeTextView.setText(DateUtils.getRelativeTime(new Date(item.getCreatedAt())));
         mContentTextView.setText(item.getText());
 

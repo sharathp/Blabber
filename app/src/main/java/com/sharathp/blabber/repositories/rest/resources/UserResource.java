@@ -107,7 +107,7 @@ public class UserResource {
     public User convertToUser() {
         final User user = new User();
         user.setId(id);
-        user.setName(name);
+        user.setRealName(name);
         user.setScreenName(screenName);
         user.setProfileImageUrl(profileImageUrl);
         user.setFollowersCount(followersCount);

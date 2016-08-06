@@ -16,7 +16,7 @@ public class UserSpec {
     public long id;
 
     @ColumnSpec(constraints = "NOT NULL")
-    public String name;
+    public String realName;
 
     @ColumnSpec(constraints = "NOT NULL")
     public String screenName;
