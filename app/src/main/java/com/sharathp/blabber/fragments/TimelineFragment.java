@@ -117,6 +117,7 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
         if (data.getCount() > 0) {
             // hide no tweets message
             hideMessageContainer();
+            markMoreItemsToLoad();
         } else {
             // show no tweets message
             showNoTweetsMessage();
