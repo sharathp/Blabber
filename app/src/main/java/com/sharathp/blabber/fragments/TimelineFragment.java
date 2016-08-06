@@ -33,6 +33,7 @@ import com.yahoo.squidb.sql.Query;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import javax.inject.Inject;
 
@@ -129,7 +130,7 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
         mTweetsAdapter.swapCursor(null);
     }
 
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(final TweetsRefreshedEvent event) {
         mBinding.srlTweets.setRefreshing(false);
         if (! event.isSuccess()) {
@@ -137,7 +138,7 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(final TweetsPastRetrievedEvent event) {
         if (event.isSuccess()) {
             if (event.getTweetsCount() == 0) {
@@ -155,7 +156,7 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
         mLayoutManager = new LinearLayoutManager(getActivity());
         moviesRecyclerView.setAdapter(mTweetsAdapter);
         moviesRecyclerView.setLayoutManager(mLayoutManager);
-        mBinding.srlTweets.setOnRefreshListener(() -> refreshTweets());
+        mBinding.srlTweets.setOnRefreshListener(() -> deleteAndRefreshTweets());
         mEndlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(mLayoutManager) {
             @Override
             public void onLoadMore(final int page, final int totalItemsCount) {
@@ -163,6 +164,17 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
             }
         };
         mBinding.rvTweets.addOnScrollListener(mEndlessRecyclerViewScrollListener);
+    }
+
+    private void deleteAndRefreshTweets() {
+        if (! NetworkUtils.isOnline(getContext())) {
+            Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        final Intent intent = UpdateTimelineService.createIntentForDeleteExistingItemsAndRetrieveLasterItems(getActivity());
+        getActivity().startService(intent);
+        markMoreItemsToLoad();
     }
 
     private void refreshTweets() {

@@ -21,6 +21,7 @@ import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityTweetsBinding;
 import com.sharathp.blabber.fragments.TimelineFragment;
 import com.sharathp.blabber.models.TweetWithUser;
+import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 
 public class TweetsActivity extends AppCompatActivity implements TweetCallback {
@@ -127,5 +128,12 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback {
     @Override
     public void onTweetSelected(TweetWithUser tweet) {
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // stop service
+        stopService(UpdateTimelineService.createIntentForLatestItems(this));
     }
 }

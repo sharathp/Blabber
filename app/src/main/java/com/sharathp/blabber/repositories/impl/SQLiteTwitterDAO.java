@@ -59,6 +59,12 @@ public class SQLiteTwitterDAO implements TwitterDAO {
         return checkAndInsertElements(tweets);
     }
 
+    @Override
+    public boolean deleteExistingTweets() {
+        mDatabase.deleteAll(Tweet.class);
+        return true;
+    }
+
     private <T extends AndroidTableModel> boolean checkAndInsertElements(final Collection<T> models) {
         boolean success = false;
         mDatabase.beginTransaction();
