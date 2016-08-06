@@ -169,6 +169,7 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
     private void deleteAndRefreshTweets() {
         if (! NetworkUtils.isOnline(getContext())) {
             Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
+            mBinding.srlTweets.setRefreshing(false);
             return;
         }
 
@@ -180,6 +181,7 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
     private void refreshTweets() {
         if (! NetworkUtils.isOnline(getContext())) {
             Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
+            mBinding.srlTweets.setRefreshing(false);
             return;
         }
 
