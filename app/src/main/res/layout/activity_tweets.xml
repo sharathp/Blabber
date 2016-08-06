@@ -58,7 +58,7 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 app:elevation="@dimen/fab_elevation"
                 app:borderWidth="0dp"
-                app:layout_behavior="com.sharathp.myorktimes.views.behaviors.ScrollAwareFABBehavior"/>
+                app:layout_behavior="com.sharathp.blabber.views.behaviors.ScrollAwareFABBehavior"/>
 
         </android.support.design.widget.CoordinatorLayout>
 
