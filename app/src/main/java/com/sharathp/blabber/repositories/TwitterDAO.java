@@ -20,4 +20,6 @@ public interface TwitterDAO {
     boolean checkAndInsertUsers(Collection<User> users);
 
     boolean checkAndInsertTweets(Collection<Tweet> tweets);
+
+    boolean deleteExistingTweets();
 }
