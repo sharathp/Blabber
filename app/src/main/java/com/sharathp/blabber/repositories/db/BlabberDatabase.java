@@ -9,6 +9,7 @@ import com.yahoo.squidb.android.AndroidOpenHelper;
 import com.yahoo.squidb.data.ISQLiteDatabase;
 import com.yahoo.squidb.data.ISQLiteOpenHelper;
 import com.yahoo.squidb.data.SquidDatabase;
+import com.yahoo.squidb.data.TableModel;
 import com.yahoo.squidb.sql.Table;
 import com.yahoo.squidb.sql.View;
 
@@ -55,5 +56,10 @@ public class BlabberDatabase extends SquidDatabase {
                                                  final OpenHelperDelegate delegate,
                                                  final int version) {
         return new AndroidOpenHelper(mContext, databaseName, delegate, version);
+    }
+
+    // SquidDatabase doesn't expose #insertRow(TableModel) method, this simply makes that method public
+    public boolean insertWithGivenId(TableModel item) {
+        return insertRow(item);
     }
 }

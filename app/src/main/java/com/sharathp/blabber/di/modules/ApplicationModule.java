@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 
 import com.sharathp.blabber.BlabberApplication;
 
+import org.greenrobot.eventbus.EventBus;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -32,5 +34,12 @@ public class ApplicationModule {
     @Provides
     SharedPreferences provideSharedPreferences() {
         return PreferenceManager.getDefaultSharedPreferences(mApplication);
+    }
+
+    @Singleton
+    @NonNull
+    @Provides
+    EventBus provideEventBus() {
+        return EventBus.builder().build();
     }
 }

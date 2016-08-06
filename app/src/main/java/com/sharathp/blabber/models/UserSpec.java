@@ -12,6 +12,7 @@ public class UserSpec {
     public static final Uri CONTENT_URI = Uri.parse("content://com.sharathp.blabber/users");
 
     @PrimaryKey
+    @ColumnSpec(name = "_id")
     public long id;
 
     @ColumnSpec(constraints = "NOT NULL")

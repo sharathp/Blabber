@@ -12,6 +12,7 @@ public class TweetSpec {
     public static final Uri CONTENT_URI = Uri.parse("content://com.sharathp.blabber/tweets");
 
     @PrimaryKey
+    @ColumnSpec(name = "_id")
     public long id;
 
     public boolean favorited;
@@ -32,7 +33,8 @@ public class TweetSpec {
 
     public boolean retweeted;
 
-    public Tweet retweetedStatus;
+    // TODO - replace this with retweetedStatus's id
+//    public Tweet retweetedStatus;
 
     @ColumnSpec(constraints = "NOT NULL")
     public long userId;
