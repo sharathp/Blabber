@@ -30,7 +30,7 @@ public class TweetWithUserSpec {
 
     public static final Property.LongProperty USER_ID = User.ID;
 
-    public static final Property.StringProperty USER_NAME = User.NAME;
+    public static final Property.StringProperty USER_REAL_NAME = User.REAL_NAME;
 
     public static final Property.StringProperty USER_SCREEN_NAME = User.SCREEN_NAME;
 

@@ -15,8 +15,8 @@
     <dimen name="retweet_icon_height">8dp</dimen>
 
     <dimen name="text_retweeted">12sp</dimen>
-    <dimen name="text_name">14sp</dimen>
-    <dimen name="text_user_name">12sp</dimen>
+    <dimen name="text_real_name">14sp</dimen>
+    <dimen name="text_screen_name">12sp</dimen>
     <dimen name="text_content">14sp</dimen>
     <dimen name="text_time">12sp</dimen>
 

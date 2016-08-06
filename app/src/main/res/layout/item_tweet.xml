@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/activity_horizontal_margin">
     <ImageView
         android:id="@+id/iv_retweet_image"
         android:layout_width="@dimen/retweet_icon_width"
@@ -15,8 +16,8 @@
         android:id="@id/tv_retweeted"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tv_name"
-        android:layout_above="@id/tv_name"
+        android:layout_alignLeft="@+id/tv_screen_name"
+        android:layout_above="@id/tv_screen_name"
         android:textSize="@dimen/text_retweeted"
         android:textColor="@color/text_retweeted"
         android:visibility="gone"/>
@@ -28,35 +29,37 @@
         android:layout_marginLeft="@dimen/margin_normal"/>
 
     <TextView
-        android:id="@id/tv_name"
+        android:id="@+id/tv_real_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/margin_content"
         android:layout_alignTop="@id/iv_profile_image"
+        android:singleLine="true"
         android:ellipsize="end"
-        android:textSize="@dimen/text_name"
-        android:textColor="@color/text_name"/>
+        android:textSize="@dimen/text_real_name"
+        android:textColor="@color/text_real_name"/>
 
     <TextView
-        android:id="@+id/tv_user_name"
+        android:id="@id/tv_screen_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/margin_content"
-        android:layout_alignBaseline="@id/tv_name"
-        android:layout_toLeftOf="@id/tv_name"
-        android:layout_toRightOf="@+id/tv_time"
+        android:layout_marginLeft="@dimen/space_content"
+        android:layout_marginRight="@dimen/space_content"
+        android:layout_alignBaseline="@id/tv_real_name"
+        android:layout_toRightOf="@id/tv_real_name"
+        android:layout_toLeftOf="@+id/tv_time"
+        android:singleLine="true"
         android:ellipsize="end"
-        android:textSize="@dimen/text_name"
-        android:textColor="@color/text_name"/>
+        android:textSize="@dimen/text_screen_name"
+        android:textColor="@color/text_screen_name"/>
 
     <TextView
         android:id="@id/tv_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/margin_content"
-        android:layout_marginRight="@dimen/margin_content"
-        android:layout_alignBaseline="@id/tv_name"
+        android:layout_alignBaseline="@id/tv_real_name"
         android:layout_alignParentRight="true"
+        android:singleLine="true"
         android:textSize="@dimen/text_time"
         android:textColor="@color/text_time"/>
 
@@ -64,8 +67,8 @@
         android:id="@+id/tv_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/tv_name"
-        android:layout_below="@id/tv_name"
+        android:layout_alignLeft="@id/tv_real_name"
+        android:layout_below="@id/tv_real_name"
         android:textSize="@dimen/text_content"
         android:textColor="@color/text_content"/>
 
