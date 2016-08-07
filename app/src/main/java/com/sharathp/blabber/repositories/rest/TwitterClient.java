@@ -1,7 +1,6 @@
 package com.sharathp.blabber.repositories.rest;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -49,12 +48,12 @@ public class TwitterClient extends OAuthBaseClient {
         client.get(apiUrl, handler);
     }
 
-    public void submitTweet(final String status, final String inReplyToStatusId, final AsyncHttpResponseHandler handler) {
+    public void submitTweet(final String status, final Long inReplyToStatusId, final AsyncHttpResponseHandler handler) {
         final String apiUrl = getApiUrl(RELATIVE_URL_STATUS_UPDATE);
         final RequestParams requestParams = new RequestParams();
         requestParams.put(REQ_PARAM_STATUS, status);
-        if (! TextUtils.isEmpty(inReplyToStatusId)) {
-            requestParams.put(REQ_PARAM_IN_REPLY_TO_STATUS_ID, inReplyToStatusId);
+        if (inReplyToStatusId != null) {
+            requestParams.put(REQ_PARAM_IN_REPLY_TO_STATUS_ID, Long.toString(inReplyToStatusId));
         }
         client.post(apiUrl, requestParams, handler);
     }

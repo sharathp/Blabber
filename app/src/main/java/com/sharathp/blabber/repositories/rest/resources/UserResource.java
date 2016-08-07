@@ -5,7 +5,7 @@ import com.sharathp.blabber.models.User;
 
 public class UserResource {
 
-    @SerializedName("id")
+    @SerializedName("id_str")
     long id;
 
     @SerializedName("name")
