@@ -68,7 +68,7 @@
         android:textSize="@dimen/text_time"
         android:textColor="@color/text_time"/>
 
-    <TextView
+    <com.sharathp.blabber.views.LinkifiedTextView
         android:id="@+id/tv_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

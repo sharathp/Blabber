@@ -32,4 +32,8 @@
     <dimen name="tweet_button_horizontal_padding">5dp</dimen>
     <dimen name="tweet_button_vertical_padding">3dp</dimen>
 
+    <dimen name="detail_text_margin_top">16dp</dimen>
+    <dimen name="detail_time_margin_top">16dp</dimen>
+    <dimen name="detail_text_content">20sp</dimen>
+
 </resources>
