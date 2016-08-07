@@ -6,6 +6,10 @@ import com.sharathp.blabber.models.Tweet;
 import java.util.Date;
 
 public class TweetResource {
+    public static final String TYPE_VIDEO = "video";
+    public static final String TYPE_IMAGE = "photo";
+
+    public static final String SUFFIX_MP4 = ".mp4";
 
     @SerializedName("id_str")
     long id;
@@ -39,6 +43,9 @@ public class TweetResource {
 
     @SerializedName("retweeted_status")
     TweetResource retweetedStatus;
+
+    @SerializedName("extended_entities")
+    EntitiesResource mExtendedEntitiesResource;
 
     public long getId() {
         return id;
@@ -128,6 +135,14 @@ public class TweetResource {
         this.retweetedStatus = retweetedStatus;
     }
 
+    public EntitiesResource getExtendedEntitiesResource() {
+        return mExtendedEntitiesResource;
+    }
+
+    public void setExtendedEntitiesResource(EntitiesResource extendedEntitiesResource) {
+        mExtendedEntitiesResource = extendedEntitiesResource;
+    }
+
     public Tweet convertToTweet() {
         final Tweet tweet = new Tweet();
         tweet.setId(id);
@@ -140,6 +155,49 @@ public class TweetResource {
         tweet.setText(text);
         tweet.setRetweetCount(retweetCount);
         tweet.setIsRetweeted(retweeted);
+
+        if (retweetedStatus != null) {
+            tweet.setRetweetedStatusId(retweetedStatus.getId());
+            tweet.setRetweetedUserId(retweetedStatus.getUser().getId());
+            tweet.setRetweetedUserName(retweetedStatus.getUser().getName());
+            tweet.setRetweetedScreenName(retweetedStatus.getUser().getScreenName());
+            tweet.setRetweetedProfileImageUrl((retweetedStatus.getUser().getProfileImageUrl()));
+        }
+
+        if (mExtendedEntitiesResource != null
+                && mExtendedEntitiesResource.getMedia() != null
+                && ! mExtendedEntitiesResource.getMedia().isEmpty()) {
+            final EntitiesResource.MediaResource mediaResource = mExtendedEntitiesResource.getMedia().get(0);
+
+            final String mediaType = mediaResource.getType();
+
+            if (TYPE_IMAGE.equals(mediaType)) {
+                tweet.setImageUrl(mediaResource.getMediaUrl());
+            }
+
+            if (TYPE_VIDEO.equals(mediaType)) {
+                tweet.setVideoUrl(getVideoUrl(mediaResource.getVideoInfo()));
+            }
+        }
+
         return tweet;
+    }
+
+    private String getVideoUrl(final EntitiesResource.VideoInfoResource videoInfoResource) {
+        if (videoInfoResource == null ||
+                videoInfoResource.getVariants() == null ||
+                videoInfoResource.getVariants().isEmpty()) {
+            return null;
+        }
+
+        // try to find the .mp4 url
+        for (final EntitiesResource.VideoInfoVariantResource resource : videoInfoResource.getVariants()) {
+            if (resource.getUrl() != null && resource.getUrl().endsWith(SUFFIX_MP4)) {
+                return resource.getUrl();
+            }
+        }
+
+        // .. else return the first url
+        return videoInfoResource.getVariants().get(0).getUrl();
     }
 }

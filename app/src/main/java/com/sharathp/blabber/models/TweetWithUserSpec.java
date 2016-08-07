@@ -37,4 +37,16 @@ public class TweetWithUserSpec {
     public static final Property.StringProperty USER_SCREEN_NAME = User.SCREEN_NAME;
 
     public static final Property.StringProperty USER_IMAGE_URL = User.PROFILE_IMAGE_URL;
+
+    // retweeted status
+
+    public static final Property.LongProperty RETWEETED_STATUS_ID = Tweet.RETWEETED_STATUS_ID;
+
+    public static final Property.LongProperty RETWEETED_USER_ID = Tweet.RETWEETED_USER_ID;
+
+    public static final Property.StringProperty RETWEETED_USER_NAME = Tweet.RETWEETED_USER_NAME;
+
+    public static final Property.StringProperty RETWEETED_SCREEN_NAME = Tweet.RETWEETED_SCREEN_NAME;
+
+    public static final Property.StringProperty RETWEETED_PROFILE_IMAGE_URL = Tweet.RETWEETED_PROFILE_IMAGE_URL;
 }

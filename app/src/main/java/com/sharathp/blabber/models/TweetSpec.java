@@ -38,4 +38,20 @@ public class TweetSpec {
 
     @ColumnSpec(constraints = "NOT NULL")
     public long userId;
+
+    public String imageUrl;
+
+    public String videoUrl;
+
+    // retweet related data
+    // TODO - use a foreign key here instead
+    public long retweetedStatusId;
+
+    public long retweetedUserId;
+
+    public String retweetedUserName;
+
+    public String retweetedScreenName;
+
+    public String retweetedProfileImageUrl;
 }
