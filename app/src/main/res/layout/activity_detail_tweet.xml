@@ -37,17 +37,17 @@
                     android:id="@+id/iv_retweet_image"
                     android:layout_width="@dimen/retweet_icon_width"
                     android:layout_height="@dimen/retweet_icon_height"
-                    android:layout_above="@+id/iv_profile_image"
-                    android:layout_alignRight="@id/iv_profile_image"
-                    android:layout_alignTop="@+id/tv_retweeted"
+                    android:layout_alignRight="@+id/iv_profile_image"
+                    android:layout_marginBottom="@dimen/space_content"
+                    android:src="@drawable/ic_retweet"
                     android:visibility="gone"/>
 
                 <TextView
-                    android:id="@id/tv_retweeted"
+                    android:id="@+id/tv_retweeted"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignLeft="@+id/tv_screen_name"
-                    android:layout_above="@id/tv_screen_name"
+                    android:layout_alignLeft="@+id/tv_real_name"
+                    android:layout_alignBottom="@id/iv_retweet_image"
                     android:textSize="@dimen/text_retweeted"
                     android:textColor="@color/text_retweeted"
                     android:visibility="gone"/>
@@ -56,12 +56,15 @@
                     android:id="@id/iv_profile_image"
                     android:layout_width="@dimen/profile_width"
                     android:layout_height="@dimen/profile_height"
-                    android:layout_marginLeft="@dimen/space_content"/>
+                    android:layout_marginLeft="@dimen/space_content"
+                    android:layout_below="@id/iv_retweet_image"
+                    android:layout_alignWithParentIfMissing="true"/>
 
                 <TextView
                     android:id="@+id/tv_real_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/iv_profile_image"
                     android:layout_marginLeft="@dimen/margin_content"
                     android:layout_marginTop="@dimen/space_content"
                     android:singleLine="true"
@@ -71,7 +74,7 @@
                     android:textColor="@color/text_real_name"/>
 
                 <TextView
-                    android:id="@id/tv_screen_name"
+                    android:id="@+id/tv_screen_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tv_real_name"
