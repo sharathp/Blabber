@@ -71,6 +71,7 @@
         android:layout_below="@id/tv_real_name"
         android:autoLink="all"
         android:linksClickable="true"
+        android:textColorLink="@color/text_color_link"
         android:textSize="@dimen/text_content"
         android:textColor="@color/text_content"/>
 
