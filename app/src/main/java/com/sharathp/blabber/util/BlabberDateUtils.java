@@ -1,11 +1,15 @@
 package com.sharathp.blabber.util;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 public class BlabberDateUtils {
     public static final String DATE_FORMAT_TWITTER = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
+
+    public static final String DATE_FORMAT_DETAIL = "h:mm a . dd MMM yy";
+
     private static final String RELATIVE_SUFFIX = " ago";
 
     public static String getRelativeTime(final Date date) {
@@ -19,6 +23,11 @@ public class BlabberDateUtils {
         } else {
             return formatted;
         }
+    }
+
+    public static String getDetailPageTime(final Date date) {
+        final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_DETAIL);
+        return sdf.format(date);
     }
 
     public static String getTwitterRelativeTime(final Date date) {

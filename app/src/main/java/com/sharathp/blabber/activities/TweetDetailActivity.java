@@ -42,7 +42,7 @@ public class TweetDetailActivity  extends AppCompatActivity {
     private void bindTweet() {
         mBinding.tvRealName.setText(mTweetWithUser.getUserRealName());
         mBinding.tvScreenName.setText("@" + mTweetWithUser.getUserScreenName());
-        mBinding.tvTime.setText(BlabberDateUtils.getTwitterRelativeTime(new Date(mTweetWithUser.getCreatedAt())));
+        mBinding.tvTime.setText(BlabberDateUtils.getDetailPageTime(new Date(mTweetWithUser.getCreatedAt())));
         mBinding.tvContent.setText(mTweetWithUser.getText());
 
         Glide.clear(mBinding.ivProfileImage);
