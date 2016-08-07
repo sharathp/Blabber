@@ -14,7 +14,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
@@ -22,12 +21,14 @@ import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentComposeBinding;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
 import com.sharathp.blabber.repositories.rest.resources.UserResource;
+import com.sharathp.blabber.util.ImageUtils;
 
 import javax.inject.Inject;
 
 import cz.msebera.android.httpclient.Header;
 
 public class ComposeFragment extends DialogFragment {
+
     private FragmentComposeBinding mBinding;
     private int mMaxCharacterCount;
 
@@ -173,16 +174,7 @@ public class ComposeFragment extends DialogFragment {
     }
 
     private void loadLoggedInUserDetails(final UserResource loggedInUser) {
-        loadProfileImage(loggedInUser.getProfileImageUrl());
-    }
-
-    private void loadProfileImage(final String profileImageUrl) {
-        Glide.with(getActivity())
-                .load(profileImageUrl)
-                .fitCenter()
-                .placeholder(R.drawable.ic_progress_indeterminate)
-                .error(R.drawable.ic_error)
-                .into(mBinding.ivProfileImage);
+        ImageUtils.loadImage(getActivity(), mBinding.ivProfileImage, loggedInUser.getProfileImageUrl());
     }
 
     public interface ComposeCallback {

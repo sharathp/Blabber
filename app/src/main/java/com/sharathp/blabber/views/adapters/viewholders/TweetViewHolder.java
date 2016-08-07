@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.util.BlabberDateUtils;
+import com.sharathp.blabber.util.ImageUtils;
 import com.sharathp.blabber.views.DynamicHeightImageView;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 import com.yahoo.squidb.recyclerview.SquidViewHolder;
@@ -66,11 +67,6 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
 
         Glide.clear(mProfileImageView);
 
-        Glide.with(itemView.getContext())
-                .load(item.getUserImageUrl())
-                .fitCenter()
-                .placeholder(R.drawable.ic_progress_indeterminate)
-                .error(R.drawable.ic_error)
-                .into(mProfileImageView);
+        ImageUtils.loadImage(itemView.getContext(), mProfileImageView, item.getUserImageUrl());
     }
 }
