@@ -1,6 +1,7 @@
 package com.sharathp.blabber.repositories.rest;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -31,13 +32,31 @@ public class TwitterClient extends OAuthBaseClient {
     private static final String REST_CALLBACK_URL = "oauth://myblabber";
 
     private static final String RELATIVE_URL_STATUS = "/statuses/home_timeline.json";
+    private static final String RELATIVE_URL_CREDENTIALS = "/account/verify_credentials.json";
+    private static final String RELATIVE_URL_STATUS_UPDATE = "/statuses/update.json";
 
     private static final String REQ_PARAM_MAX_ID = "max_id";
     private static final String REQ_PARAM_SINCE_ID = "since_id";
+    private static final String REQ_PARAM_STATUS = "status";
+    private static final String REQ_PARAM_IN_REPLY_TO_STATUS_ID = "in_reply_to_status_id";
 
-
-    public TwitterClient(Context context) {
+    public TwitterClient(final Context context) {
         super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
+    }
+
+    public void getLoggedInUserDetails(final AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_CREDENTIALS);
+        client.get(apiUrl, handler);
+    }
+
+    public void submitTweet(final String status, final String inReplyToStatusId, final AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_STATUS_UPDATE);
+        final RequestParams requestParams = new RequestParams();
+        requestParams.put(REQ_PARAM_STATUS, status);
+        if (! TextUtils.isEmpty(inReplyToStatusId)) {
+            requestParams.put(REQ_PARAM_IN_REPLY_TO_STATUS_ID, inReplyToStatusId);
+        }
+        client.post(apiUrl, requestParams, handler);
     }
 
     public void getPastTweets(final Long maxId, final AsyncHttpResponseHandler handler) {

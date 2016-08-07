@@ -18,15 +18,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityTweetsBinding;
+import com.sharathp.blabber.events.TweetRefreshRequiredEvent;
 import com.sharathp.blabber.fragments.ComposeFragment;
 import com.sharathp.blabber.fragments.TimelineFragment;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 
-public class TweetsActivity extends AppCompatActivity implements TweetCallback {
+import org.greenrobot.eventbus.EventBus;
+
+import javax.inject.Inject;
+
+public class TweetsActivity extends AppCompatActivity implements TweetCallback, ComposeFragment.ComposeCallback {
     private static final String TAG = TweetsActivity.class.getSimpleName();
     private static final int INDEX_HOME = 0;
 
@@ -38,9 +44,14 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback {
 
     private ActionBarDrawerToggle mDrawerToggle;
 
+    @Inject
+    EventBus mEventBus;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        BlabberApplication.from(this).getComponent().inject(this);
 
         final ActivityTweetsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_tweets);
         mToolbar = binding.toolbar;
@@ -54,7 +65,7 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback {
             final ComposeFragment composeFragment = ComposeFragment.createInstance();
             composeFragment.setStyle(DialogFragment.STYLE_NO_FRAME, R.style.Dialog_FullScreen);
             composeFragment.show(fm, "compose_fragment");
-
+            composeFragment.setCallback(this);
         });
         mComposeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.fab_compose_background)));
 
@@ -144,5 +155,10 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback {
         super.onStop();
         // stop service
         stopService(UpdateTimelineService.createIntentForLatestItems(this));
+    }
+
+    @Override
+    public void onTweetSubmitted(String tweet) {
+        mEventBus.post(new TweetRefreshRequiredEvent());
     }
 }

@@ -16,4 +16,6 @@
     <string name="hint_compose_tweet">What\'s happening?</string>
     <string name="action_tweet">Tweet</string>
     <string name="max_characters_tweet">140</string>
+    <string name="error_tweet_submit">Unable to submit tweet</string>
+    <string name="error_profile_retrieval">Unable to retrieve user profile</string>
 </resources>
