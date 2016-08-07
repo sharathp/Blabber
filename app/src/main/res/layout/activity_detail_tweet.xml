@@ -7,18 +7,27 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:elevation="8dp"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="@style/ToolbarTheme"/>
+            android:theme="@style/ToolbarTheme">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="8dp"
+                android:minHeight="?attr/actionBarSize"/>
+
+        </android.support.design.widget.AppBarLayout>
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="@dimen/space_content">
+            android:paddingTop="@dimen/detail_top_padding"
+            android:paddingBottom="@dimen/space_content"
+            android:paddingLeft="@dimen/space_content"
+            android:paddingRight="@dimen/space_content">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -54,7 +63,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/margin_content"
-                    android:layout_alignTop="@id/iv_profile_image"
+                    android:layout_marginTop="@dimen/space_content"
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:textStyle="bold"

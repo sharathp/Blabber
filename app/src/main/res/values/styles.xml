@@ -12,9 +12,9 @@
 
     <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <!-- android:textColorPrimary is the color of the title text in the Toolbar  -->
-        <item name="android:textColorPrimary">@color/color_primary_dark</item>
-        <item name="colorAccent">@color/color_primary_dark</item>
-        <item name="colorControlNormal">@color/color_primary_dark</item>
+        <item name="android:textColorPrimary">@color/text_content</item>
+        <item name="colorControlNormal">@color/color_twitter_blue</item>
+        <item name="android:background">@android:color/white</item>
     </style>
 
     <style name="Divider">

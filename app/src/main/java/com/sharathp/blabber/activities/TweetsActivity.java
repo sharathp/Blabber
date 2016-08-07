@@ -17,7 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
@@ -41,7 +40,6 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
     private Toolbar mToolbar;
     private NavigationView mDrawer;
     private FloatingActionButton mComposeFab;
-    private TextView mToolbarTitleTextView;
 
     private ActionBarDrawerToggle mDrawerToggle;
 
@@ -59,7 +57,6 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
         mDrawerLayout = binding.drawerLayout;
         mDrawer = binding.nvDrawer;
         mComposeFab = binding.fabFilter;
-        mToolbarTitleTextView = binding.tvToolbarTitle;
 
         mComposeFab.setOnClickListener(view -> {
             final FragmentManager fm = getSupportFragmentManager();
@@ -74,8 +71,6 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         setupDrawerContent();
 
         showHome();
@@ -142,7 +137,7 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
         fragmentManager.beginTransaction().replace(R.id.fl_content, fragment).commit();
 
         menuItem.setChecked(true);
-        mToolbarTitleTextView.setText(menuItem.getTitle());
+        getSupportActionBar().setTitle(menuItem.getTitle());
         mDrawerLayout.closeDrawers();
     }
 
