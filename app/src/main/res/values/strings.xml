@@ -19,4 +19,6 @@
     <string name="error_tweet_submit">Unable to submit tweet</string>
     <string name="error_profile_retrieval">Unable to retrieve user profile</string>
     <string name="title_activity_detail">Tweet</string>
+    <string name="text_retweets">RETWEETS</string>
+    <string name="text_likes">LIKES</string>
 </resources>
