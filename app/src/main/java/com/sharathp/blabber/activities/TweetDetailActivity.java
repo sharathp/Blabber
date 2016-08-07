@@ -12,6 +12,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.view.View;
 
 import com.bumptech.glide.Glide;
 import com.sharathp.blabber.BlabberApplication;
@@ -57,14 +58,36 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
     }
 
     private void bindTweet() {
-        mBinding.tvRealName.setText(mTweetWithUser.getUserRealName());
-        mBinding.tvScreenName.setText("@" + mTweetWithUser.getUserScreenName());
+        String userName = mTweetWithUser.getUserRealName();
+        String screenName = mTweetWithUser.getUserScreenName();
+        String profileImageUrl = mTweetWithUser.getUserImageUrl();
+
+        if (mTweetWithUser.getRetweetedUserName() != null) {
+            // show retweeted & image,
+            mBinding.ivRetweetImage.setVisibility(View.VISIBLE);
+            mBinding.tvRetweeted.setVisibility(View.VISIBLE);
+
+            userName = mTweetWithUser.getRetweetedUserName();
+            screenName = mTweetWithUser.getRetweetedScreenName();
+            profileImageUrl = mTweetWithUser.getRetweetedProfileImageUrl();
+
+            // TODO - compare self to check who retweeted and then use "You" if self retweeted
+            mBinding.tvRetweeted.setText(String.format(getResources().getString(R.string.str_pattern_retweeted_name), mTweetWithUser.getUserRealName()));
+        } else {
+            // hide retweeted & image
+            mBinding.ivRetweetImage.setVisibility(View.GONE);
+            mBinding.tvRetweeted.setVisibility(View.GONE);
+        }
+
+
+        mBinding.tvRealName.setText(userName);
+        mBinding.tvScreenName.setText("@" + screenName);
         mBinding.tvTime.setText(BlabberDateUtils.getDetailPageTime(new Date(mTweetWithUser.getCreatedAt())));
         mBinding.tvContent.setText(mTweetWithUser.getText());
 
         Glide.clear(mBinding.ivProfileImage);
 
-        ImageUtils.loadImage(this, mBinding.ivProfileImage, mTweetWithUser.getUserImageUrl());
+        ImageUtils.loadImage(this, mBinding.ivProfileImage, profileImageUrl);
         setLikes();
         setRetweets();
 
