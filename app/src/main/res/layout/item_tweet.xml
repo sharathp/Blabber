@@ -30,7 +30,7 @@
         android:id="@id/iv_profile_image"
         android:layout_width="@dimen/profile_width"
         android:layout_height="@dimen/profile_height"
-        android:layout_marginLeft="@dimen/margin_normal"/>
+        android:layout_marginLeft="@dimen/space_content"/>
 
     <TextView
         android:id="@+id/tv_real_name"
