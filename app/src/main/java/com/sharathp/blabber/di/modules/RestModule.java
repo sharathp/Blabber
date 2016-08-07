@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
-import com.sharathp.blabber.util.DateUtils;
+import com.sharathp.blabber.util.BlabberDateUtils;
 
 import javax.inject.Singleton;
 
@@ -21,7 +21,7 @@ public class RestModule {
     @Singleton
     public Gson provideGson() {
         return new GsonBuilder()
-                .setDateFormat(DateUtils.DATE_FORMAT_TWITTER)
+                .setDateFormat(BlabberDateUtils.DATE_FORMAT_TWITTER)
                 .create();
     }
 
