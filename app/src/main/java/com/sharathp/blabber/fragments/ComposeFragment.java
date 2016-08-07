@@ -12,13 +12,32 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+import com.loopj.android.http.TextHttpResponseHandler;
+import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentComposeBinding;
+import com.sharathp.blabber.repositories.rest.TwitterClient;
+import com.sharathp.blabber.repositories.rest.resources.UserResource;
+
+import javax.inject.Inject;
+
+import cz.msebera.android.httpclient.Header;
 
 public class ComposeFragment extends DialogFragment {
     private FragmentComposeBinding mBinding;
     private int mMaxCharacterCount;
+
+    private ComposeCallback mCallback;
+
+    @Inject
+    Gson mGson;
+
+    @Inject
+    TwitterClient mTwitterClient;
 
     public static ComposeFragment createInstance() {
         return new ComposeFragment();
@@ -28,6 +47,7 @@ public class ComposeFragment extends DialogFragment {
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMaxCharacterCount = Integer.parseInt(getString(R.string.max_characters_tweet));
+        BlabberApplication.from(getActivity()).getComponent().inject(this);
     }
 
     @Override
@@ -78,6 +98,30 @@ public class ComposeFragment extends DialogFragment {
                 // no-op
             }
         });
+
+        mBinding.btnSubmit.setOnClickListener(v -> submitTweet());
+
+        // dismiss the screen on tapping close
+        mBinding.ivClose.setOnClickListener(v -> dismiss());
+    }
+
+    @Override
+    public void onActivityCreated(final Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        // TODO - save user details into preferences instead of calling every time
+        mTwitterClient.getLoggedInUserDetails(new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers, final String responseString, final Throwable throwable) {
+                Toast.makeText(getActivity(), R.string.error_profile_retrieval, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
+                final UserResource userResource = mGson.fromJson(responseString, UserResource.class);
+                loadLoggedInUserDetails(userResource);
+            }
+        });
     }
 
     @Override
@@ -90,5 +134,58 @@ public class ComposeFragment extends DialogFragment {
         getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
         // Call super onResume after sizing
         super.onResume();
+    }
+
+    public void setCallback(final ComposeCallback callback) {
+        mCallback = callback;
+    }
+
+    private void submitTweet() {
+        // show spinner
+        mBinding.flLoading.setVisibility(View.VISIBLE);
+        // disable edittext to dismiss keyboard
+        mBinding.etTweetContent.setEnabled(false);
+
+        final String tweet = mBinding.etTweetContent.getText().toString();
+
+        mTwitterClient.submitTweet(tweet, null, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers, final String responseString, final Throwable throwable) {
+                // hide spinner
+                mBinding.flLoading.setVisibility(View.GONE);
+
+                // enable edit text again
+                mBinding.etTweetContent.setEnabled(true);
+
+                // give feedback to the user
+                Toast.makeText(getActivity(), R.string.error_tweet_submit, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
+                dismiss();
+
+                if (mCallback != null) {
+                    mCallback.onTweetSubmitted(tweet);
+                }
+            }
+        });
+    }
+
+    private void loadLoggedInUserDetails(final UserResource loggedInUser) {
+        loadProfileImage(loggedInUser.getProfileImageUrl());
+    }
+
+    private void loadProfileImage(final String profileImageUrl) {
+        Glide.with(getActivity())
+                .load(profileImageUrl)
+                .fitCenter()
+                .placeholder(R.drawable.ic_progress_indeterminate)
+                .error(R.drawable.ic_error)
+                .into(mBinding.ivProfileImage);
+    }
+
+    public interface ComposeCallback {
+        void onTweetSubmitted(final String tweet);
     }
 }
