@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class TweetResource {
 
-    @SerializedName("id")
+    @SerializedName("id_str")
     long id;
 
     @SerializedName("favorited")
@@ -25,7 +25,7 @@ public class TweetResource {
     @SerializedName("in_reply_to_screen_name")
     String inReplyToScreenName;
 
-    @SerializedName("in_reply_to_status_id")
+    @SerializedName("in_reply_to_status_id_str")
     long inReplyToStatusId;
 
     @SerializedName("text")

@@ -48,12 +48,37 @@
                 android:layout_above="@+id/divider_action_container"
                 android:layout_below="@id/ll_top_bar">
 
-                <EditText
-                    android:id="@+id/et_tweet_content"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
-                    android:hint="@string/hint_compose_tweet"/>
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/iv_down_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow_downward"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tv_reply_to"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/iv_down_icon"
+                        android:layout_alignTop="@id/iv_down_icon"
+                        android:textColor="@color/compose_reply_to_text"
+                        android:visibility="gone" />
+
+                    <EditText
+                        android:id="@+id/et_tweet_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_below="@id/iv_down_icon"
+                        android:layout_marginTop="@dimen/space_content"
+                        android:layout_alignWithParentIfMissing="true"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/hint_compose_tweet"/>
+
+                </RelativeLayout>
             </ScrollView>
 
             <View

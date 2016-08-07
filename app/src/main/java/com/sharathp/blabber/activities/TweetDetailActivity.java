@@ -70,7 +70,7 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
 
         mBinding.ivReplyAction.setOnClickListener(view -> {
             final FragmentManager fm = getSupportFragmentManager();
-            final ComposeFragment composeFragment = ComposeFragment.createInstance();
+            final ComposeFragment composeFragment = ComposeFragment.createInstance(mTweetWithUser);
             composeFragment.setStyle(DialogFragment.STYLE_NO_FRAME, R.style.Dialog_FullScreen);
             composeFragment.show(fm, "compose_fragment");
             composeFragment.setCallback(this);

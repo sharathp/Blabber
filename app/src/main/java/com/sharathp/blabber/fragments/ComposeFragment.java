@@ -19,6 +19,7 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentComposeBinding;
+import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
 import com.sharathp.blabber.repositories.rest.resources.UserResource;
 import com.sharathp.blabber.util.ImageUtils;
@@ -28,9 +29,11 @@ import javax.inject.Inject;
 import cz.msebera.android.httpclient.Header;
 
 public class ComposeFragment extends DialogFragment {
+    public static String ARG_REPLY_TO_TWEET = ComposeFragment.class.getSimpleName() + ":REPLY_TO_TWEET";
 
     private FragmentComposeBinding mBinding;
     private int mMaxCharacterCount;
+    private TweetWithUser mReplyTo;
 
     private ComposeCallback mCallback;
 
@@ -41,7 +44,17 @@ public class ComposeFragment extends DialogFragment {
     TwitterClient mTwitterClient;
 
     public static ComposeFragment createInstance() {
-        return new ComposeFragment();
+        return createInstance(null);
+    }
+
+    public static ComposeFragment createInstance(final TweetWithUser tweetWithUser) {
+        final ComposeFragment fragment = new ComposeFragment();
+        if (tweetWithUser != null) {
+            final Bundle args = new Bundle();
+            args.putParcelable(ARG_REPLY_TO_TWEET, tweetWithUser);
+            fragment.setArguments(args);
+        }
+        return fragment;
     }
 
     @Override
@@ -49,6 +62,10 @@ public class ComposeFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         mMaxCharacterCount = Integer.parseInt(getString(R.string.max_characters_tweet));
         BlabberApplication.from(getActivity()).getComponent().inject(this);
+
+        if (getArguments() != null) {
+            mReplyTo = getArguments().getParcelable(ARG_REPLY_TO_TWEET);
+        }
     }
 
     @Override
@@ -100,6 +117,14 @@ public class ComposeFragment extends DialogFragment {
             }
         });
 
+        if (mReplyTo != null) {
+            mBinding.tvReplyTo.setVisibility(View.VISIBLE);
+            mBinding.ivDownIcon.setVisibility(View.VISIBLE);
+            mBinding.tvReplyTo.setText(String.format(getResources().getString(R.string.str_pattern_reply_to), mReplyTo.getUserRealName()));
+            mBinding.etTweetContent.setText("@" + mReplyTo.getUserScreenName() + " ");
+            mBinding.etTweetContent.setSelection(mBinding.etTweetContent.getText().length());
+        }
+
         mBinding.btnSubmit.setOnClickListener(v -> submitTweet());
 
         // dismiss the screen on tapping close
@@ -149,7 +174,13 @@ public class ComposeFragment extends DialogFragment {
 
         final String tweet = mBinding.etTweetContent.getText().toString();
 
-        mTwitterClient.submitTweet(tweet, null, new TextHttpResponseHandler() {
+        Long inReplyToStatusId = null;
+
+        if (mReplyTo != null) {
+            inReplyToStatusId = mReplyTo.getId();
+        }
+
+        mTwitterClient.submitTweet(tweet, inReplyToStatusId, new TextHttpResponseHandler() {
             @Override
             public void onFailure(final int statusCode, final Header[] headers, final String responseString, final Throwable throwable) {
                 // hide spinner

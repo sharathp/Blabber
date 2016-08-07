@@ -13,6 +13,7 @@
     <color name="close_compose">@color/color_twitter_blue</color>
     <color name="compose_tweet_character_count">#899AA7</color>
     <color name="compose_tweet_character_count_max_reached">#FF0000</color>
+    <color name="compose_reply_to_text">#B6B6B6</color>
 
     <color name="action_tweet_disabled">#6abff2</color>
     <color name="action_tweet_enabled">@color/color_twitter_blue</color>
