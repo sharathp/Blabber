@@ -143,21 +143,21 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/iv_reply"
+                        android:id="@+id/iv_reply_action"
                         android:layout_width="@dimen/detail_action_width"
                         android:layout_height="@dimen/detail_action_height"
                         android:layout_weight="1"
                         android:src="@drawable/ic_reply"/>
 
                     <ImageView
-                        android:id="@+id/iv_retweet"
+                        android:id="@+id/iv_retweet_action"
                         android:layout_width="@dimen/detail_action_width"
                         android:layout_height="@dimen/detail_action_height"
                         android:layout_weight="1"
                         android:src="@drawable/ic_retweet"/>
 
                     <ImageView
-                        android:id="@+id/iv_like"
+                        android:id="@+id/iv_like_action"
                         android:layout_width="@dimen/detail_action_width"
                         android:layout_height="@dimen/detail_action_height"
                         android:layout_weight="1"
