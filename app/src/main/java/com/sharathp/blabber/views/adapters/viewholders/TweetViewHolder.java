@@ -60,13 +60,34 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
     }
 
     public final void bindTweet() {
-        mRealNameTextView.setText(item.getUserRealName());
-        mScreenNameTextView.setText("@" + item.getUserScreenName());
+        String userName = item.getUserRealName();
+        String screenName = item.getUserScreenName();
+        String profileImageUrl = item.getUserImageUrl();
+
+        if (item.getRetweetedUserName() != null) {
+            // show retweeted & image,
+            mRetweetImageView.setVisibility(View.VISIBLE);
+            mRetweetedName.setVisibility(View.VISIBLE);
+
+            userName = item.getRetweetedUserName();
+            screenName = item.getRetweetedScreenName();
+            profileImageUrl = item.getRetweetedProfileImageUrl();
+
+            // TODO - compare self to check who retweeted and then use "You" if self retweeted
+            mRetweetedName.setText(String.format(itemView.getContext().getResources().getString(R.string.str_pattern_retweeted_name), item.getUserRealName()));
+        } else {
+            // hide retweeted & image
+            mRetweetImageView.setVisibility(View.GONE);
+            mRetweetedName.setVisibility(View.GONE);
+        }
+
+        mRealNameTextView.setText(userName);
+        mScreenNameTextView.setText("@" + screenName);
         mTimeTextView.setText(BlabberDateUtils.getTwitterRelativeTime(new Date(item.getCreatedAt())));
         mContentTextView.setText(item.getText());
 
         Glide.clear(mProfileImageView);
 
-        ImageUtils.loadImage(itemView.getContext(), mProfileImageView, item.getUserImageUrl());
+        ImageUtils.loadImage(itemView.getContext(), mProfileImageView, profileImageUrl);
     }
 }
