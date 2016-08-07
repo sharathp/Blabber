@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/ll_top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/margin_compose"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_close"
+                android:layout_width="@dimen/close_compose_width"
+                android:layout_height="@dimen/close_compose_height"
+                android:src="@drawable/ic_close"/>
+
+            <!-- Dummy view to expand in the middle  -->
+            <View
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent" />
+
+            <com.sharathp.blabber.views.DynamicHeightImageView
+                android:id="@+id/iv_profile_image"
+                android:layout_width="@dimen/profile_width"
+                android:layout_height="@dimen/profile_height"
+                android:src="@drawable/ic_error"/>
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/margin_compose"
+            android:layout_marginRight="@dimen/margin_compose"
+            android:layout_marginTop="@dimen/margin_compose"
+            android:layout_marginBottom="@dimen/margin_compose"
+            android:layout_above="@+id/divider_action_container"
+            android:layout_below="@id/ll_top_bar">
+
+            <EditText
+                android:id="@+id/et_tweet_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:hint="@string/hint_compose_tweet"/>
+        </ScrollView>
+
+        <View
+            android:id="@+id/divider_action_container"
+            style="@style/DialogDivider"
+            android:layout_above="@+id/ll_action_container"/>
+
+        <LinearLayout
+            android:id="@id/ll_action_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="right|center_vertical"
+            android:layout_margin="@dimen/margin_compose"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_tweet_character_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/space_content"
+                android:focusableInTouchMode="true"
+                android:text="@string/max_characters_tweet"
+                android:textColor="@color/compose_tweet_character_count"/>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="3dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="3dp"
+                android:text="@string/action_tweet"
+                android:textAllCaps="false"
+                android:enabled="false"
+                android:textColor="@android:color/white"
+                app:backgroundTint="@color/action_tweet"/>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+</layout>

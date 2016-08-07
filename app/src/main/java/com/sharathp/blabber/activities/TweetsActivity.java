@@ -1,5 +1,6 @@
 package com.sharathp.blabber.activities;
 
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -15,10 +16,10 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityTweetsBinding;
+import com.sharathp.blabber.fragments.ComposeFragment;
 import com.sharathp.blabber.fragments.TimelineFragment;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.service.UpdateTimelineService;
@@ -31,7 +32,7 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback {
     private DrawerLayout mDrawerLayout;
     private Toolbar mToolbar;
     private NavigationView mDrawer;
-    private FloatingActionButton mFiltersFab;
+    private FloatingActionButton mComposeFab;
     private TextView mToolbarTitleTextView;
 
     private ActionBarDrawerToggle mDrawerToggle;
@@ -44,10 +45,15 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback {
         mToolbar = binding.toolbar;
         mDrawerLayout = binding.drawerLayout;
         mDrawer = binding.nvDrawer;
-        mFiltersFab = binding.fabFilter;
+        mComposeFab = binding.fabFilter;
         mToolbarTitleTextView = binding.tvToolbarTitle;
 
-        mFiltersFab.setOnClickListener(view -> Toast.makeText(this, "Compose new tweet", Toast.LENGTH_LONG).show() );
+        mComposeFab.setOnClickListener(view -> {
+            final FragmentManager fm = getSupportFragmentManager();
+            final ComposeFragment composeFragment = ComposeFragment.createInstance();
+            composeFragment.show(fm, "compose_fragment");
+        });
+        mComposeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.fab_compose_background)));
 
         mDrawerToggle = setupDrawerToggle();
         mDrawerLayout.addDrawerListener(mDrawerToggle);
@@ -105,13 +111,13 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback {
         switch(menuItem.getItemId()) {
             case R.id.nav_home: {
                 fragment = TimelineFragment.createInstance();
-                mFiltersFab.setVisibility(View.VISIBLE);
+                mComposeFab.setVisibility(View.VISIBLE);
                 break;
             }
             default: {
                 Log.w(TAG, "Unknown menu item: " + menuItem.getTitle());
                 fragment = TimelineFragment.createInstance();
-                mFiltersFab.setVisibility(View.VISIBLE);
+                mComposeFab.setVisibility(View.VISIBLE);
                 break;
             }
         }

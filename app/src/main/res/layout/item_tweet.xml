@@ -69,6 +69,8 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/tv_real_name"
         android:layout_below="@id/tv_real_name"
+        android:autoLink="all"
+        android:linksClickable="true"
         android:textSize="@dimen/text_content"
         android:textColor="@color/text_content"/>
 

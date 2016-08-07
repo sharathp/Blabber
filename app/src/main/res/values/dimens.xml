@@ -8,8 +8,8 @@
     <dimen name="margin_content">72dp</dimen>
     <dimen name="space_content">8dp</dimen>
 
-    <dimen name="profile_width">36dp</dimen>
-    <dimen name="profile_height">36dp</dimen>
+    <dimen name="profile_width">48dp</dimen>
+    <dimen name="profile_height">48dp</dimen>
 
     <dimen name="retweet_icon_width">8dp</dimen>
     <dimen name="retweet_icon_height">8dp</dimen>
@@ -25,5 +25,9 @@
     <dimen name="loading_indicator_inner_radius">15dp</dimen>
     <dimen name="loading_indicator_thickness">3dp</dimen>
     <dimen name="fab_elevation">4dp</dimen>
+    <dimen name="close_compose_width">24dp</dimen>
+    <dimen name="close_compose_height">24dp</dimen>
+
+    <dimen name="margin_compose">8dp</dimen>
 
 </resources>
