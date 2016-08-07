@@ -1,5 +1,6 @@
 package com.sharathp.blabber.activities;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
@@ -146,8 +147,9 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
     }
 
     @Override
-    public void onTweetSelected(TweetWithUser tweet) {
-
+    public void onTweetSelected(final TweetWithUser tweet) {
+        final Intent intent = TweetDetailActivity.createIntent(this, tweet);
+        startActivity(intent);
     }
 
     @Override

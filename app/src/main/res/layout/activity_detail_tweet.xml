@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="8dp"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/ToolbarTheme"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/space_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/iv_retweet_image"
+                    android:layout_width="@dimen/retweet_icon_width"
+                    android:layout_height="@dimen/retweet_icon_height"
+                    android:layout_above="@+id/iv_profile_image"
+                    android:layout_alignRight="@id/iv_profile_image"
+                    android:layout_alignTop="@+id/tv_retweeted"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@id/tv_retweeted"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/tv_screen_name"
+                    android:layout_above="@id/tv_screen_name"
+                    android:textSize="@dimen/text_retweeted"
+                    android:textColor="@color/text_retweeted"
+                    android:visibility="gone"/>
+
+                <com.sharathp.blabber.views.DynamicHeightImageView
+                    android:id="@id/iv_profile_image"
+                    android:layout_width="@dimen/profile_width"
+                    android:layout_height="@dimen/profile_height"
+                    android:layout_marginLeft="@dimen/space_content"/>
+
+                <TextView
+                    android:id="@+id/tv_real_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/margin_content"
+                    android:layout_alignTop="@id/iv_profile_image"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/text_real_name"
+                    android:textColor="@color/text_real_name"/>
+
+                <TextView
+                    android:id="@id/tv_screen_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_real_name"
+                    android:layout_alignLeft="@id/tv_real_name"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="@dimen/text_screen_name"
+                    android:textColor="@color/text_screen_name"/>
+
+                <TextView
+                    android:id="@+id/tv_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/iv_profile_image"
+                    android:layout_below="@id/iv_profile_image"
+                    android:layout_marginTop="@dimen/detail_text_margin_top"
+                    android:autoLink="all"
+                    android:linksClickable="true"
+                    android:textColorLink="@color/text_color_link"
+                    android:lineSpacingMultiplier="1.1"
+                    android:textSize="@dimen/detail_text_content"
+                    android:textColor="@color/text_content"/>
+
+                <TextView
+                    android:id="@+id/tv_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/tv_content"
+                    android:layout_below="@id/tv_content"
+                    android:layout_marginTop="@dimen/detail_time_margin_top"
+                    android:singleLine="true"
+                    android:textSize="@dimen/text_time"
+                    android:textColor="@color/text_time"/>
+
+            </RelativeLayout>
+        </ScrollView>
+
+    </LinearLayout>
+</layout>

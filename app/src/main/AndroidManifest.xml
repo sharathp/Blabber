@@ -36,7 +36,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.TweetsActivity" />
+        <activity android:name=".activities.TweetsActivity"
+            android:launchMode="singleTop"/>
+
+        <activity android:name=".activities.TweetDetailActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.TweetsActivity" />
+
+        </activity>
 
         <service android:name=".service.UpdateTimelineService"
             android:exported="false" />
