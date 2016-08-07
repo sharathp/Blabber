@@ -5,6 +5,15 @@
     <color name="color_primary_light">#0084B4</color>
     <color name="color_accent">#FF4081</color>
 
+    <color name="color_divider">#B6B6B6</color>
+
+    <color name="color_twitter_blue">#1DA1F2</color>
+
+    <color name="fab_compose_background">@color/color_twitter_blue</color>
+    <color name="close_compose">@color/color_twitter_blue</color>
+    <color name="action_tweet">@color/color_twitter_blue</color>
+    <color name="compose_tweet_character_count">#899AA7</color>
+
     <color name="text_retweeted">#899AA7</color>
     <color name="text_real_name">#292F33</color>
     <color name="text_screen_name">#899AA7</color>
