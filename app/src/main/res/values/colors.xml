@@ -27,5 +27,10 @@
 
     <color name="text_color_link">@color/color_twitter_blue</color>
 
+    <color name="detail_text_likes_retweets_numbers">#292F33</color>
+
+    <color name="action_normal">#AAB8C2</color>
+    <color name="action_retweet_active">#19CF86</color>
+    <color name="action_like_active">#E81C4F</color>
 
 </resources>

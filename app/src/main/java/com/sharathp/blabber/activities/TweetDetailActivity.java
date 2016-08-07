@@ -6,6 +6,10 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 
 import com.bumptech.glide.Glide;
 import com.sharathp.blabber.R;
@@ -48,5 +52,26 @@ public class TweetDetailActivity  extends AppCompatActivity {
         Glide.clear(mBinding.ivProfileImage);
 
         ImageUtils.loadImage(this, mBinding.ivProfileImage, mTweetWithUser.getUserImageUrl());
+        setLikes();
+        setRetweets();
+    }
+
+    private void setLikes() {
+        final SpannableStringBuilder spannable = getSpannedText(getString(R.string.text_retweets), mTweetWithUser.getFavoriteCount());
+        mBinding.tvLikes.setText(spannable);
+    }
+
+    private void setRetweets() {
+        final SpannableStringBuilder spannable = getSpannedText(getString(R.string.text_likes), mTweetWithUser.getFavoriteCount());
+        mBinding.tvRetweets.setText(spannable);
+    }
+
+    private SpannableStringBuilder getSpannedText(final String label, final int count) {
+        final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+        spannableStringBuilder.append(Integer.toString(count));
+        spannableStringBuilder.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableStringBuilder.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.detail_text_likes_retweets_numbers)), 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableStringBuilder.append(" ").append(label);
+        return spannableStringBuilder;
     }
 }
