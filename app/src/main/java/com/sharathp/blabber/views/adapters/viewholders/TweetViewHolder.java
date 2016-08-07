@@ -7,7 +7,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.models.TweetWithUser;
-import com.sharathp.blabber.util.DateUtils;
+import com.sharathp.blabber.util.BlabberDateUtils;
 import com.sharathp.blabber.views.DynamicHeightImageView;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 import com.yahoo.squidb.recyclerview.SquidViewHolder;
@@ -61,7 +61,7 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
     public final void bindTweet() {
         mRealNameTextView.setText(item.getUserRealName());
         mScreenNameTextView.setText("@" + item.getUserScreenName());
-        mTimeTextView.setText(DateUtils.getRelativeTime(new Date(item.getCreatedAt())));
+        mTimeTextView.setText(BlabberDateUtils.getTwitterRelativeTime(new Date(item.getCreatedAt())));
         mContentTextView.setText(item.getText());
 
         Glide.clear(mProfileImageView);
