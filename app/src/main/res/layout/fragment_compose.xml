@@ -79,15 +79,15 @@
                 android:id="@+id/btn_submit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="3dp"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:paddingTop="3dp"
+                android:paddingBottom="@dimen/tweet_button_vertical_padding"
+                android:paddingLeft="@dimen/tweet_button_horizontal_padding"
+                android:paddingRight="@dimen/tweet_button_horizontal_padding"
+                android:paddingTop="@dimen/tweet_button_vertical_padding"
                 android:text="@string/action_tweet"
                 android:textAllCaps="false"
                 android:enabled="false"
                 android:textColor="@android:color/white"
-                app:backgroundTint="@color/action_tweet"/>
+                app:backgroundTint="@color/btn_tweet"/>
 
         </LinearLayout>
     </RelativeLayout>

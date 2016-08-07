@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -51,7 +52,9 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback {
         mComposeFab.setOnClickListener(view -> {
             final FragmentManager fm = getSupportFragmentManager();
             final ComposeFragment composeFragment = ComposeFragment.createInstance();
+            composeFragment.setStyle(DialogFragment.STYLE_NO_FRAME, R.style.Dialog_FullScreen);
             composeFragment.show(fm, "compose_fragment");
+
         });
         mComposeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.fab_compose_background)));
 

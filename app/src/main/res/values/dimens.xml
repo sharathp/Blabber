@@ -29,5 +29,7 @@
     <dimen name="close_compose_height">24dp</dimen>
 
     <dimen name="margin_compose">8dp</dimen>
+    <dimen name="tweet_button_horizontal_padding">5dp</dimen>
+    <dimen name="tweet_button_vertical_padding">3dp</dimen>
 
 </resources>
