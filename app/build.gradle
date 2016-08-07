@@ -18,6 +18,8 @@ ext {
     STETHO_VERSION = "1.3.1"
     OAUTH_HANDLER_VERSION = "1.0.0"
     EVENT_BUS_VERSION = "3.0.0"
+    GLIDE_TRANSFORMATIONS_VERSION = "2.0.1"
+    CALLIGRAPHY_VERSION = "2.2.0"
 }
 
 apt {
@@ -82,7 +84,11 @@ dependencies {
     compile "com.jakewharton:butterknife:$BUTTERKNIFE_VERSION"
     apt "com.jakewharton:butterknife-compiler:$BUTTERKNIFE_VERSION"
     compile "com.google.code.gson:gson:$GSON_VERSION"
+
     compile "com.github.bumptech.glide:glide:$GLIDE_VERSION"
+    compile "jp.wasabeef:glide-transformations:$GLIDE_TRANSFORMATIONS_VERSION"
+
+    compile "uk.co.chrisjenx:calligraphy:$CALLIGRAPHY_VERSION"
 
     // squidb
     compile "com.yahoo.squidb:squidb:$SQUIDB_VERSION"

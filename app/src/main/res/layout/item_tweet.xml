@@ -2,7 +2,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/activity_horizontal_margin">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:paddingTop="@dimen/space_content"
+                android:paddingBottom="@dimen/space_content"
+                android:paddingRight="@dimen/space_content"
+                tools:ignore="MissingPrefix">
     <ImageView
         android:id="@+id/iv_retweet_image"
         android:layout_width="@dimen/retweet_icon_width"
@@ -36,6 +40,7 @@
         android:layout_alignTop="@id/iv_profile_image"
         android:singleLine="true"
         android:ellipsize="end"
+        android:textStyle="bold"
         android:textSize="@dimen/text_real_name"
         android:textColor="@color/text_real_name"/>
 

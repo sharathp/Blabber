@@ -25,6 +25,7 @@ import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.util.NetworkUtils;
+import com.sharathp.blabber.views.DividerItemDecoration;
 import com.sharathp.blabber.views.EndlessRecyclerViewScrollListener;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 import com.sharathp.blabber.views.adapters.TweetsAdapter;
@@ -163,6 +164,7 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
         mLayoutManager = new LinearLayoutManager(getActivity());
         moviesRecyclerView.setAdapter(mTweetsAdapter);
         moviesRecyclerView.setLayoutManager(mLayoutManager);
+        moviesRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
         mBinding.srlTweets.setOnRefreshListener(() -> deleteAndRefreshTweets());
         mEndlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(mLayoutManager) {
             @Override
