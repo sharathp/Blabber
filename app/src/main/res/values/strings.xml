@@ -21,5 +21,7 @@
     <string name="title_activity_detail">Tweet</string>
     <string name="text_retweets">RETWEETS</string>
     <string name="text_likes">LIKES</string>
+
     <string name="str_pattern_reply_to">Replying to %s</string>
+    <string name="str_pattern_retweeted_name">%s Retweeted</string>
 </resources>
