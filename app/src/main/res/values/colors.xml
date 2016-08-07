@@ -11,8 +11,11 @@
 
     <color name="fab_compose_background">@color/color_twitter_blue</color>
     <color name="close_compose">@color/color_twitter_blue</color>
-    <color name="action_tweet">@color/color_twitter_blue</color>
     <color name="compose_tweet_character_count">#899AA7</color>
+    <color name="compose_tweet_character_count_max_reached">#FF0000</color>
+
+    <color name="action_tweet_disabled">#6abff2</color>
+    <color name="action_tweet_enabled">@color/color_twitter_blue</color>
 
     <color name="text_retweeted">#899AA7</color>
     <color name="text_real_name">#292F33</color>
@@ -21,4 +24,6 @@
     <color name="text_embedded_user_name">#0084B4</color>
     <color name="text_content">#292F33</color>
     <color name="text_time">#899AA7</color>
+
+
 </resources>
