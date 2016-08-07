@@ -18,6 +18,8 @@ public class TweetWithUserSpec {
 
     public static final Property.IntegerProperty FAVORITE_COUNT = Tweet.FAVORITE_COUNT;
 
+    public static final Property.IntegerProperty RETWEET_COUNT = Tweet.RETWEET_COUNT;
+
     public static final Property.BooleanProperty FAVORITED = Tweet.FAVORITED;
 
     public static final Property.BooleanProperty RETWEETED = Tweet.RETWEETED;

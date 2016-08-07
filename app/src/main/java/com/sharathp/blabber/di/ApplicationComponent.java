@@ -1,5 +1,6 @@
 package com.sharathp.blabber.di;
 
+import com.sharathp.blabber.activities.TweetDetailActivity;
 import com.sharathp.blabber.activities.TweetsActivity;
 import com.sharathp.blabber.di.modules.ApplicationModule;
 import com.sharathp.blabber.di.modules.DatabaseModule;
@@ -23,4 +24,6 @@ public interface ApplicationComponent {
     void inject(ComposeFragment composeFragment);
 
     void inject(TweetsActivity tweetsActivity);
+
+    void inject(TweetDetailActivity tweetDetailActivity);
 }
