@@ -22,6 +22,7 @@ import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.repositories.LocalPreferencesDAO;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
 import com.sharathp.blabber.util.ImageUtils;
+import com.sharathp.blabber.util.NetworkUtils;
 
 import javax.inject.Inject;
 
@@ -145,6 +146,11 @@ public class ComposeFragment extends DialogFragment {
     }
 
     private void submitTweet() {
+        if (! NetworkUtils.isOnline(getActivity())) {
+            Toast.makeText(getContext(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
+            return;
+        }
+
         // show spinner
         mBinding.flLoading.setVisibility(View.VISIBLE);
         // disable edittext to dismiss keyboard
