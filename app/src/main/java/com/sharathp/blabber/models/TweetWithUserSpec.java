@@ -38,6 +38,8 @@ public class TweetWithUserSpec {
 
     public static final Property.IntegerProperty IMAGE_HEIGHT = Tweet.IMAGE_HEIGHT;
 
+    public static final Property.DoubleProperty VIDEO_ASPECT_RATIO = Tweet.VIDEO_ASPECT_RATIO;
+
     // user info
 
     public static final Property.LongProperty USER_ID = User.ID;

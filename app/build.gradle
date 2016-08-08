@@ -20,6 +20,7 @@ ext {
     EVENT_BUS_VERSION = "3.0.0"
     GLIDE_TRANSFORMATIONS_VERSION = "2.0.1"
     CALLIGRAPHY_VERSION = "2.2.0"
+    FENSTER_VERSION = "0.0.2"
 }
 
 apt {
@@ -89,6 +90,8 @@ dependencies {
     compile "jp.wasabeef:glide-transformations:$GLIDE_TRANSFORMATIONS_VERSION"
 
     compile "uk.co.chrisjenx:calligraphy:$CALLIGRAPHY_VERSION"
+
+    compile "com.malmstein:fenster:$FENSTER_VERSION"
 
     // squidb
     compile "com.yahoo.squidb:squidb:$SQUIDB_VERSION"

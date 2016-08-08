@@ -12,9 +12,11 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.view.Display;
 import android.view.View;
 
 import com.bumptech.glide.Glide;
+import com.malmstein.fenster.controller.MediaFensterPlayerController;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityDetailTweetBinding;
@@ -57,6 +59,29 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
         bindTweet();
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        if (mTweetWithUser.getVideoUrl() == null) {
+            return;
+        }
+
+        // readjust height & play in next frame
+        mBinding.flVideo.post(() -> {
+            final Display display = getWindowManager().getDefaultDisplay();
+            final int width = display.getWidth();
+            final int newHeight = (int) ((double) width / mTweetWithUser.getVideoAspectRatio());
+            mBinding.flVideo.getLayoutParams().height = newHeight;
+
+            //  play video
+            mBinding.playVideoTexture.setMediaController(mBinding.playVideoController);
+            mBinding.playVideoTexture.setVideo(mTweetWithUser.getVideoUrl(),
+                    MediaFensterPlayerController.DEFAULT_VIDEO_START);
+            mBinding.playVideoTexture.start();
+        });
+    }
+
     private void bindTweet() {
         String userName = mTweetWithUser.getUserRealName();
         String screenName = mTweetWithUser.getUserScreenName();
@@ -94,6 +119,12 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
             ImageUtils.loadImage(this, mBinding.ivMediaImage, mTweetWithUser.getImageUrl());
         } else {
             mBinding.ivMediaImage.setVisibility(View.GONE);
+        }
+
+        if (mTweetWithUser.getVideoUrl() != null) {
+            mBinding.flVideo.setVisibility(View.VISIBLE);
+        } else {
+            mBinding.flVideo.setVisibility(View.GONE);
         }
 
         setLikes();

@@ -24,10 +24,10 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="@dimen/detail_top_padding"
             android:paddingBottom="@dimen/space_content"
             android:paddingLeft="@dimen/space_content"
-            android:paddingRight="@dimen/space_content">
+            android:paddingRight="@dimen/space_content"
+            android:paddingTop="@dimen/detail_top_padding">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -46,19 +46,19 @@
                     android:id="@+id/tv_retweeted"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignLeft="@+id/tv_real_name"
                     android:layout_alignBottom="@id/iv_retweet_image"
-                    android:textSize="@dimen/text_retweeted"
+                    android:layout_alignLeft="@+id/tv_real_name"
                     android:textColor="@color/text_retweeted"
+                    android:textSize="@dimen/text_retweeted"
                     android:visibility="gone"/>
 
                 <com.sharathp.blabber.views.DynamicHeightImageView
                     android:id="@id/iv_profile_image"
                     android:layout_width="@dimen/profile_width"
                     android:layout_height="@dimen/profile_height"
-                    android:layout_marginLeft="@dimen/space_content"
+                    android:layout_alignWithParentIfMissing="true"
                     android:layout_below="@id/iv_retweet_image"
-                    android:layout_alignWithParentIfMissing="true"/>
+                    android:layout_marginLeft="@dimen/space_content"/>
 
                 <TextView
                     android:id="@+id/tv_real_name"
@@ -67,22 +67,22 @@
                     android:layout_alignTop="@id/iv_profile_image"
                     android:layout_marginLeft="@dimen/margin_content"
                     android:layout_marginTop="@dimen/space_content"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:textStyle="bold"
+                    android:singleLine="true"
+                    android:textColor="@color/text_real_name"
                     android:textSize="@dimen/text_real_name"
-                    android:textColor="@color/text_real_name"/>
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/tv_screen_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_real_name"
                     android:layout_alignLeft="@id/tv_real_name"
-                    android:singleLine="true"
+                    android:layout_below="@id/tv_real_name"
                     android:ellipsize="end"
-                    android:textSize="@dimen/text_screen_name"
-                    android:textColor="@color/text_screen_name"/>
+                    android:singleLine="true"
+                    android:textColor="@color/text_screen_name"
+                    android:textSize="@dimen/text_screen_name"/>
 
                 <TextView
                     android:id="@+id/tv_content"
@@ -92,19 +92,43 @@
                     android:layout_below="@id/iv_profile_image"
                     android:layout_marginTop="@dimen/detail_text_margin_top"
                     android:autoLink="all"
-                    android:linksClickable="true"
-                    android:textColorLink="@color/text_color_link"
                     android:lineSpacingMultiplier="1.1"
-                    android:textSize="@dimen/detail_text_content"
-                    android:textColor="@color/text_content"/>
+                    android:linksClickable="true"
+                    android:textColor="@color/text_content"
+                    android:textColorLink="@color/text_color_link"
+                    android:textSize="@dimen/detail_text_content"/>
+
+                <FrameLayout
+                    android:id="@+id/fl_video"
+                    android:layout_below="@id/tv_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_content">
+
+                    <com.malmstein.fenster.view.FensterVideoView
+                        android:id="@+id/play_video_texture"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fitsSystemWindows="true"
+                        app:scaleType="scaleToFit"
+                        android:keepScreenOn="true"/>
+
+                    <com.malmstein.fenster.controller.MediaFensterPlayerController
+                        android:id="@+id/play_video_controller"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:animateLayoutChanges="true"
+                        android:fitsSystemWindows="true"/>
+                </FrameLayout>
 
                 <com.sharathp.blabber.views.DynamicHeightImageView
                     android:id="@+id/iv_media_image"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/fl_video"
                     android:layout_marginLeft="@dimen/space_content"
                     android:layout_marginTop="@dimen/space_content"
-                    android:layout_below="@id/tv_content"
                     android:adjustViewBounds="true"
                     android:visibility="gone"/>
 
@@ -116,43 +140,43 @@
                     android:layout_below="@id/iv_media_image"
                     android:layout_marginTop="@dimen/detail_time_margin_top"
                     android:singleLine="true"
-                    android:textSize="@dimen/text_time"
-                    android:textColor="@color/text_time"/>
+                    android:textColor="@color/text_time"
+                    android:textSize="@dimen/text_time"/>
 
                 <View
                     android:id="@+id/divider_time"
                     style="@style/Divider"
                     android:layout_below="@id/tv_time"
-                    android:layout_marginTop="@dimen/detail_divider_margin"
-                    android:layout_marginBottom="@dimen/detail_divider_margin"/>
+                    android:layout_marginBottom="@dimen/detail_divider_margin"
+                    android:layout_marginTop="@dimen/detail_divider_margin"/>
 
                 <TextView
                     android:id="@+id/tv_likes"
-                    android:layout_marginLeft="@dimen/space_content"
-                    android:layout_below="@id/divider_time"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/divider_time"
+                    android:layout_marginLeft="@dimen/space_content"/>
 
                 <TextView
                     android:id="@+id/tv_retweets"
-                    android:layout_toRightOf="@id/tv_likes"
-                    android:layout_marginLeft="@dimen/space_content"
-                    android:layout_alignBaseline="@id/tv_likes"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@id/tv_likes"
+                    android:layout_marginLeft="@dimen/space_content"
+                    android:layout_toRightOf="@id/tv_likes"/>
 
                 <View
                     android:id="@+id/divider_tweets_likes"
                     style="@style/Divider"
                     android:layout_below="@id/tv_likes"
-                    android:layout_marginTop="@dimen/detail_divider_margin"
-                    android:layout_marginBottom="@dimen/detail_divider_margin"/>
+                    android:layout_marginBottom="@dimen/detail_divider_margin"
+                    android:layout_marginTop="@dimen/detail_divider_margin"/>
 
                 <LinearLayout
                     android:id="@+id/ll_action_container"
-                    android:layout_below="@id/divider_tweets_likes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/divider_tweets_likes"
                     android:orientation="horizontal">
 
                     <ImageView

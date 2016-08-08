@@ -179,6 +179,8 @@ public class TweetResource {
 
             if (TYPE_VIDEO.equals(mediaType)) {
                 tweet.setVideoUrl(getVideoUrl(mediaResource.getVideoInfo()));
+                final int[] aspectRatio = mediaResource.getVideoInfo().getAspectRatio();
+                tweet.setVideoAspectRatio((double) aspectRatio[0] / (double) aspectRatio[1]);
             }
         }
 
