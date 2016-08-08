@@ -39,15 +39,17 @@ public class TweetSpec {
     @ColumnSpec(constraints = "NOT NULL")
     public long userId;
 
+    // image
     public String imageUrl;
 
     public int imageWidth;
 
     public int imageHeight;
 
+    // video
     public String videoUrl;
 
-    public int[] videoAspectRatio;
+    public double videoAspectRatio;
 
     // retweet related data
     // TODO - use a foreign key here instead

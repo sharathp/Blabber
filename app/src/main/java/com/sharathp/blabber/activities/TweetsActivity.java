@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
@@ -143,6 +146,10 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
 
     @Override
     public void onTweetSelected(final TweetWithUser tweet) {
+        if (! requestWritePermissions()) {
+            return;
+        }
+
         final Intent intent = TweetDetailActivity.createIntent(this, tweet);
         startActivity(intent);
     }
@@ -157,5 +164,19 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
     @Override
     public void onTweetSubmitted(String tweet) {
         mEventBus.post(new TweetRefreshRequiredEvent());
+    }
+
+    private boolean requestWritePermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Settings.System.canWrite(this)) {
+                return true;
+            } else {
+                Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        }
+        return false;
     }
 }
