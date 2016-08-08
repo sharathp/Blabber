@@ -46,8 +46,8 @@ The following **additional** features are implemented:
 
 * [x] Display count of likes/favorites and retweets both on the list and detail screens
 * [x] FAB and toolbar react to scrolling
-* [x] (Technical) Used retro-lambda
-* [x] (Technical) Used Started Background Service to load & save tweets
+* [x] \(Technical\) Used retro-lambda
+* [x] \(Technical\) Used Started Background Service to load & save tweets
 
 ## Video Walkthrough
 
