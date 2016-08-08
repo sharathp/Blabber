@@ -42,6 +42,9 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
     @BindView(R.id.tv_content)
     TextView mContentTextView;
 
+    @BindView(R.id.iv_media_image)
+    DynamicHeightImageView mMediaImageView;
+
 
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -87,7 +90,15 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
         mContentTextView.setText(item.getText());
 
         Glide.clear(mProfileImageView);
+        ImageUtils.loadProfileImage(itemView.getContext(), mProfileImageView, profileImageUrl);
 
-        ImageUtils.loadImage(itemView.getContext(), mProfileImageView, profileImageUrl);
+        if (item.getImageUrl() != null) {
+            mMediaImageView.setVisibility(View.VISIBLE);
+            mMediaImageView.setHeightRatio((float) item.getImageHeight() / (float) item.getImageWidth());
+            Glide.clear(mMediaImageView);
+            ImageUtils.loadImage(itemView.getContext(), mMediaImageView, item.getImageUrl());
+        } else {
+            mMediaImageView.setVisibility(View.GONE);
+        }
     }
 }

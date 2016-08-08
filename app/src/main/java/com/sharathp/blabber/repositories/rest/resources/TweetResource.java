@@ -173,6 +173,8 @@ public class TweetResource {
 
             if (TYPE_IMAGE.equals(mediaType)) {
                 tweet.setImageUrl(mediaResource.getMediaUrl());
+                tweet.setImageWidth(mediaResource.getSizes().getMedium().getWidth());
+                tweet.setImageHeight(mediaResource.getSizes().getMedium().getHeight());
             }
 
             if (TYPE_VIDEO.equals(mediaType)) {

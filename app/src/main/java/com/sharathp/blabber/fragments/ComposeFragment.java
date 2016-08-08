@@ -205,7 +205,7 @@ public class ComposeFragment extends DialogFragment {
     }
 
     private void loadLoggedInUserDetails(final UserResource loggedInUser) {
-        ImageUtils.loadImage(getActivity(), mBinding.ivProfileImage, loggedInUser.getProfileImageUrl());
+        ImageUtils.loadProfileImage(getActivity(), mBinding.ivProfileImage, loggedInUser.getProfileImageUrl());
     }
 
     public interface ComposeCallback {

@@ -30,6 +30,16 @@ public class TweetWithUserSpec {
 
     public static final Property.LongProperty CREATED_AT = Tweet.CREATED_AT;
 
+    public static final Property.StringProperty IMAGE_URL = Tweet.IMAGE_URL;
+
+    public static final Property.StringProperty VIDEO_URL = Tweet.VIDEO_URL;
+
+    public static final Property.IntegerProperty IMAGE_WIDTH = Tweet.IMAGE_WIDTH;
+
+    public static final Property.IntegerProperty IMAGE_HEIGHT = Tweet.IMAGE_HEIGHT;
+
+    // user info
+
     public static final Property.LongProperty USER_ID = User.ID;
 
     public static final Property.StringProperty USER_REAL_NAME = User.REAL_NAME;
