@@ -14,14 +14,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentComposeBinding;
 import com.sharathp.blabber.models.TweetWithUser;
+import com.sharathp.blabber.repositories.LocalPreferencesDAO;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
-import com.sharathp.blabber.repositories.rest.resources.UserResource;
 import com.sharathp.blabber.util.ImageUtils;
 
 import javax.inject.Inject;
@@ -38,14 +37,10 @@ public class ComposeFragment extends DialogFragment {
     private ComposeCallback mCallback;
 
     @Inject
-    Gson mGson;
-
-    @Inject
     TwitterClient mTwitterClient;
 
-    public static ComposeFragment createInstance() {
-        return createInstance(null);
-    }
+    @Inject
+    LocalPreferencesDAO mLocalPreferencesDAO;
 
     public static ComposeFragment createInstance(final TweetWithUser tweetWithUser) {
         final ComposeFragment fragment = new ComposeFragment();
@@ -129,25 +124,8 @@ public class ComposeFragment extends DialogFragment {
 
         // dismiss the screen on tapping close
         mBinding.ivClose.setOnClickListener(v -> dismiss());
-    }
 
-    @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        // TODO - save user details into preferences instead of calling every time
-        mTwitterClient.getLoggedInUserDetails(new TextHttpResponseHandler() {
-            @Override
-            public void onFailure(final int statusCode, final Header[] headers, final String responseString, final Throwable throwable) {
-                Toast.makeText(getActivity(), R.string.error_profile_retrieval, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
-                final UserResource userResource = mGson.fromJson(responseString, UserResource.class);
-                loadLoggedInUserDetails(userResource);
-            }
-        });
+        ImageUtils.loadProfileImage(getActivity(), mBinding.ivProfileImage, mLocalPreferencesDAO.getUserProfileImageUrl());
     }
 
     @Override
@@ -202,10 +180,6 @@ public class ComposeFragment extends DialogFragment {
                 }
             }
         });
-    }
-
-    private void loadLoggedInUserDetails(final UserResource loggedInUser) {
-        ImageUtils.loadProfileImage(getActivity(), mBinding.ivProfileImage, loggedInUser.getProfileImageUrl());
     }
 
     public interface ComposeCallback {
