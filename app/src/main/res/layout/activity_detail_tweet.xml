@@ -98,12 +98,22 @@
                     android:textSize="@dimen/detail_text_content"
                     android:textColor="@color/text_content"/>
 
+                <com.sharathp.blabber.views.DynamicHeightImageView
+                    android:id="@+id/iv_media_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/space_content"
+                    android:layout_marginTop="@dimen/space_content"
+                    android:layout_below="@id/tv_content"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"/>
+
                 <TextView
                     android:id="@+id/tv_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@id/tv_content"
-                    android:layout_below="@id/tv_content"
+                    android:layout_below="@id/iv_media_image"
                     android:layout_marginTop="@dimen/detail_time_margin_top"
                     android:singleLine="true"
                     android:textSize="@dimen/text_time"

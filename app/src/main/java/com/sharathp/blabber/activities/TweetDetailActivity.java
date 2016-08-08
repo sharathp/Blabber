@@ -79,15 +79,23 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
             mBinding.tvRetweeted.setVisibility(View.GONE);
         }
 
-
         mBinding.tvRealName.setText(userName);
         mBinding.tvScreenName.setText("@" + screenName);
         mBinding.tvTime.setText(BlabberDateUtils.getDetailPageTime(new Date(mTweetWithUser.getCreatedAt())));
         mBinding.tvContent.setText(mTweetWithUser.getText());
 
         Glide.clear(mBinding.ivProfileImage);
+        ImageUtils.loadProfileImage(this, mBinding.ivProfileImage, profileImageUrl);
 
-        ImageUtils.loadImage(this, mBinding.ivProfileImage, profileImageUrl);
+        if (mTweetWithUser.getImageUrl() != null) {
+            mBinding.ivMediaImage.setVisibility(View.VISIBLE);
+            mBinding.ivMediaImage.setHeightRatio((float) mTweetWithUser.getImageHeight() / (float) mTweetWithUser.getImageWidth());
+            Glide.clear(mBinding.ivMediaImage);
+            ImageUtils.loadImage(this, mBinding.ivMediaImage, mTweetWithUser.getImageUrl());
+        } else {
+            mBinding.ivMediaImage.setVisibility(View.GONE);
+        }
+
         setLikes();
         setRetweets();
 

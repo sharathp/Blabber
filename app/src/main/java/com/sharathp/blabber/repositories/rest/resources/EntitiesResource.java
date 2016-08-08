@@ -29,6 +29,8 @@ public class EntitiesResource {
         @SerializedName("video_info")
         VideoInfoResource videoInfo;
 
+        SizesResource sizes;
+
         public long getId() {
             return id;
         }
@@ -60,9 +62,20 @@ public class EntitiesResource {
         public void setVideoInfo(VideoInfoResource videoInfo) {
             this.videoInfo = videoInfo;
         }
+
+        public SizesResource getSizes() {
+            return sizes;
+        }
+
+        public void setSizes(SizesResource sizes) {
+            this.sizes = sizes;
+        }
     }
 
     public static class VideoInfoResource {
+        @SerializedName("aspect_ratio")
+        int[] aspectRatio;
+
         List<VideoInfoVariantResource> variants;
 
         public List<VideoInfoVariantResource> getVariants() {
@@ -71,6 +84,14 @@ public class EntitiesResource {
 
         public void setVariants(List<VideoInfoVariantResource> variants) {
             this.variants = variants;
+        }
+
+        public int[] getAspectRatio() {
+            return aspectRatio;
+        }
+
+        public void setAspectRatio(int[] aspectRatio) {
+            this.aspectRatio = aspectRatio;
         }
     }
 
@@ -94,6 +115,42 @@ public class EntitiesResource {
 
         public void setUrl(String url) {
             this.url = url;
+        }
+    }
+
+    public static class SizesResource {
+        SizeResource medium;
+
+        public SizeResource getMedium() {
+            return medium;
+        }
+
+        public void setMedium(SizeResource medium) {
+            this.medium = medium;
+        }
+    }
+
+    public static class SizeResource {
+        @SerializedName("w")
+        int width;
+
+        @SerializedName("h")
+        int height;
+
+        public int getWidth() {
+            return width;
+        }
+
+        public void setWidth(int width) {
+            this.width = width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public void setHeight(int height) {
+            this.height = height;
         }
     }
 }

@@ -41,7 +41,13 @@ public class TweetSpec {
 
     public String imageUrl;
 
+    public int imageWidth;
+
+    public int imageHeight;
+
     public String videoUrl;
+
+    public int[] videoAspectRatio;
 
     // retweet related data
     // TODO - use a foreign key here instead
