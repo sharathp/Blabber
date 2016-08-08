@@ -45,6 +45,20 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
     @BindView(R.id.iv_media_image)
     DynamicHeightImageView mMediaImageView;
 
+    @BindView(R.id.iv_reply_action)
+    ImageView mReplyActionImageView;
+
+    @BindView(R.id.iv_retweet_action)
+    ImageView mRetweetActionImageView;
+
+    @BindView(R.id.tv_retweet_count)
+    TextView mRetweetCountTextView;
+
+    @BindView(R.id.iv_like_action)
+    ImageView mLikeActionImageView;
+
+    @BindView(R.id.tv_like_count)
+    TextView mLikeCountTextView;
 
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -55,10 +69,22 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
         }
     };
 
+    private View.OnClickListener mReplyClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(final View view) {
+            if (mTweetCallback != null) {
+                mTweetCallback.onTweetReplied(item);
+            }
+        }
+    };
+
     public TweetViewHolder(final View itemView, final TweetCallback tweetCallback) {
         super(itemView, new TweetWithUser());
         ButterKnife.bind(this, itemView);
+
         itemView.setOnClickListener(mOnClickListener);
+        mReplyActionImageView.setOnClickListener(mReplyClickListener);
+
         mTweetCallback = tweetCallback;
     }
 
@@ -99,6 +125,23 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
             ImageUtils.loadImage(itemView.getContext(), mMediaImageView, item.getImageUrl());
         } else {
             mMediaImageView.setVisibility(View.GONE);
+        }
+
+        setLikes();
+        setRetweets();
+    }
+
+    private void setLikes() {
+        mLikeCountTextView.setText(Integer.toString(item.getFavoriteCount()));
+        if (item.getFavorited()) {
+            mLikeActionImageView.setImageResource(R.drawable.ic_like_active);
+        }
+    }
+
+    private void setRetweets() {
+        mRetweetCountTextView.setText(Integer.toString(item.getRetweetCount()));
+        if (item.getRetweeted()) {
+            mRetweetActionImageView.setImageResource(R.drawable.ic_retweet_active);
         }
     }
 }
