@@ -61,13 +61,7 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
         mDrawer = binding.nvDrawer;
         mComposeFab = binding.fabFilter;
 
-        mComposeFab.setOnClickListener(view -> {
-            final FragmentManager fm = getSupportFragmentManager();
-            final ComposeFragment composeFragment = ComposeFragment.createInstance();
-            composeFragment.setStyle(DialogFragment.STYLE_NO_FRAME, R.style.Dialog_FullScreen);
-            composeFragment.show(fm, "compose_fragment");
-            composeFragment.setCallback(this);
-        });
+        mComposeFab.setOnClickListener(view -> openCompose(null));
         mComposeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.fab_compose_background)));
 
         mDrawerToggle = setupDrawerToggle();
@@ -162,8 +156,21 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
     }
 
     @Override
-    public void onTweetSubmitted(String tweet) {
+    public void onTweetSubmitted(final String tweet) {
         mEventBus.post(new TweetRefreshRequiredEvent());
+    }
+
+    @Override
+    public void onTweetReplied(final TweetWithUser tweet) {
+        openCompose(tweet);
+    }
+
+    private void openCompose(final TweetWithUser tweetWithUser) {
+        final FragmentManager fm = getSupportFragmentManager();
+        final ComposeFragment composeFragment = ComposeFragment.createInstance(tweetWithUser);
+        composeFragment.setStyle(DialogFragment.STYLE_NO_FRAME, R.style.Dialog_FullScreen);
+        composeFragment.show(fm, "compose_fragment");
+        composeFragment.setCallback(this);
     }
 
     private boolean requestWritePermissions() {

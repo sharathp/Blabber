@@ -37,8 +37,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.TweetsActivity"
-            android:launchMode="singleTop"/>
+        <activity android:name=".activities.TweetsActivity"/>
 
         <activity android:name=".activities.TweetDetailActivity" >
             <meta-data

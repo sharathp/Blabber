@@ -41,4 +41,9 @@
     <dimen name="detail_action_height">24dp</dimen>
     <dimen name="detail_action_width">24dp</dimen>
 
+    <dimen name="list_action_height">18dp</dimen>
+    <dimen name="list_action_width">18dp</dimen>
+    <dimen name="text_list_action_count">12sp</dimen>
+
+
 </resources>
