@@ -14,6 +14,8 @@
     <dimen name="retweet_icon_width">16dp</dimen>
     <dimen name="retweet_icon_height">16dp</dimen>
 
+    <dimen name="text_drawer_title">30sp</dimen>
+
     <dimen name="text_retweeted">14sp</dimen>
     <dimen name="text_real_name">16sp</dimen>
     <dimen name="text_screen_name">14sp</dimen>
