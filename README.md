@@ -44,7 +44,7 @@ The following **bonus** features are implemented:
 
 The following **additional** features are implemented:
 
-* [x] Displaying count of likes/favorites and retweets
+* [x] Display count of likes/favorites and retweets both on the list and detail screens.
 * [x] FAB and toolbar react to scrolling
 
 ## Video Walkthrough
@@ -62,7 +62,15 @@ Describe any challenges encountered while building the app.
 ## Open-source libraries used
 
 - [Android Async HTTP](https://github.com/loopj/android-async-http) - Simple asynchronous HTTP requests with JSON parsing
-- [Picasso](http://square.github.io/picasso/) - Image loading and caching library for Android
+- [Glide](https://github.com/bumptech/glide) - An image loading and caching library for Android focused on smooth scrolling
+- [Butterknife](http://jakewharton.github.io/butterknife/) - Field and method binding for Android views
+- [Gson](https://github.com/google/gson) - A Java serialization/deserialization library that can convert Java Objects into JSON and back
+- [Dagger](http://google.github.io/dagger/) - Compile-time dependency injection framework for Android
+- [SquiDB](https://github.com/yahoo/squidb) - SquiDB is a SQLite database library for Android and iOS
+- [Parceler](https://github.com/johncarl81/parceler) - Android Parcelables made easy through code generation
+- [Stetho](http://facebook.github.io/stetho/) - A debug bridge for Android applications
+- [EventBus](https://github.com/greenrobot/EventBus) - Android optimized event bus that simplifies communication between Activities, Fragments, Threads, Services, etc. Less code, better quality.
+- [fenster](https://github.com/malmstein/fenster) - A library to display videos in a TextureView using a custom MediaPlayer controller
 
 ## License
 
