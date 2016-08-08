@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="192dp"
-              android:background="?attr/colorPrimaryDark"
+              android:background="@color/color_primary_light"
+              android:orientation="vertical"
               android:padding="16dp"
+              android:gravity="center"
               android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
-        android:id="@+id/iv_launcher_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginRight="36dp"
+        android:id="@+id/iv_profile_image"
+        android:layout_width="@dimen/profile_width"
+        android:layout_height="@dimen/profile_height"
+        android:layout_marginTop="@dimen/drawer_margin_top"
         android:src="@drawable/ic_error"/>
 
     <TextView
-        android:id="@+id/tv_drawer_title"
+        android:id="@+id/tv_profile_name"
+        android:layout_marginTop="@dimen/space_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/iv_launcher_image"
-        android:layout_alignParentBottom="true"
+        android:gravity="center"
         android:textSize="@dimen/text_drawer_title"
-        android:text="@string/app_name"
         android:textColor="@android:color/white"
         android:textStyle="bold"/>
 
-</RelativeLayout>
+</LinearLayout>
