@@ -3,6 +3,9 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="login_horizontal_margin">32dp</dimen>
+    <dimen name="login_vertical_margin">32dp</dimen>
+
 
     <dimen name="margin_normal">16dp</dimen>
     <dimen name="margin_content">80dp</dimen>
@@ -13,6 +16,15 @@
 
     <dimen name="retweet_icon_width">16dp</dimen>
     <dimen name="retweet_icon_height">16dp</dimen>
+
+    <dimen name="login_bird_height">40dp</dimen>
+    <dimen name="login_bird_width">40dp</dimen>
+    <dimen name="login_bird_margin_top">40dp</dimen>
+    <dimen name="text_login_welcome">32sp</dimen>
+    <dimen name="login_button_vertical_padding">15dp</dimen>
+    <dimen name="login_button_horizontal_padding">35dp</dimen>
+    <dimen name="login_welcome_margin_top">75dp</dimen>
+    <dimen name="login_welcome_button_top">125dp</dimen>
 
     <dimen name="text_drawer_title">30sp</dimen>
 
