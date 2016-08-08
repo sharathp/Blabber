@@ -1,19 +1,49 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".LoginActivity" >
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/color_twitter_blue"
+                android:paddingBottom="@dimen/login_vertical_margin"
+                android:paddingLeft="@dimen/login_horizontal_margin"
+                android:paddingRight="@dimen/login_horizontal_margin"
+                android:paddingTop="@dimen/login_vertical_margin"
+                tools:context=".activities.LoginActivity">
 
-    <Button
+    <ImageView
+        android:id="@+id/iv_tweet"
+        android:layout_marginTop="@dimen/login_bird_margin_top"
+        android:layout_width="@dimen/login_bird_width"
+        android:layout_height="@dimen/login_bird_height"
+        android:src="@drawable/ic_bird"/>
+
+
+    <TextView
+        android:id="@+id/tv_welcome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/login_welcome_margin_top"
+        android:layout_below="@id/iv_tweet"
+        android:textStyle="bold"
+        android:textSize="@dimen/text_login_welcome"
+        android:textColor="@android:color/white"
+        android:layout_centerVertical="true"
+        android:text="@string/welcome_to_blabber"/>
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_margin="20dp"
+        android:paddingTop="@dimen/login_button_vertical_padding"
+        android:paddingBottom="@dimen/login_button_vertical_padding"
+        android:paddingRight="@dimen/login_button_horizontal_padding"
+        android:paddingLeft="@dimen/login_button_horizontal_padding"
+        android:layout_marginTop="@dimen/login_welcome_button_top"
+        android:layout_below="@id/tv_welcome"
+        android:textStyle="bold"
+        android:textColor="@color/color_twitter_blue"
         android:onClick="loginToRest"
-        android:text="@string/login_label" />
+        android:background="@android:color/white"
+        android:text="@string/login_label"/>
 
 </RelativeLayout>
