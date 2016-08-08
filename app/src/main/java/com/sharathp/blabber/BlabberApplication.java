@@ -15,18 +15,8 @@ public class BlabberApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
-		initFonts();
 		initDependencyInjection();
 		initStetho();
-	}
-
-	private void initFonts() {
-//		CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-//				.setDefaultFontPath("fonts/helveticaneue.ttf")
-//				.setFontAttrId(R.attr.fontPath)
-//				.build()
-//		);
 	}
 
 	private void initDependencyInjection() {
