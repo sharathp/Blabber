@@ -135,6 +135,8 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
         mLikeCountTextView.setText(Integer.toString(item.getFavoriteCount()));
         if (item.getFavorited()) {
             mLikeActionImageView.setImageResource(R.drawable.ic_like_active);
+        } else {
+            mLikeActionImageView.setImageResource(R.drawable.ic_like);
         }
     }
 
@@ -142,6 +144,8 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
         mRetweetCountTextView.setText(Integer.toString(item.getRetweetCount()));
         if (item.getRetweeted()) {
             mRetweetActionImageView.setImageResource(R.drawable.ic_retweet_active);
+        } else {
+            mRetweetActionImageView.setImageResource(R.drawable.ic_retweet);
         }
     }
 }
