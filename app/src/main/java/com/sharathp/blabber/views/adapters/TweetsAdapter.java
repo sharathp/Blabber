@@ -50,7 +50,7 @@ public class TweetsAdapter extends SquidRecyclerAdapter<TweetWithUser, SquidView
                 return new TweetViewHolder(tweetView, mTweetCallback);
             }
             case TYPE_LOADING: {
-                final View view = inflater.inflate(R.layout.view_articles_loading, parent, false);
+                final View view = inflater.inflate(R.layout.view_tweets_loading, parent, false);
                 return new LoadingItemHolder(view);
             }
             default: {

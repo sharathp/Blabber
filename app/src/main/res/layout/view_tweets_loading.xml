@@ -2,8 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/color_primary_light">
+    android:layout_height="@dimen/tweets_loading_indicator_height">
 
     <ProgressBar
         android:id="@+id/pb_loading_progress_bar"
@@ -15,10 +14,9 @@
     <TextView
         android:id="@+id/tv_article_end_message"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/loading_indicator_height"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/message_end_of_tweets"
-        android:textColor="@color/color_primary_dark"
         android:textStyle="bold"
         android:visibility="gone"/>
 </FrameLayout>
