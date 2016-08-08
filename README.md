@@ -44,8 +44,10 @@ The following **bonus** features are implemented:
 
 The following **additional** features are implemented:
 
-* [x] Display count of likes/favorites and retweets both on the list and detail screens.
+* [x] Display count of likes/favorites and retweets both on the list and detail screens
 * [x] FAB and toolbar react to scrolling
+* [x] (Technical) Used retro-lambda
+* [x] (Technical) Used Started Background Service to load & save tweets
 
 ## Video Walkthrough
 
@@ -57,7 +59,8 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-Describe any challenges encountered while building the app.
+* Twitter API is convoluted, spent a lot of time understanding the API
+* Getting to play videos seem to be a bit tricky 
 
 ## Open-source libraries used
 
@@ -71,6 +74,7 @@ Describe any challenges encountered while building the app.
 - [Stetho](http://facebook.github.io/stetho/) - A debug bridge for Android applications
 - [EventBus](https://github.com/greenrobot/EventBus) - Android optimized event bus that simplifies communication between Activities, Fragments, Threads, Services, etc. Less code, better quality.
 - [fenster](https://github.com/malmstein/fenster) - A library to display videos in a TextureView using a custom MediaPlayer controller
+- [retrolambda](https://github.com/orfjackal/retrolambda) - Backport of Java 8's lambda expressions to Java 7, 6 and 5
 
 ## License
 

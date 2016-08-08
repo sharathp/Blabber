@@ -231,8 +231,9 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
                 intent.setData(Uri.parse("package:" + getPackageName()));
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }
