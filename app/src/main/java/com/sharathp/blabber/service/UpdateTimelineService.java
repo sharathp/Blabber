@@ -1,15 +1,10 @@
 package com.sharathp.blabber.service;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.IBinder;
-import android.os.Looper;
+import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -17,6 +12,7 @@ import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
+import com.sharathp.blabber.events.StatusSubmittedEvent;
 import com.sharathp.blabber.events.TweetsPastRetrievedEvent;
 import com.sharathp.blabber.events.TweetsRefreshedEvent;
 import com.sharathp.blabber.models.Tweet;
@@ -38,19 +34,22 @@ import javax.inject.Inject;
 import cz.msebera.android.httpclient.Header;
 
 
-public class UpdateTimelineService extends Service {
+public class UpdateTimelineService extends BaseService {
     private static final String TAG = UpdateTimelineService.class.getSimpleName();
-    private static final String EXTRA_UPDATE_TYPE = UpdateTimelineService.class.getName() + ".UPDATE_TYPE";
+    private static final String EXTRA_OPERATION_TYPE = UpdateTimelineService.class.getName() + ".OPERATION_TYPE";
+    private static final String EXTRA_STATUS = UpdateTimelineService.class.getName() + ".EXTRA_STATUS";
+    private static final String EXTRA_IN_REPLY_TO_STATUS_ID = UpdateTimelineService.class.getName() + ".IN_REPLY_TO_STATUS_ID";
 
-    @IntDef({UPDATE_TYPE_LATEST, UPDATE_TYPE_PAST, UPDATE_TYPE_DELETE_EXISTING_AND_LATEST})
-    private @interface UpdateType {}
+    @IntDef({OP_REFRESH_LATEST, OP_REFRESH_PAST, OP_DELETE_EXISTING_AND_REFRESH,
+            OP_TWEET, OP_TWEET_FAVORITE, OP_TWEET_UNFAVORITE})
+    private @interface OperationType {}
 
-    private static final int UPDATE_TYPE_LATEST = 1;
-    private static final int UPDATE_TYPE_PAST = 2;
-    private static final int UPDATE_TYPE_DELETE_EXISTING_AND_LATEST = 3;
-
-    private volatile HandlerThread mHandlerThread;
-    private ServiceHandler mServiceHandler;
+    private static final int OP_REFRESH_LATEST = 1;
+    private static final int OP_REFRESH_PAST = 2;
+    private static final int OP_DELETE_EXISTING_AND_REFRESH = 3;
+    private static final int OP_TWEET = 4;
+    private static final int OP_TWEET_FAVORITE = 5;
+    private static final int OP_TWEET_UNFAVORITE = 6;
 
     @Inject
     EventBus mEventBus;
@@ -65,21 +64,30 @@ public class UpdateTimelineService extends Service {
     Gson mGson;
 
     public static Intent createIntentForLatestItems(final Context context) {
-        return createIntent(context, UPDATE_TYPE_LATEST);
+        return createIntent(context, OP_REFRESH_LATEST);
     }
 
     public static Intent createIntentForPastItems(final Context context) {
-        return createIntent(context, UPDATE_TYPE_PAST);
+        return createIntent(context, OP_REFRESH_PAST);
     }
 
     public static Intent createIntentForDeleteExistingItemsAndRetrieveLasterItems(final Context context) {
-        return createIntent(context, UPDATE_TYPE_DELETE_EXISTING_AND_LATEST);
+        return createIntent(context, OP_DELETE_EXISTING_AND_REFRESH);
+    }
+
+    public static Intent createIntentForTweeting(final Context context, final String status, final Long inReplyToStatusId) {
+        final Intent intent = createIntent(context, OP_TWEET);
+        intent.putExtra(EXTRA_STATUS, status);
+        if (inReplyToStatusId != null) {
+            intent.putExtra(EXTRA_IN_REPLY_TO_STATUS_ID, inReplyToStatusId);
+        }
+        return intent;
     }
 
     // from and to are exclusive
-    private static Intent createIntent(final Context context, @UpdateType final int updateType) {
+    private static Intent createIntent(final Context context, @OperationType final int operationType) {
         final Intent intent = new Intent(context, UpdateTimelineService.class);
-        intent.putExtra(EXTRA_UPDATE_TYPE, updateType);
+        intent.putExtra(EXTRA_OPERATION_TYPE, operationType);
         return intent;
     }
 
@@ -87,178 +95,171 @@ public class UpdateTimelineService extends Service {
     public void onCreate() {
         super.onCreate();
         BlabberApplication.from(this).getComponent().inject(this);
-
-        // An Android handler thread internally operates on a looper.
-        mHandlerThread = new HandlerThread("UpdateTimelineService.HandlerThread");
-        mHandlerThread.start();
-        // An Android service handler is a handler running on a specific background thread.
-        mServiceHandler = new ServiceHandler(mHandlerThread.getLooper());
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(final Intent intent) {
-        return null;
     }
 
     @Override
-    public int onStartCommand(final Intent intent, final int flags, final int startId) {
+    protected void doHandleMessage(final Message message) {
+        final Bundle intentData = message.getData();
+        final int operationType = intentData.getInt(EXTRA_OPERATION_TYPE, -1);
 
-        if (intent != null) {
-            final int updateType = intent.getIntExtra(EXTRA_UPDATE_TYPE, -1);
-
-            final Message message = Message.obtain();
-            message.what = updateType;
-            mServiceHandler.sendMessage(message);
+        switch (operationType) {
+            case OP_REFRESH_LATEST: {
+                Log.i(TAG, "Retrieved Latest tweets");
+                retrieveLatestTweets(null);
+                break;
+            }
+            case OP_REFRESH_PAST: {
+                Log.i(TAG, "Retrieved past tweets");
+                retrievePastTweets();
+                break;
+            }
+            case OP_DELETE_EXISTING_AND_REFRESH: {
+                Log.i(TAG, "Deleting and retrieving latest tweets");
+                deleteExistingData();
+                retrieveLatestTweets(null);
+                break;
+            }
+            case OP_TWEET: {
+                Log.i(TAG, "Tweeting/Retweeting");
+                final String status = intentData.getString(EXTRA_STATUS);
+                Long inReplyToStatusId = intentData.getLong(EXTRA_IN_REPLY_TO_STATUS_ID, -1);
+                if (inReplyToStatusId == -1) {
+                    inReplyToStatusId = null;
+                }
+                tweet(status, inReplyToStatusId);
+                break;
+            }
+            default: {
+                Log.w(TAG, "Invalid value for: " + EXTRA_OPERATION_TYPE + ": " + operationType);
+            }
         }
-
-        return START_STICKY;
     }
 
-    @Override
-    public void onDestroy() {
-        Log.i(TAG, "Shutting down UpdateTimelineService");
-        // Cleanup service before destruction
-        mHandlerThread.quit();
+    private void tweet(final String status, final Long inReplyToStatusId) {
+        mTwitterClient.submitTweet(status, inReplyToStatusId, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers, final String responseString, final Throwable throwable) {
+                mEventBus.post(new StatusSubmittedEvent(status, false));
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
+                retrieveLatestTweets(new StatusSubmittedEvent(status, true));
+            }
+        });
     }
 
-    final class ServiceHandler extends Handler {
-        ServiceHandler(final Looper looper) {
-            super(looper);
+    private void retrievePastTweets() {
+        final Tweet tweet = mTwitterDAO.getEarliestTweet();
+        Long maxId = null;
+        if (tweet != null) {
+            maxId = tweet.getId();
         }
+        mTwitterClient.getPastTweets(maxId, getPastTweetsResponseHandler());
+    }
 
-        // Define how to handle any incoming messages here
-        @Override
-        public void handleMessage(final Message message) {
-            final int updateType = message.what;
+    private void retrieveLatestTweets(final Object additionalEventToPostOnceComplete) {
+        final Tweet tweet = mTwitterDAO.getLatestTweet();
+        Long sinceId = null;
+        if (tweet != null) {
+            sinceId = tweet.getId();
+        }
+        mTwitterClient.getLatestTweets(sinceId, getRefreshTweetsResponseHandler(additionalEventToPostOnceComplete));
+    }
 
-            switch (updateType) {
-                case UPDATE_TYPE_LATEST: {
-                    Log.i(TAG, "Retrieved Latest tweets");
-                    retrieveLatestTweets();
-                    break;
-                }
-                case UPDATE_TYPE_PAST: {
-                    Log.i(TAG, "Retrieved past tweets");
-                    retrievePastTweets();
-                    break;
-                }
-                case UPDATE_TYPE_DELETE_EXISTING_AND_LATEST: {
-                    Log.i(TAG, "Deleting and retrieving latest tweets");
-                    deleteExistingData();
-                    retrieveLatestTweets();
-                    break;
-                }
-                default: {
-                    Log.w(TAG, "Invalid value for: " + EXTRA_UPDATE_TYPE + ": " + updateType);
-                }
+    private boolean saveTweets(final List<TweetResource> tweetResources) {
+        final List<Tweet> tweets = new ArrayList<>();
+        for (final TweetResource tweetResource : tweetResources) {
+            tweets.add(tweetResource.convertToTweet());
+        }
+        return mTwitterDAO.checkAndInsertTweets(tweets);
+    }
+
+    private boolean saveUsers(final List<TweetResource> tweetResources) {
+        // this will filter the unique users
+        final Map<Long, User> userMap = new HashMap<>();
+        for (final TweetResource tweetResource : tweetResources) {
+            userMap.put(tweetResource.getUser().getId(), tweetResource.getUser().convertToUser());
+        }
+        return mTwitterDAO.checkAndInsertUsers(userMap.values());
+    }
+
+    private void deleteExistingData() {
+        mTwitterDAO.deleteExistingTweets();
+    }
+
+    private boolean saveTweetsAndUsers(final List<TweetResource> tweetResources) {
+        boolean success = true;
+
+        if (!tweetResources.isEmpty()) {
+            success = saveUsers(tweetResources);
+            if (success) {
+                success = saveTweets(tweetResources);
+            }
+
+            if (!success) {
+                Log.i(TAG, "Unable to save tweets");
             }
         }
 
-        private void retrievePastTweets() {
-            final Tweet tweet = mTwitterDAO.getEarliestTweet();
-            Long maxId = null;
-            if (tweet != null) {
-                maxId = tweet.getId();
-            }
-            mTwitterClient.getPastTweets(maxId, getPastTweetsResponseHandler());
-        }
+        return success;
+    }
 
-        private void retrieveLatestTweets() {
-            final Tweet tweet = mTwitterDAO.getLatestTweet();
-            Long sinceId = null;
-            if (tweet != null) {
-                sinceId = tweet.getId();
-            }
-            mTwitterClient.getLatestTweets(sinceId, getRefreshTweetsResponseHandler());
-        }
-
-        private boolean saveTweets(final List<TweetResource> tweetResources) {
-            final List<Tweet> tweets = new ArrayList<>();
-            for (final TweetResource tweetResource: tweetResources) {
-                tweets.add(tweetResource.convertToTweet());
-            }
-            return mTwitterDAO.checkAndInsertTweets(tweets);
-        }
-
-        private boolean saveUsers(final List<TweetResource> tweetResources) {
-            // this will filter the unique users
-            final Map<Long, User> userMap = new HashMap<>();
-            for (final TweetResource tweetResource: tweetResources) {
-                userMap.put(tweetResource.getUser().getId(), tweetResource.getUser().convertToUser());
-            }
-            return mTwitterDAO.checkAndInsertUsers(userMap.values());
-        }
-
-        private void deleteExistingData() {
-            mTwitterDAO.deleteExistingTweets();
-        }
-
-        private boolean saveTweetsAndUsers(final List<TweetResource> tweetResources) {
-            boolean success = true;
-
-            if (! tweetResources.isEmpty()) {
-                success = saveUsers(tweetResources);
-                if (success) {
-                    success = saveTweets(tweetResources);
-                }
-
-                if (!success) {
-                    Log.i(TAG, "Unable to save tweets");
+    private AsyncHttpResponseHandler getRefreshTweetsResponseHandler(final Object additionalEventToPostOnceComplete) {
+        return new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                Log.e(TAG, "Error retrieving tweets: " + responseString, throwable);
+                final TweetsRefreshedEvent tweetsRefreshedEvent = new TweetsRefreshedEvent(0, false);
+                mEventBus.post(tweetsRefreshedEvent);
+                if (additionalEventToPostOnceComplete != null) {
+                    mEventBus.post(additionalEventToPostOnceComplete);
                 }
             }
 
-            return success;
-        }
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers,
+                                  final String responseString) {
+                final Type responseType = new TypeToken<List<TweetResource>>() {
+                }.getType();
+                final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
+                Log.i(TAG, "Retrieved tweets: " + tweetResources.size());
 
-        private AsyncHttpResponseHandler getRefreshTweetsResponseHandler() {
-            return new TextHttpResponseHandler() {
-                @Override
-                public void onFailure(final int statusCode, final Header[] headers,
-                                      final String responseString, final Throwable throwable) {
-                    Log.e(TAG, "Error retrieving tweets: " + responseString, throwable);
-                    final TweetsRefreshedEvent tweetsRefreshedEvent = new TweetsRefreshedEvent(0, false);
-                    mEventBus.post(tweetsRefreshedEvent);
+                boolean success = saveTweetsAndUsers(tweetResources);
+
+                final TweetsRefreshedEvent tweetsRefreshedEvent = new TweetsRefreshedEvent(tweetResources.size(), success);
+                mEventBus.post(tweetsRefreshedEvent);
+                if (additionalEventToPostOnceComplete != null) {
+                    mEventBus.post(additionalEventToPostOnceComplete);
                 }
+            }
+        };
+    }
 
-                @Override
-                public void onSuccess(final int statusCode, final Header[] headers,
-                                      final String responseString) {
-                    final Type responseType = new TypeToken<List<TweetResource>>(){}.getType();
-                    final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
-                    Log.i(TAG, "Retrieved tweets: " + tweetResources.size());
+    private AsyncHttpResponseHandler getPastTweetsResponseHandler() {
+        return new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                Log.e(TAG, "Error retrieving tweets: " + responseString, throwable);
+                final TweetsPastRetrievedEvent tweetsPastRetrievedEvent = new TweetsPastRetrievedEvent(0, false);
+                mEventBus.post(tweetsPastRetrievedEvent);
+            }
 
-                    boolean success = saveTweetsAndUsers(tweetResources);
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers,
+                                  final String responseString) {
+                final Type responseType = new TypeToken<List<TweetResource>>() {
+                }.getType();
+                final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
+                Log.i(TAG, "Retrieved tweets: " + tweetResources.size());
 
-                    final TweetsRefreshedEvent tweetsRefreshedEvent = new TweetsRefreshedEvent(tweetResources.size(), success);
-                    mEventBus.post(tweetsRefreshedEvent);
-                }
-            };
-        }
+                boolean success = saveTweetsAndUsers(tweetResources);
 
-        private AsyncHttpResponseHandler getPastTweetsResponseHandler() {
-            return new TextHttpResponseHandler() {
-                @Override
-                public void onFailure(final int statusCode, final Header[] headers,
-                                      final String responseString, final Throwable throwable) {
-                    Log.e(TAG, "Error retrieving tweets: " + responseString, throwable);
-                    final TweetsPastRetrievedEvent tweetsPastRetrievedEvent = new TweetsPastRetrievedEvent(0, false);
-                    mEventBus.post(tweetsPastRetrievedEvent);
-                }
-
-                @Override
-                public void onSuccess(final int statusCode, final Header[] headers,
-                                      final String responseString) {
-                    final Type responseType = new TypeToken<List<TweetResource>>(){}.getType();
-                    final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
-                    Log.i(TAG, "Retrieved tweets: " + tweetResources.size());
-
-                    boolean success = saveTweetsAndUsers(tweetResources);
-
-                    final TweetsPastRetrievedEvent tweetsPastRetrievedEvent = new TweetsPastRetrievedEvent(tweetResources.size(), success);
-                    mEventBus.post(tweetsPastRetrievedEvent);
-                }
-            };
-        }
+                final TweetsPastRetrievedEvent tweetsPastRetrievedEvent = new TweetsPastRetrievedEvent(tweetResources.size(), success);
+                mEventBus.post(tweetsPastRetrievedEvent);
+            }
+        };
     }
 }
