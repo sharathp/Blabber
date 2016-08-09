@@ -30,10 +30,16 @@ public class TwitterClient extends OAuthBaseClient {
     private static final String REST_CONSUMER_SECRET = BuildConfig.TWITTER_API_SECRET;
     private static final String REST_CALLBACK_URL = "oauth://myblabber";
 
-    private static final String RELATIVE_URL_STATUS = "/statuses/home_timeline.json";
+    private static final String RELATIVE_URL_HOME_TIMELINE = "/statuses/home_timeline.json";
     private static final String RELATIVE_URL_CREDENTIALS = "/account/verify_credentials.json";
     private static final String RELATIVE_URL_STATUS_UPDATE = "/statuses/update.json";
+    private static final String RELATIVE_URL_FAVORITE = "/favorites/create.json";
+    private static final String RELATIVE_URL_UNFAVORITE = "/favorites/destroy.json";
+    private static final String RELATIVE_URL_RETWEET = "/statuses/retweet/%d.json";
+    private static final String RELATIVE_URL_UNRETWEET = "/statuses/unretweet/%d.json";
+    private static final String RELATIVE_URL_STATUS = "/statuses/show/%d.json";
 
+    private static final String REQ_STATUS_ID = "id";
     private static final String REQ_PARAM_MAX_ID = "max_id";
     private static final String REQ_PARAM_SINCE_ID = "since_id";
     private static final String REQ_PARAM_STATUS = "status";
@@ -59,18 +65,49 @@ public class TwitterClient extends OAuthBaseClient {
     }
 
     public void getPastTweets(final Long maxId, final AsyncHttpResponseHandler handler) {
-        final String apiUrl = getApiUrl(RELATIVE_URL_STATUS);
-        final RequestParams requestParams = getRequestParams(maxId, null);
+        final String apiUrl = getApiUrl(RELATIVE_URL_HOME_TIMELINE);
+        final RequestParams requestParams = getTweetsRequestParams(maxId, null);
         client.get(apiUrl, requestParams, handler);
     }
 
     public void getLatestTweets(final Long sinceId, final AsyncHttpResponseHandler handler) {
-        final String apiUrl = getApiUrl(RELATIVE_URL_STATUS);
-        final RequestParams requestParams = getRequestParams(null, sinceId);
+        final String apiUrl = getApiUrl(RELATIVE_URL_HOME_TIMELINE);
+        final RequestParams requestParams = getTweetsRequestParams(null, sinceId);
         client.get(apiUrl, requestParams, handler);
     }
 
-    private RequestParams getRequestParams(final Long maxId, final Long sinceId) {
+    public void getTweet(final Long statusId, final AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(String.format(RELATIVE_URL_STATUS, statusId));
+        client.post(apiUrl, getStatusRequestParams(statusId), handler);
+    }
+
+    public void unretweet(final Long statusId, final AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(String.format(RELATIVE_URL_RETWEET, statusId));
+        client.post(apiUrl, getStatusRequestParams(statusId), handler);
+    }
+
+    public void retweet(final Long statusId, final AsyncHttpResponseHandler handler ) {
+        final String apiUrl = getApiUrl(String.format(RELATIVE_URL_UNRETWEET, statusId));
+        client.post(apiUrl, getStatusRequestParams(statusId), handler);
+    }
+
+    public void favorite(final Long statusId, final AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_FAVORITE);
+        client.post(apiUrl, getStatusRequestParams(statusId), handler);
+    }
+
+    public void unfavorite(final Long statusId, final AsyncHttpResponseHandler handler ) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_UNFAVORITE);
+        client.post(apiUrl, getStatusRequestParams(statusId), handler);
+    }
+
+    private RequestParams getStatusRequestParams(final Long statusId) {
+        final RequestParams requestParams = new RequestParams();
+        requestParams.put(REQ_STATUS_ID, statusId);
+        return requestParams;
+    }
+
+    private RequestParams getTweetsRequestParams(final Long maxId, final Long sinceId) {
         final RequestParams requestParams = new RequestParams();
         if (maxId != null) {
             requestParams.put(REQ_PARAM_MAX_ID, maxId);
