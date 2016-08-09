@@ -18,7 +18,6 @@ import android.widget.Toast;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentTimelineBinding;
-import com.sharathp.blabber.events.TweetRefreshRequiredEvent;
 import com.sharathp.blabber.events.TweetsPastRetrievedEvent;
 import com.sharathp.blabber.events.TweetsRefreshedEvent;
 import com.sharathp.blabber.models.TweetWithUser;
@@ -151,11 +150,6 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
             markNoMoreItemsToLoad();
             Toast.makeText(getActivity(), R.string.message_past_tweets_failed, Toast.LENGTH_LONG).show();
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(final TweetRefreshRequiredEvent event) {
-        refreshTweets();
     }
 
     private void initViews() {

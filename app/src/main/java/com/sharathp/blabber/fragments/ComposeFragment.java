@@ -1,6 +1,7 @@
 package com.sharathp.blabber.fragments;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,19 +15,21 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.loopj.android.http.TextHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentComposeBinding;
+import com.sharathp.blabber.events.StatusSubmittedEvent;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.repositories.LocalPreferencesDAO;
-import com.sharathp.blabber.repositories.rest.TwitterClient;
+import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.util.ImageUtils;
 import com.sharathp.blabber.util.NetworkUtils;
 
-import javax.inject.Inject;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
-import cz.msebera.android.httpclient.Header;
+import javax.inject.Inject;
 
 public class ComposeFragment extends DialogFragment {
     public static String ARG_REPLY_TO_TWEET = ComposeFragment.class.getSimpleName() + ":REPLY_TO_TWEET";
@@ -38,10 +41,10 @@ public class ComposeFragment extends DialogFragment {
     private ComposeCallback mCallback;
 
     @Inject
-    TwitterClient mTwitterClient;
+    LocalPreferencesDAO mLocalPreferencesDAO;
 
     @Inject
-    LocalPreferencesDAO mLocalPreferencesDAO;
+    EventBus mEventBus;
 
     public static ComposeFragment createInstance(final TweetWithUser tweetWithUser) {
         final ComposeFragment fragment = new ComposeFragment();
@@ -130,6 +133,18 @@ public class ComposeFragment extends DialogFragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        mEventBus.register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mEventBus.unregister(this);
+    }
+
+    @Override
     public void onResume() {
         // Get existing layout params for the window
         final ViewGroup.LayoutParams params = getDialog().getWindow().getAttributes();
@@ -164,28 +179,28 @@ public class ComposeFragment extends DialogFragment {
             inReplyToStatusId = mReplyTo.getId();
         }
 
-        mTwitterClient.submitTweet(tweet, inReplyToStatusId, new TextHttpResponseHandler() {
-            @Override
-            public void onFailure(final int statusCode, final Header[] headers, final String responseString, final Throwable throwable) {
-                // hide spinner
-                mBinding.flLoading.setVisibility(View.GONE);
+        final Intent tweetService = UpdateTimelineService.createIntentForTweeting(getActivity(), tweet, inReplyToStatusId);
+        getActivity().startService(tweetService);
+    }
 
-                // enable edit text again
-                mBinding.etTweetContent.setEnabled(true);
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(final StatusSubmittedEvent event) {
+        if (event.isSuccess()) {
+            dismiss();
 
-                // give feedback to the user
-                Toast.makeText(getActivity(), R.string.error_tweet_submit, Toast.LENGTH_LONG).show();
+            if (mCallback != null) {
+                mCallback.onTweetSubmitted(event.getStatus());
             }
+        } else {
+            // hide spinner
+            mBinding.flLoading.setVisibility(View.GONE);
 
-            @Override
-            public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
-                dismiss();
+            // enable edit text again
+            mBinding.etTweetContent.setEnabled(true);
 
-                if (mCallback != null) {
-                    mCallback.onTweetSubmitted(tweet);
-                }
-            }
-        });
+            // give feedback to the user
+            Toast.makeText(getActivity(), R.string.error_tweet_submit, Toast.LENGTH_LONG).show();
+        }
     }
 
     public interface ComposeCallback {

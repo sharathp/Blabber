@@ -20,7 +20,6 @@ import com.malmstein.fenster.controller.MediaFensterPlayerController;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityDetailTweetBinding;
-import com.sharathp.blabber.events.TweetRefreshRequiredEvent;
 import com.sharathp.blabber.fragments.ComposeFragment;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.util.BlabberDateUtils;
@@ -166,8 +165,6 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
 
     @Override
     public void onTweetSubmitted(final String tweet) {
-        // set result activity instead?
-        mEventBus.post(new TweetRefreshRequiredEvent());
-        this.finish();
+        // no-op
     }
 }

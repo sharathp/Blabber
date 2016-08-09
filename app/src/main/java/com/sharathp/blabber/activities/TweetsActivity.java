@@ -29,7 +29,6 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityTweetsBinding;
-import com.sharathp.blabber.events.TweetRefreshRequiredEvent;
 import com.sharathp.blabber.fragments.ComposeFragment;
 import com.sharathp.blabber.fragments.TimelineFragment;
 import com.sharathp.blabber.models.TweetWithUser;
@@ -206,7 +205,7 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
 
     @Override
     public void onTweetSubmitted(final String tweet) {
-        mEventBus.post(new TweetRefreshRequiredEvent());
+        // no-op
     }
 
     @Override
