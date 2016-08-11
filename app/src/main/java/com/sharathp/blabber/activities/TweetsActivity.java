@@ -31,7 +31,7 @@ import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityTweetsBinding;
 import com.sharathp.blabber.fragments.ComposeFragment;
 import com.sharathp.blabber.fragments.HomeTimelineFragment;
-import com.sharathp.blabber.models.TweetWithUser;
+import com.sharathp.blabber.models.ITweetWithUser;
 import com.sharathp.blabber.repositories.LocalPreferencesDAO;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
 import com.sharathp.blabber.repositories.rest.resources.UserResource;
@@ -187,7 +187,7 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
     }
 
     @Override
-    public void onTweetSelected(final TweetWithUser tweet) {
+    public void onTweetSelected(final ITweetWithUser tweet) {
         if (! requestWritePermissions()) {
             return;
         }
@@ -209,11 +209,11 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
     }
 
     @Override
-    public void onTweetReplied(final TweetWithUser tweet) {
+    public void onTweetReplied(final ITweetWithUser tweet) {
         openCompose(tweet);
     }
 
-    private void openCompose(final TweetWithUser tweetWithUser) {
+    private void openCompose(final ITweetWithUser tweetWithUser) {
         final FragmentManager fm = getSupportFragmentManager();
         final ComposeFragment composeFragment = ComposeFragment.createInstance(tweetWithUser);
         composeFragment.setStyle(DialogFragment.STYLE_NO_FRAME, R.style.Dialog_FullScreen);

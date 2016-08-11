@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
@@ -19,6 +20,7 @@ import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentComposeBinding;
 import com.sharathp.blabber.events.StatusSubmittedEvent;
+import com.sharathp.blabber.models.ITweetWithUser;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.repositories.LocalPreferencesDAO;
 import com.sharathp.blabber.service.UpdateTimelineService;
@@ -46,11 +48,11 @@ public class ComposeFragment extends DialogFragment {
     @Inject
     EventBus mEventBus;
 
-    public static ComposeFragment createInstance(final TweetWithUser tweetWithUser) {
+    public static ComposeFragment createInstance(final ITweetWithUser tweetWithUser) {
         final ComposeFragment fragment = new ComposeFragment();
         if (tweetWithUser != null) {
             final Bundle args = new Bundle();
-            args.putParcelable(ARG_REPLY_TO_TWEET, tweetWithUser);
+            args.putParcelable(ARG_REPLY_TO_TWEET, (Parcelable) tweetWithUser);
             fragment.setArguments(args);
         }
         return fragment;

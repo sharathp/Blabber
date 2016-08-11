@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -21,6 +22,7 @@ import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityDetailTweetBinding;
 import com.sharathp.blabber.fragments.ComposeFragment;
+import com.sharathp.blabber.models.ITweetWithUser;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.util.BlabberDateUtils;
 import com.sharathp.blabber.util.ImageUtils;
@@ -40,9 +42,9 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
     private TweetWithUser mTweetWithUser;
     private ActivityDetailTweetBinding mBinding;
 
-    public static Intent createIntent(final Context context, final TweetWithUser tweetWithUser) {
+    public static Intent createIntent(final Context context, final ITweetWithUser tweetWithUser) {
         final Intent intent = new Intent(context, TweetDetailActivity.class);
-        intent.putExtra(EXTRA_TWEET, tweetWithUser);
+        intent.putExtra(EXTRA_TWEET, (Parcelable) tweetWithUser);
         return intent;
     }
 

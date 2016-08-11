@@ -5,13 +5,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.sharathp.blabber.R;
-import com.sharathp.blabber.models.TweetWithUser;
+import com.sharathp.blabber.models.ITweetWithUser;
+import com.yahoo.squidb.data.AbstractModel;
 import com.yahoo.squidb.recyclerview.SquidViewHolder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class LoadingItemHolder extends SquidViewHolder<TweetWithUser> {
+public class LoadingItemHolder<T extends AbstractModel & ITweetWithUser> extends SquidViewHolder<T> {
 
     @BindView(R.id.pb_loading_progress_bar)
     ProgressBar mLoadingProgressBar;
@@ -19,8 +20,8 @@ public class LoadingItemHolder extends SquidViewHolder<TweetWithUser> {
     @BindView(R.id.tv_article_end_message)
     TextView mEndOfArticlesTextView;
 
-    public LoadingItemHolder(final View itemView) {
-        super(itemView, new TweetWithUser());
+    public LoadingItemHolder(final View itemView, final T model) {
+        super(itemView, model);
         ButterKnife.bind(this, itemView);
     }
 
