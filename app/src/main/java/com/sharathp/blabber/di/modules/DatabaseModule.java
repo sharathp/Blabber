@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.User;
+import com.sharathp.blabber.models.UserTimeline;
 import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.repositories.db.BlabberDatabase;
 import com.sharathp.blabber.repositories.impl.SQLiteTwitterDAO;
@@ -44,7 +45,7 @@ public class DatabaseModule {
         // Setting up a UriNotifier will sent ContentObserver notifications to Uris on table writes
         registerSimpleDataChangedNotifier(contentResolver, database, Tweet.TABLE, Tweet.CONTENT_URI);
         registerSimpleDataChangedNotifier(contentResolver, database, User.TABLE, User.CONTENT_URI);
-
+        registerSimpleDataChangedNotifier(contentResolver, database, UserTimeline.TABLE, UserTimeline.CONTENT_URI);
         return database;
     }
 
