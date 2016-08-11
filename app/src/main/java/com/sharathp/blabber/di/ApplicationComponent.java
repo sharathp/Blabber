@@ -7,7 +7,7 @@ import com.sharathp.blabber.di.modules.ApplicationModule;
 import com.sharathp.blabber.di.modules.DatabaseModule;
 import com.sharathp.blabber.di.modules.RestModule;
 import com.sharathp.blabber.fragments.ComposeFragment;
-import com.sharathp.blabber.fragments.TimelineFragment;
+import com.sharathp.blabber.fragments.HomeTimelineFragment;
 import com.sharathp.blabber.service.UpdateTimelineService;
 
 import javax.inject.Singleton;
@@ -20,7 +20,7 @@ public interface ApplicationComponent {
 
     void inject(UpdateTimelineService updateTimelineService);
 
-    void inject(TimelineFragment timelineFragment);
+    void inject(HomeTimelineFragment homeTimelineFragment);
 
     void inject(ComposeFragment composeFragment);
 

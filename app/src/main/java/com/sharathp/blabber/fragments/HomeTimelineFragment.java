@@ -38,7 +38,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import javax.inject.Inject;
 
-public class TimelineFragment extends Fragment implements LoaderManager.LoaderCallbacks<SquidCursor<TweetWithUser>> {
+public class HomeTimelineFragment extends Fragment implements LoaderManager.LoaderCallbacks<SquidCursor<TweetWithUser>> {
     private static final int TWEET_ITEM_LOADER_ID = 0;
 
     @Inject
@@ -54,8 +54,8 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
     private TweetsAdapter mTweetsAdapter;
     private EndlessRecyclerViewScrollListener mEndlessRecyclerViewScrollListener;
 
-    public static TimelineFragment createInstance() {
-        return new TimelineFragment();
+    public static HomeTimelineFragment createInstance() {
+        return new HomeTimelineFragment();
     }
 
     @Override
