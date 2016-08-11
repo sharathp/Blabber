@@ -3,9 +3,9 @@ package com.sharathp.blabber.views.adapters;
 import android.view.View;
 
 import com.sharathp.blabber.models.TweetWithUser;
-import com.sharathp.blabber.views.adapters.base.BaseLoadingItemHolder;
-import com.sharathp.blabber.views.adapters.base.BaseTweetViewHolder;
 import com.sharathp.blabber.views.adapters.base.BaseTweetsAdapter;
+import com.sharathp.blabber.views.adapters.viewholders.LoadingItemHolder;
+import com.sharathp.blabber.views.adapters.viewholders.TweetViewHolder;
 import com.yahoo.squidb.recyclerview.SquidViewHolder;
 
 public class TweetsAdapter extends BaseTweetsAdapter<TweetWithUser, SquidViewHolder<TweetWithUser>> {
@@ -15,12 +15,12 @@ public class TweetsAdapter extends BaseTweetsAdapter<TweetWithUser, SquidViewHol
     }
 
     @Override
-    protected BaseTweetViewHolder<TweetWithUser> getTweetViewHolder(final View view) {
-        return new BaseTweetViewHolder<>(view, mTweetCallback, new TweetWithUser());
+    protected TweetViewHolder<TweetWithUser> getTweetViewHolder(final View view) {
+        return new TweetViewHolder<>(view, mTweetCallback, new TweetWithUser());
     }
 
     @Override
-    protected BaseLoadingItemHolder<TweetWithUser> getLoadingItemViewHolder(final View view) {
-        return new BaseLoadingItemHolder<>(view, new TweetWithUser());
+    protected LoadingItemHolder<TweetWithUser> getLoadingItemViewHolder(final View view) {
+        return new LoadingItemHolder<>(view, new TweetWithUser());
     }
 }
