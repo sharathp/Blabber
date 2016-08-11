@@ -1,9 +1,10 @@
 package com.sharathp.blabber.views.adapters;
 
-import com.sharathp.blabber.models.TweetWithUser;
+import com.sharathp.blabber.models.ITweetWithUser;
 
 public interface TweetCallback {
-    void onTweetSelected(TweetWithUser tweet);
 
-    void onTweetReplied(TweetWithUser tweet);
+    void onTweetSelected(ITweetWithUser tweet);
+
+    void onTweetReplied(ITweetWithUser tweet);
 }

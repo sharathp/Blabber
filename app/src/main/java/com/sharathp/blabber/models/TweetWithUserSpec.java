@@ -1,11 +1,13 @@
 package com.sharathp.blabber.models;
 
+import com.yahoo.squidb.annotations.Implements;
 import com.yahoo.squidb.annotations.ViewModelSpec;
 import com.yahoo.squidb.annotations.ViewQuery;
 import com.yahoo.squidb.sql.Property;
 import com.yahoo.squidb.sql.Query;
 
 @ViewModelSpec(className="TweetWithUser", viewName="tweets_and_users")
+@Implements(interfaceClasses = {ITweetWithUser.class})
 public class TweetWithUserSpec {
 
     @ViewQuery

@@ -6,11 +6,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.sharathp.blabber.R;
-import com.sharathp.blabber.models.TweetWithUser;
+import com.sharathp.blabber.models.ITweetWithUser;
 import com.sharathp.blabber.util.BlabberDateUtils;
 import com.sharathp.blabber.util.ImageUtils;
 import com.sharathp.blabber.views.DynamicHeightImageView;
 import com.sharathp.blabber.views.adapters.TweetCallback;
+import com.yahoo.squidb.data.AbstractModel;
 import com.yahoo.squidb.recyclerview.SquidViewHolder;
 
 import java.util.Date;
@@ -18,7 +19,7 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
+public class TweetViewHolder<T extends AbstractModel & ITweetWithUser> extends SquidViewHolder<T> {
     private final TweetCallback mTweetCallback;
 
     @BindView(R.id.iv_retweet_image)
@@ -78,8 +79,8 @@ public class TweetViewHolder extends SquidViewHolder<TweetWithUser> {
         }
     };
 
-    public TweetViewHolder(final View itemView, final TweetCallback tweetCallback) {
-        super(itemView, new TweetWithUser());
+    public TweetViewHolder(final View itemView, final TweetCallback tweetCallback, final T item) {
+        super(itemView, item);
         ButterKnife.bind(this, itemView);
 
         itemView.setOnClickListener(mOnClickListener);
