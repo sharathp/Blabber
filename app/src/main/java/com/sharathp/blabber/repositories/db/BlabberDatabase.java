@@ -5,6 +5,8 @@ import android.content.Context;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.models.User;
+import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
+import com.sharathp.blabber.models.UserTimeline;
 import com.yahoo.squidb.android.AndroidOpenHelper;
 import com.yahoo.squidb.data.ISQLiteDatabase;
 import com.yahoo.squidb.data.ISQLiteOpenHelper;
@@ -35,14 +37,14 @@ public class BlabberDatabase extends SquidDatabase {
     @Override
     protected Table[] getTables() {
         return new Table[]{
-                Tweet.TABLE, User.TABLE
+                Tweet.TABLE, User.TABLE, UserTimeline.TABLE
         };
     }
 
     @Override
     protected View[] getViews() {
         return new View[]{
-            TweetWithUser.VIEW
+            TweetWithUser.VIEW, UserTimeLineTweetWithUser.VIEW
         };
     }
 
