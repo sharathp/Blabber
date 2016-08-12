@@ -7,16 +7,16 @@ import com.yahoo.squidb.sql.Join;
 import com.yahoo.squidb.sql.Property;
 import com.yahoo.squidb.sql.Query;
 
-@ViewModelSpec(className="UserTimeLineTweetWithUser", viewName="timelines_and_tweets")
+@ViewModelSpec(className="MentionsWithUser", viewName="mentions_and_tweets")
 @Implements(interfaceClasses = {ITweetWithUser.class})
-public class UserTimeLineTweetWithUserSpec {
+public class MentionsWithUserSpec {
 
     @ViewQuery
-    public static final Query QUERY = Query.select().from(UserTimeline.TABLE)
-            .join(Join.inner(Tweet.TABLE, UserTimeline.TWEET_ID.eq(Tweet.ID)),
+    public static final Query QUERY = Query.select().from(Mentions.TABLE)
+            .join(Join.inner(Tweet.TABLE, Mentions.TWEET_ID.eq(Tweet.ID)),
                     Join.inner(User.TABLE, Tweet.USER_ID.eq(User.ID)));
 
-    public static final Property.LongProperty USER_TIME_LINE_ID = UserTimeline.USER_TIME_LINE_ID;
+    public static final Property.LongProperty USER_MENTION_ID = Mentions.USER_MENTION_ID;
 
     public static final Property.LongProperty ID = Tweet.ID;
 

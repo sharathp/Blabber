@@ -2,6 +2,8 @@ package com.sharathp.blabber.repositories.db;
 
 import android.content.Context;
 
+import com.sharathp.blabber.models.Mentions;
+import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.models.User;
@@ -37,14 +39,14 @@ public class BlabberDatabase extends SquidDatabase {
     @Override
     protected Table[] getTables() {
         return new Table[]{
-                Tweet.TABLE, User.TABLE, UserTimeline.TABLE
+                Tweet.TABLE, User.TABLE, UserTimeline.TABLE, Mentions.TABLE
         };
     }
 
     @Override
     protected View[] getViews() {
         return new View[]{
-            TweetWithUser.VIEW, UserTimeLineTweetWithUser.VIEW
+            TweetWithUser.VIEW, UserTimeLineTweetWithUser.VIEW, MentionsWithUser.VIEW
         };
     }
 
