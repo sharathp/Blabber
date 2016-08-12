@@ -4,6 +4,9 @@
 
     <string name="label_new_tweet">Compose Tweet</string>
 
+    <string name="home_tab_title_home_timeline">Home</string>
+    <string name="home_tab_title_mentions">Mentions</string>
+
     <string name="message_end_of_tweets">End of Tweets</string>
     <string name="message_no_tweets">No Tweets</string>
     <string name="message_no_internet">Cannot connect to Internet</string>

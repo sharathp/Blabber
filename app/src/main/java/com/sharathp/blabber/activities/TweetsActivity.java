@@ -30,6 +30,7 @@ import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityTweetsBinding;
 import com.sharathp.blabber.fragments.ComposeFragment;
+import com.sharathp.blabber.fragments.HomeFragment;
 import com.sharathp.blabber.fragments.HomeTimelineFragment;
 import com.sharathp.blabber.models.ITweetWithUser;
 import com.sharathp.blabber.repositories.LocalPreferencesDAO;
@@ -166,7 +167,7 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
         Fragment fragment;
         switch(menuItem.getItemId()) {
             case R.id.nav_home: {
-                fragment = HomeTimelineFragment.createInstance();
+                fragment = HomeFragment.createInstance();
                 mComposeFab.setVisibility(View.VISIBLE);
                 break;
             }

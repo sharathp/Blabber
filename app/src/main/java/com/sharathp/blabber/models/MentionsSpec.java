@@ -6,7 +6,7 @@ import com.yahoo.squidb.annotations.ColumnSpec;
 import com.yahoo.squidb.annotations.TableModelSpec;
 
 // almost like many-many table between user and tweets
-@TableModelSpec(className="Mentions", tableName="user_mentions")
+@TableModelSpec(className="Mentions", tableName="user_mentions", tableConstraint = "UNIQUE (userMentionId, tweetId)")
 public class MentionsSpec {
 
     public static final Uri CONTENT_URI = Uri.parse("content://com.sharathp.blabber/mentions");

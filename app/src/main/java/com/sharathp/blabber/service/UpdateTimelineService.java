@@ -13,7 +13,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.events.MentionsPastRetrievedEvent;
-import com.sharathp.blabber.events.MentionsRefreshedEvent;
+import com.sharathp.blabber.events.MentionsLatestEvent;
 import com.sharathp.blabber.events.StatusSubmittedEvent;
 import com.sharathp.blabber.events.TweetsPastRetrievedEvent;
 import com.sharathp.blabber.events.TweetsRefreshedEvent;
@@ -93,6 +93,14 @@ public class UpdateTimelineService extends BaseService {
             intent.putExtra(EXTRA_IN_REPLY_TO_STATUS_ID, inReplyToStatusId);
         }
         return intent;
+    }
+
+    public static Intent createIntentForLatestMentions(final Context context) {
+        return createIntent(context, OP_MENTION_LATEST);
+    }
+
+    public static Intent createIntentForPastMentions(final Context context) {
+        return createIntent(context, OP_MENTION_PAST);
     }
 
     // from and to are exclusive
@@ -176,11 +184,11 @@ public class UpdateTimelineService extends BaseService {
         if (pastMention != null) {
             maxId = pastMention.getId();
         }
-        mTwitterClient.getPastMentionTweets(maxId, getMentionsPastTweetsResponseHandler());
+        mTwitterClient.getPastMentionTweets(maxId - 1, getMentionsPastTweetsResponseHandler());
     }
 
     private void retrieveLatestMentions() {
-        final MentionsWithUser latestMention = mTwitterDAO.getEarliestMention();
+        final MentionsWithUser latestMention = mTwitterDAO.getLatestMention();
         Long sinceId = null;
         if (latestMention != null) {
             sinceId = latestMention.getId();
@@ -194,7 +202,7 @@ public class UpdateTimelineService extends BaseService {
         if (tweet != null) {
             maxId = tweet.getId();
         }
-        mTwitterClient.getPastTweets(maxId, getPastTweetsResponseHandler());
+        mTwitterClient.getPastTweets(maxId - 1, getPastTweetsResponseHandler());
     }
 
     private void retrieveLatestTweets(final Object additionalEventToPostOnceComplete) {
@@ -330,8 +338,8 @@ public class UpdateTimelineService extends BaseService {
             public void onFailure(final int statusCode, final Header[] headers,
                                   final String responseString, final Throwable throwable) {
                 Log.e(TAG, "Error retrieving mentions: " + responseString, throwable);
-                final MentionsRefreshedEvent mentionsRefreshedEvent = new MentionsRefreshedEvent(0, false);
-                mEventBus.post(mentionsRefreshedEvent);
+                final MentionsLatestEvent mentionsLatestEvent = new MentionsLatestEvent(0, false);
+                mEventBus.post(mentionsLatestEvent);
             }
 
             @Override
@@ -344,8 +352,8 @@ public class UpdateTimelineService extends BaseService {
 
                 boolean success = saveMentions(tweetResources);
 
-                final MentionsRefreshedEvent mentionsRefreshedEvent = new MentionsRefreshedEvent(tweetResources.size(), success);
-                mEventBus.post(mentionsRefreshedEvent);
+                final MentionsLatestEvent mentionsLatestEvent = new MentionsLatestEvent(tweetResources.size(), success);
+                mEventBus.post(mentionsLatestEvent);
             }
         };
     }

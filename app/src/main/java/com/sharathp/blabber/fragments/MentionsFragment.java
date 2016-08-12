@@ -15,18 +15,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentTimelineBinding;
-import com.sharathp.blabber.events.TweetsPastRetrievedEvent;
-import com.sharathp.blabber.events.TweetsRefreshedEvent;
-import com.sharathp.blabber.models.TweetWithUser;
+import com.sharathp.blabber.events.MentionsPastRetrievedEvent;
+import com.sharathp.blabber.events.MentionsLatestEvent;
+import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.util.NetworkUtils;
 import com.sharathp.blabber.views.DividerItemDecoration;
 import com.sharathp.blabber.views.EndlessRecyclerViewScrollListener;
+import com.sharathp.blabber.views.adapters.MentionsAdapter;
 import com.sharathp.blabber.views.adapters.TweetCallback;
-import com.sharathp.blabber.views.adapters.TweetsAdapter;
 import com.yahoo.squidb.data.SquidCursor;
 import com.yahoo.squidb.sql.Order;
 import com.yahoo.squidb.sql.Query;
@@ -37,7 +38,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import javax.inject.Inject;
 
-public class MentionsFragment extends Fragment implements LoaderManager.LoaderCallbacks<SquidCursor<TweetWithUser>> {
+public class MentionsFragment extends Fragment implements LoaderManager.LoaderCallbacks<SquidCursor<MentionsWithUser>> {
     private static final int TWEET_ITEM_LOADER_ID = 0;
 
     @Inject
@@ -50,7 +51,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
 
     private FragmentTimelineBinding mBinding;
     private LinearLayoutManager mLayoutManager;
-    private TweetsAdapter mTweetsAdapter;
+    private MentionsAdapter mMentionsAdapter;
     private EndlessRecyclerViewScrollListener mEndlessRecyclerViewScrollListener;
 
     public static MentionsFragment createInstance() {
@@ -69,7 +70,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        BlabberApplication.from(getActivity()).getComponent().inject(this);
+        BlabberApplication.from(getActivity()).getComponent().inject(this);
     }
 
     @Nullable
@@ -106,14 +107,14 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public Loader<SquidCursor<TweetWithUser>> onCreateLoader(final int id, final Bundle args) {
-        final Query query = Query.select(TweetWithUser.PROPERTIES)
-                .orderBy(Order.desc(TweetWithUser.CREATED_AT));
-        return mTwitterDAO.getTweets(query);
+    public Loader<SquidCursor<MentionsWithUser>> onCreateLoader(final int id, final Bundle args) {
+        final Query query = Query.select(MentionsWithUser.PROPERTIES)
+                .orderBy(Order.desc(MentionsWithUser.CREATED_AT));
+        return mTwitterDAO.getMentions(query);
     }
 
     @Override
-    public void onLoadFinished(final Loader<SquidCursor<TweetWithUser>> loader, final SquidCursor<TweetWithUser> data) {
+    public void onLoadFinished(final Loader<SquidCursor<MentionsWithUser>> loader, final SquidCursor<MentionsWithUser> data) {
         if (data.getCount() > 0) {
             // hide no tweets message
             hideMessageContainer();
@@ -123,16 +124,16 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
             showNoTweetsMessage();
             markNoMoreItemsToLoad();
         }
-        mTweetsAdapter.swapCursor(data);
+        mMentionsAdapter.swapCursor(data);
     }
 
     @Override
-    public void onLoaderReset(final Loader<SquidCursor<TweetWithUser>> loader) {
-        mTweetsAdapter.swapCursor(null);
+    public void onLoaderReset(final Loader<SquidCursor<MentionsWithUser>> loader) {
+        mMentionsAdapter.swapCursor(null);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(final TweetsRefreshedEvent event) {
+    public void onEventMainThread(final MentionsLatestEvent event) {
         mBinding.srlTweets.setRefreshing(false);
         if (! event.isSuccess()) {
             Toast.makeText(getActivity(), R.string.message_refresh_failed, Toast.LENGTH_LONG).show();
@@ -140,7 +141,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(final TweetsPastRetrievedEvent event) {
+    public void onEventMainThread(final MentionsPastRetrievedEvent event) {
         if (event.isSuccess()) {
             if (event.getTweetsCount() == 0) {
                 markNoMoreItemsToLoad();
@@ -152,13 +153,13 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void initViews() {
-        mTweetsAdapter = new TweetsAdapter(mCallback);
+        mMentionsAdapter = new MentionsAdapter(mCallback);
         final RecyclerView moviesRecyclerView = mBinding.rvTweets;
         mLayoutManager = new LinearLayoutManager(getActivity());
-        moviesRecyclerView.setAdapter(mTweetsAdapter);
+        moviesRecyclerView.setAdapter(mMentionsAdapter);
         moviesRecyclerView.setLayoutManager(mLayoutManager);
         moviesRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
-        mBinding.srlTweets.setOnRefreshListener(() -> deleteAndRefreshTweets());
+        mBinding.srlTweets.setOnRefreshListener(() -> refreshTweets());
         mEndlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(mLayoutManager) {
             @Override
             public void onLoadMore(final int page, final int totalItemsCount) {
@@ -168,18 +169,6 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
         mBinding.rvTweets.addOnScrollListener(mEndlessRecyclerViewScrollListener);
     }
 
-    private void deleteAndRefreshTweets() {
-        if (! NetworkUtils.isOnline(getContext())) {
-            Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
-            mBinding.srlTweets.setRefreshing(false);
-            return;
-        }
-
-        final Intent intent = UpdateTimelineService.createIntentForDeleteExistingItemsAndRetrieveLasterItems(getActivity());
-        getActivity().startService(intent);
-        markMoreItemsToLoad();
-    }
-
     private void refreshTweets() {
         if (! NetworkUtils.isOnline(getContext())) {
             Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
@@ -187,7 +176,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
             return;
         }
 
-        final Intent intent = UpdateTimelineService.createIntentForLatestItems(getActivity());
+        final Intent intent = UpdateTimelineService.createIntentForLatestMentions(getActivity());
         getActivity().startService(intent);
         markMoreItemsToLoad();
     }
@@ -199,7 +188,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
             return;
         }
 
-        final Intent intent = UpdateTimelineService.createIntentForPastItems(getActivity());
+        final Intent intent = UpdateTimelineService.createIntentForPastMentions(getActivity());
         getActivity().startService(intent);
     }
 
@@ -229,11 +218,11 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
 
     private void markNoMoreItemsToLoad() {
         mEndlessRecyclerViewScrollListener.setEndReached(true);
-        mTweetsAdapter.setEndReached();
+        mMentionsAdapter.setEndReached();
     }
 
     private void markMoreItemsToLoad() {
         mEndlessRecyclerViewScrollListener.setEndReached(false);
-        mTweetsAdapter.clearEndReached();
+        mMentionsAdapter.clearEndReached();
     }
 }
