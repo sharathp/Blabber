@@ -17,10 +17,14 @@ import com.sharathp.blabber.events.MentionsLatestEvent;
 import com.sharathp.blabber.events.StatusSubmittedEvent;
 import com.sharathp.blabber.events.TweetsPastRetrievedEvent;
 import com.sharathp.blabber.events.TweetsRefreshedEvent;
+import com.sharathp.blabber.events.UserTimelineLatestEvent;
+import com.sharathp.blabber.events.UserTimelinePastRetrievedEvent;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.User;
+import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
+import com.sharathp.blabber.models.UserTimeline;
 import com.sharathp.blabber.repositories.LocalPreferencesDAO;
 import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
@@ -41,13 +45,17 @@ import cz.msebera.android.httpclient.Header;
 
 public class UpdateTimelineService extends BaseService {
     private static final String TAG = UpdateTimelineService.class.getSimpleName();
+
     private static final String EXTRA_OPERATION_TYPE = UpdateTimelineService.class.getName() + ".OPERATION_TYPE";
+    private static final String EXTRA_USER_ID = UpdateTimelineService.class.getName() + ".USER_ID";
+
     private static final String EXTRA_STATUS = UpdateTimelineService.class.getName() + ".EXTRA_STATUS";
     private static final String EXTRA_IN_REPLY_TO_STATUS_ID = UpdateTimelineService.class.getName() + ".IN_REPLY_TO_STATUS_ID";
 
+
     @IntDef({OP_REFRESH_LATEST, OP_REFRESH_PAST, OP_DELETE_EXISTING_AND_REFRESH,
             OP_TWEET, OP_TWEET_FAVORITE, OP_TWEET_UNFAVORITE,OP_MENTION_LATEST,
-            OP_MENTION_PAST})
+            OP_MENTION_PAST, OP_USER_TIMELINE_LATEST, OP_USER_TIMELINE_PAST})
     private @interface OperationType {}
 
     private static final int OP_REFRESH_LATEST = 1;
@@ -58,6 +66,8 @@ public class UpdateTimelineService extends BaseService {
     private static final int OP_TWEET_UNFAVORITE = 6;
     private static final int OP_MENTION_LATEST= 7;
     private static final int OP_MENTION_PAST = 8;
+    private static final int OP_USER_TIMELINE_LATEST= 9;
+    private static final int OP_USER_TIMELINE_PAST = 10;
 
     @Inject
     EventBus mEventBus;
@@ -101,6 +111,18 @@ public class UpdateTimelineService extends BaseService {
 
     public static Intent createIntentForPastMentions(final Context context) {
         return createIntent(context, OP_MENTION_PAST);
+    }
+
+    public static Intent createIntentForLatestUserTimeline(final Context context, final long userId) {
+        final Intent intent = createIntent(context, OP_USER_TIMELINE_LATEST);
+        intent.putExtra(EXTRA_USER_ID, userId);
+        return intent;
+    }
+
+    public static Intent createIntentForPastUserTimeline(final Context context, final long userId) {
+        final Intent intent =  createIntent(context, OP_USER_TIMELINE_PAST);
+        intent.putExtra(EXTRA_USER_ID, userId);
+        return intent;
     }
 
     // from and to are exclusive
@@ -158,6 +180,16 @@ public class UpdateTimelineService extends BaseService {
                 retrievePastMentions();
                 break;
             }
+            case OP_USER_TIMELINE_LATEST: {
+                Log.i(TAG, "Retrieved Latest user tweets");
+                retrieveLatestUserTimeline(intentData.getLong(EXTRA_USER_ID, -1));
+                break;
+            }
+            case OP_USER_TIMELINE_PAST: {
+                Log.i(TAG, "Retrieved Past user tweets");
+                retrievePastUserTimeline(intentData.getLong(EXTRA_USER_ID, -1));
+                break;
+            }
             default: {
                 Log.w(TAG, "Invalid value for: " + EXTRA_OPERATION_TYPE + ": " + operationType);
             }
@@ -176,6 +208,24 @@ public class UpdateTimelineService extends BaseService {
                 retrieveLatestTweets(new StatusSubmittedEvent(status, true));
             }
         });
+    }
+
+    private void retrieveLatestUserTimeline(final long userId) {
+        final UserTimeLineTweetWithUser latestUserTimeline = mTwitterDAO.getLatestUserTimeline(userId);
+        Long sinceId = null;
+        if (latestUserTimeline != null) {
+            sinceId = latestUserTimeline.getId();
+        }
+        mTwitterClient.getLatestUserTimeLineTweets(sinceId, userId, getLatestUserTimelineResponseHandler(userId));
+    }
+
+    private void retrievePastUserTimeline(final long userId) {
+        final UserTimeLineTweetWithUser pastUserTimeline = mTwitterDAO.getEarliestUserTimeline(userId);
+        Long maxId = null;
+        if (pastUserTimeline != null) {
+            maxId = pastUserTimeline.getId();
+        }
+        mTwitterClient.getPastUserTimeLineTweets(maxId - 1, userId, getPastUserTimelineResponseHandler(userId));
     }
 
     private void retrievePastMentions() {
@@ -270,6 +320,27 @@ public class UpdateTimelineService extends BaseService {
         success = mTwitterDAO.checkAndInsertMentions(mentions);
         if (! success) {
             Log.i(TAG, "Unable to save mentions");
+        }
+        return success;
+    }
+
+    private boolean saveUserTimelines(final Long userId, final List<TweetResource> tweetResources) {
+        boolean success = saveTweetsAndUsers(tweetResources);
+
+        if (! success) {
+            Log.i(TAG, "Unable to save tweets, not saving timelines");
+            return success;
+        }
+
+        final List<UserTimeline> userTimelines = new ArrayList<>();
+        for (final TweetResource tweetResource : tweetResources) {
+            userTimelines.add(new UserTimeline()
+                    .setTweetId(tweetResource.getId())
+                    .setUserTimeLineId(userId));
+        }
+        success = mTwitterDAO.checkAndInsertUserTimelines(userTimelines);
+        if (! success) {
+            Log.i(TAG, "Unable to save user timelines");
         }
         return success;
     }
@@ -380,6 +451,60 @@ public class UpdateTimelineService extends BaseService {
 
                 final MentionsPastRetrievedEvent mentionsPastRetrievedEvent = new MentionsPastRetrievedEvent(tweetResources.size(), success);
                 mEventBus.post(mentionsPastRetrievedEvent);
+            }
+        };
+    }
+
+    private AsyncHttpResponseHandler getLatestUserTimelineResponseHandler(final Long userId) {
+        return new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                Log.e(TAG, "Error retrieving user timeline: " + responseString, throwable);
+
+                final UserTimelineLatestEvent userTimelineLatestEvent = new UserTimelineLatestEvent(userId, 0, false);
+                mEventBus.post(userTimelineLatestEvent);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers,
+                                  final String responseString) {
+                final Type responseType = new TypeToken<List<TweetResource>>() {
+                }.getType();
+                final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
+                Log.i(TAG, "Retrieved latest user timeline: " + tweetResources.size());
+
+                final boolean success = saveUserTimelines(userId, tweetResources);
+
+                final UserTimelineLatestEvent userTimelineLatestEvent = new UserTimelineLatestEvent(userId, tweetResources.size(), success);
+                mEventBus.post(userTimelineLatestEvent);
+            }
+        };
+    }
+
+    private AsyncHttpResponseHandler getPastUserTimelineResponseHandler(final Long userId) {
+        return new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                Log.e(TAG, "Error retrieving past timeline: " + responseString, throwable);
+
+                final UserTimelinePastRetrievedEvent userTimelinePastRetrievedEvent = new UserTimelinePastRetrievedEvent(userId, 0, false);
+                mEventBus.post(userTimelinePastRetrievedEvent);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers,
+                                  final String responseString) {
+                final Type responseType = new TypeToken<List<TweetResource>>() {
+                }.getType();
+                final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
+                Log.i(TAG, "Retrieved past user timeline: " + tweetResources.size());
+
+                final boolean success = saveUserTimelines(userId, tweetResources);
+
+                final UserTimelinePastRetrievedEvent userTimelinePastRetrievedEvent = new UserTimelinePastRetrievedEvent(userId, tweetResources.size(), success);
+                mEventBus.post(userTimelinePastRetrievedEvent);
             }
         };
     }
