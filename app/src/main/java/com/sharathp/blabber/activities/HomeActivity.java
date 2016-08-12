@@ -1,5 +1,6 @@
 package com.sharathp.blabber.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -13,6 +14,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -28,10 +30,10 @@ import com.google.gson.Gson;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
-import com.sharathp.blabber.databinding.ActivityTweetsBinding;
+import com.sharathp.blabber.databinding.ActivityHomeBinding;
 import com.sharathp.blabber.fragments.ComposeFragment;
-import com.sharathp.blabber.fragments.HomeFragment;
 import com.sharathp.blabber.fragments.HomeTimelineFragment;
+import com.sharathp.blabber.fragments.MentionsFragment;
 import com.sharathp.blabber.models.ITweetWithUser;
 import com.sharathp.blabber.repositories.LocalPreferencesDAO;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
@@ -46,8 +48,8 @@ import javax.inject.Inject;
 
 import cz.msebera.android.httpclient.Header;
 
-public class TweetsActivity extends AppCompatActivity implements TweetCallback, ComposeFragment.ComposeCallback {
-    private static final String TAG = TweetsActivity.class.getSimpleName();
+public class HomeActivity extends AppCompatActivity implements TweetCallback, ComposeFragment.ComposeCallback {
+    private static final String TAG = HomeActivity.class.getSimpleName();
     private static final int INDEX_HOME = 0;
 
     private DrawerLayout mDrawerLayout;
@@ -75,7 +77,7 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
 
         BlabberApplication.from(this).getComponent().inject(this);
 
-        final ActivityTweetsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_tweets);
+        final ActivityHomeBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
         mToolbar = binding.toolbar;
         mDrawerLayout = binding.drawerLayout;
         mDrawer = binding.nvDrawer;
@@ -90,12 +92,16 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
         setSupportActionBar(mToolbar);
         setupDrawerContent();
 
-        showHome();
+        setHomeInfo();
+
+        binding.vpHome.setAdapter(new HomePagerAdapter(getSupportFragmentManager(), this));
+
+        binding.tlHome.setupWithViewPager(binding.vpHome);
 
         mTwitterClient.getLoggedInUserDetails(new TextHttpResponseHandler() {
             @Override
             public void onFailure(final int statusCode, final Header[] headers, final String responseString, final Throwable throwable) {
-                Toast.makeText(TweetsActivity.this, R.string.error_profile_retrieval, Toast.LENGTH_SHORT).show();
+                Toast.makeText(HomeActivity.this, R.string.error_profile_retrieval, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -123,9 +129,10 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
         ImageUtils.loadProfileImage(this, profileImageView, userImageUrl);
     }
 
-    private void showHome() {
-        // simulate clicking which shows home
-        selectDrawerItem(mDrawer.getMenu().getItem(INDEX_HOME));
+    private void setHomeInfo() {
+        final MenuItem homeMenuItem = mDrawer.getMenu().getItem(INDEX_HOME);
+        homeMenuItem.setChecked(true);
+        setTitle(homeMenuItem.getTitle());
     }
 
     private ActionBarDrawerToggle setupDrawerToggle() {
@@ -164,24 +171,17 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
     }
 
     public void selectDrawerItem(final MenuItem menuItem) {
-        Fragment fragment;
         switch(menuItem.getItemId()) {
             case R.id.nav_home: {
-                fragment = HomeFragment.createInstance();
-                mComposeFab.setVisibility(View.VISIBLE);
+                // already on home, do nothing
                 break;
             }
             default: {
                 Log.w(TAG, "Unknown menu item: " + menuItem.getTitle());
-                fragment = HomeTimelineFragment.createInstance();
                 mComposeFab.setVisibility(View.VISIBLE);
                 break;
             }
         }
-
-        // Insert the fragment by replacing any existing fragment
-        final FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.fl_content, fragment).commit();
 
         menuItem.setChecked(true);
         getSupportActionBar().setTitle(menuItem.getTitle());
@@ -236,5 +236,43 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
             }
         }
         return true;
+    }
+
+    static class HomePagerAdapter extends FragmentPagerAdapter {
+        private static final int POSITION_HOME_TIMELINE = 0;
+        private static final int POSITION_MENTIONS = 1;
+
+        private final int PAGE_COUNT = 2;
+        private int tabTitleIds[] = new int[]{R.string.home_tab_title_home_timeline,
+                R.string.home_tab_title_mentions};
+        private Context context;
+
+        public HomePagerAdapter(final FragmentManager fm, final Context context) {
+            super(fm);
+            this.context = context;
+        }
+
+        @Override
+        public int getCount() {
+            return PAGE_COUNT;
+        }
+
+        @Override
+        public Fragment getItem(final int position) {
+            switch (position) {
+                case POSITION_HOME_TIMELINE: {
+                    return HomeTimelineFragment.createInstance();
+                }
+                case POSITION_MENTIONS: {
+                    return MentionsFragment.createInstance();
+                }
+            }
+            throw new IllegalStateException("Unknown tab position: " + position);
+        }
+
+        @Override
+        public CharSequence getPageTitle(final int position) {
+            return context.getResources().getString(tabTitleIds[position]);
+        }
     }
 }

@@ -47,10 +47,15 @@
         <item name="tabIndicatorHeight">3dp</item>
         <item name="android:background">@android:color/white</item>
         <item name="tabSelectedTextColor">@color/color_twitter_blue</item>
+        <item name="tabTextAppearance">@style/TabTextAppearance</item>
         <item name="tabMode">fixed</item>
         <item name="tabGravity">fill</item>
         <item name="tabPaddingStart">16dp</item>
         <item name="tabPaddingEnd">16dp</item>
+    </style>
+
+    <style name="TabTextAppearance" parent="TextAppearance.AppCompat.Button">
+        <item name="android:textColor">@color/tab_normal</item>
     </style>
 
 </resources>

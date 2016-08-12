@@ -23,7 +23,6 @@ import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityDetailTweetBinding;
 import com.sharathp.blabber.fragments.ComposeFragment;
 import com.sharathp.blabber.models.ITweetWithUser;
-import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.util.BlabberDateUtils;
 import com.sharathp.blabber.util.ImageUtils;
 
@@ -39,7 +38,7 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
     @Inject
     EventBus mEventBus;
 
-    private TweetWithUser mTweetWithUser;
+    private ITweetWithUser mTweetWithUser;
     private ActivityDetailTweetBinding mBinding;
 
     public static Intent createIntent(final Context context, final ITweetWithUser tweetWithUser) {
