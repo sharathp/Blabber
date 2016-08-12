@@ -7,6 +7,8 @@ import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.models.User;
+import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
+import com.sharathp.blabber.models.UserTimeline;
 import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.repositories.db.BlabberDatabase;
 import com.yahoo.squidb.android.AndroidTableModel;
@@ -15,6 +17,7 @@ import com.yahoo.squidb.sql.Query;
 import com.yahoo.squidb.support.SquidSupportCursorLoader;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -32,6 +35,13 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     public SquidSupportCursorLoader<TweetWithUser> getTweets(final Query query) {
         final SquidSupportCursorLoader<TweetWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, TweetWithUser.class, query);
         loader.setNotificationUri(Tweet.CONTENT_URI);
+        return loader;
+    }
+
+    @Override
+    public SquidSupportCursorLoader<UserTimeLineTweetWithUser> getUserTimeline(final Query query) {
+        final SquidSupportCursorLoader<UserTimeLineTweetWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, UserTimeLineTweetWithUser.class, query);
+        loader.setNotificationUri(UserTimeline.CONTENT_URI);
         return loader;
     }
 
@@ -56,6 +66,24 @@ public class SQLiteTwitterDAO implements TwitterDAO {
                 .orderBy(Order.asc(MentionsWithUser.CREATED_AT))
                 .limit(1);
         return mDatabase.fetchByQuery(MentionsWithUser.class, query);
+    }
+
+    @Override
+    public UserTimeLineTweetWithUser getLatestUserTimeline(final Long userId) {
+        final Query query = Query.select(UserTimeLineTweetWithUser.PROPERTIES)
+                .where(UserTimeLineTweetWithUser.USER_TIME_LINE_ID.eq(userId))
+                .orderBy(Order.desc(UserTimeLineTweetWithUser.CREATED_AT))
+                .limit(1);
+        return mDatabase.fetchByQuery(UserTimeLineTweetWithUser.class, query);
+    }
+
+    @Override
+    public UserTimeLineTweetWithUser getEarliestUserTimeline(final Long userId) {
+        final Query query = Query.select(UserTimeLineTweetWithUser.PROPERTIES)
+                .where(UserTimeLineTweetWithUser.USER_TIME_LINE_ID.eq(userId))
+                .orderBy(Order.asc(UserTimeLineTweetWithUser.CREATED_AT))
+                .limit(1);
+        return mDatabase.fetchByQuery(UserTimeLineTweetWithUser.class, query);
     }
 
     @Override
@@ -96,6 +124,36 @@ public class SQLiteTwitterDAO implements TwitterDAO {
                 // insert if it doesn't exist
                 if(mDatabase.fetchByQuery(Mentions.class, query) == null) {
                     success = mDatabase.persist(mention);
+                } else {
+                    success = true;
+                }
+
+                // short-circuit and exit the loop
+                if (! success) {
+                    break;
+                }
+            }
+            if (success) {
+                mDatabase.setTransactionSuccessful();
+            }
+        } finally {
+            mDatabase.endTransaction();
+        }
+        return success;
+    }
+
+    @Override
+    public boolean checkAndInsertUserTimelines(final List<UserTimeline> userTimelines) {
+        boolean success = true;
+        mDatabase.beginTransaction();
+        try {
+            for (final UserTimeline userTimeline: userTimelines) {
+                final Query query = Query.select(UserTimeline.PROPERTIES)
+                        .where(UserTimeline.TWEET_ID.eq(userTimeline.getId()));
+
+                // insert if it doesn't exist
+                if(mDatabase.fetchByQuery(UserTimeline.class, query) == null) {
+                    success = mDatabase.persist(userTimeline);
                 } else {
                     success = true;
                 }

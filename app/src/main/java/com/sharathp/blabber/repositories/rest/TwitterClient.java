@@ -40,12 +40,15 @@ public class TwitterClient extends OAuthBaseClient {
     private static final String RELATIVE_URL_STATUS = "/statuses/show/%d.json";
 
     private static final String RELATIVE_URL_MENTION = "/statuses/mentions_timeline.json";
+    private static final String RELATIVE_URL_USER_TIMELINE = "/statuses/user_timeline.json";
+
 
     private static final String REQ_STATUS_ID = "id";
     private static final String REQ_PARAM_MAX_ID = "max_id";
     private static final String REQ_PARAM_SINCE_ID = "since_id";
     private static final String REQ_PARAM_STATUS = "status";
     private static final String REQ_PARAM_IN_REPLY_TO_STATUS_ID = "in_reply_to_status_id";
+    private static final String REQ_PARAM_USER_ID = "user_id";
 
     public TwitterClient(final Context context) {
         super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
@@ -87,6 +90,24 @@ public class TwitterClient extends OAuthBaseClient {
     public void getLatestMentionTweets(final Long sinceId, final AsyncHttpResponseHandler handler) {
         final String apiUrl = getApiUrl(RELATIVE_URL_MENTION);
         final RequestParams requestParams = getTweetsRequestParams(null, sinceId);
+        client.get(apiUrl, requestParams, handler);
+    }
+
+    public void getLatestUserTimeLineTweets(final Long maxId, final Long userId, final AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_USER_TIMELINE);
+        final RequestParams requestParams = getTweetsRequestParams(maxId, null);
+        if (userId != null && userId > 0) {
+            requestParams.put(REQ_PARAM_USER_ID, userId);
+        }
+        client.get(apiUrl, requestParams, handler);
+    }
+
+    public void getPastUserTimeLineTweets(final Long sinceId, final Long userId, final AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_USER_TIMELINE);
+        final RequestParams requestParams = getTweetsRequestParams(null, sinceId);
+        if (userId != null && userId > 0) {
+            requestParams.put(REQ_PARAM_USER_ID, userId);
+        }
         client.get(apiUrl, requestParams, handler);
     }
 
