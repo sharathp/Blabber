@@ -1,5 +1,7 @@
 package com.sharathp.blabber.repositories;
 
+import com.sharathp.blabber.models.Mentions;
+import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.models.User;
@@ -17,9 +19,15 @@ public interface TwitterDAO {
 
     Tweet getEarliestTweet();
 
+    MentionsWithUser getLatestMention();
+
+    MentionsWithUser getEarliestMention();
+
     boolean checkAndInsertUsers(Collection<User> users);
 
     boolean checkAndInsertTweets(Collection<Tweet> tweets);
+
+    boolean checkAndInsertMentions(Collection<Mentions> mentions);
 
     boolean deleteExistingTweets();
 }

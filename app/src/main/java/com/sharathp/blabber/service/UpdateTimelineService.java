@@ -12,11 +12,16 @@ import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
+import com.sharathp.blabber.events.MentionsPastRetrievedEvent;
+import com.sharathp.blabber.events.MentionsRefreshedEvent;
 import com.sharathp.blabber.events.StatusSubmittedEvent;
 import com.sharathp.blabber.events.TweetsPastRetrievedEvent;
 import com.sharathp.blabber.events.TweetsRefreshedEvent;
+import com.sharathp.blabber.models.Mentions;
+import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.User;
+import com.sharathp.blabber.repositories.LocalPreferencesDAO;
 import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
 import com.sharathp.blabber.repositories.rest.resources.TweetResource;
@@ -41,7 +46,8 @@ public class UpdateTimelineService extends BaseService {
     private static final String EXTRA_IN_REPLY_TO_STATUS_ID = UpdateTimelineService.class.getName() + ".IN_REPLY_TO_STATUS_ID";
 
     @IntDef({OP_REFRESH_LATEST, OP_REFRESH_PAST, OP_DELETE_EXISTING_AND_REFRESH,
-            OP_TWEET, OP_TWEET_FAVORITE, OP_TWEET_UNFAVORITE})
+            OP_TWEET, OP_TWEET_FAVORITE, OP_TWEET_UNFAVORITE,OP_MENTION_LATEST,
+            OP_MENTION_PAST})
     private @interface OperationType {}
 
     private static final int OP_REFRESH_LATEST = 1;
@@ -50,6 +56,8 @@ public class UpdateTimelineService extends BaseService {
     private static final int OP_TWEET = 4;
     private static final int OP_TWEET_FAVORITE = 5;
     private static final int OP_TWEET_UNFAVORITE = 6;
+    private static final int OP_MENTION_LATEST= 7;
+    private static final int OP_MENTION_PAST = 8;
 
     @Inject
     EventBus mEventBus;
@@ -62,6 +70,9 @@ public class UpdateTimelineService extends BaseService {
 
     @Inject
     Gson mGson;
+
+    @Inject
+    LocalPreferencesDAO mLocalPreferencesDAO;
 
     public static Intent createIntentForLatestItems(final Context context) {
         return createIntent(context, OP_REFRESH_LATEST);
@@ -129,6 +140,16 @@ public class UpdateTimelineService extends BaseService {
                 tweet(status, inReplyToStatusId);
                 break;
             }
+            case OP_MENTION_LATEST: {
+                Log.i(TAG, "Retrieved Latest mentions");
+                retrieveLatestMentions();
+                break;
+            }
+            case OP_MENTION_PAST: {
+                Log.i(TAG, "Retrieved Past mentions");
+                retrievePastMentions();
+                break;
+            }
             default: {
                 Log.w(TAG, "Invalid value for: " + EXTRA_OPERATION_TYPE + ": " + operationType);
             }
@@ -147,6 +168,24 @@ public class UpdateTimelineService extends BaseService {
                 retrieveLatestTweets(new StatusSubmittedEvent(status, true));
             }
         });
+    }
+
+    private void retrievePastMentions() {
+        final MentionsWithUser pastMention = mTwitterDAO.getEarliestMention();
+        Long maxId = null;
+        if (pastMention != null) {
+            maxId = pastMention.getId();
+        }
+        mTwitterClient.getPastMentionTweets(maxId, getMentionsPastTweetsResponseHandler());
+    }
+
+    private void retrieveLatestMentions() {
+        final MentionsWithUser latestMention = mTwitterDAO.getEarliestMention();
+        Long sinceId = null;
+        if (latestMention != null) {
+            sinceId = latestMention.getId();
+        }
+        mTwitterClient.getLatestMentionTweets(sinceId, getMentionsRefreshResponseHandler());
     }
 
     private void retrievePastTweets() {
@@ -205,6 +244,28 @@ public class UpdateTimelineService extends BaseService {
         return success;
     }
 
+    private boolean saveMentions(final List<TweetResource> tweetResources) {
+        boolean success = saveTweetsAndUsers(tweetResources);
+
+        if (! success) {
+            Log.i(TAG, "Unable to save tweets, not saving mentions");
+            return success;
+        }
+
+        final long userId = mLocalPreferencesDAO.getUserId();
+        final List<Mentions> mentions = new ArrayList<>();
+        for (final TweetResource tweetResource : tweetResources) {
+            mentions.add(new Mentions()
+                    .setTweetId(tweetResource.getId())
+                    .setUserMentionId(userId));
+        }
+        success = mTwitterDAO.checkAndInsertMentions(mentions);
+        if (! success) {
+            Log.i(TAG, "Unable to save mentions");
+        }
+        return success;
+    }
+
     private AsyncHttpResponseHandler getRefreshTweetsResponseHandler(final Object additionalEventToPostOnceComplete) {
         return new TextHttpResponseHandler() {
             @Override
@@ -242,7 +303,7 @@ public class UpdateTimelineService extends BaseService {
             @Override
             public void onFailure(final int statusCode, final Header[] headers,
                                   final String responseString, final Throwable throwable) {
-                Log.e(TAG, "Error retrieving tweets: " + responseString, throwable);
+                Log.e(TAG, "Error retrieving past tweets: " + responseString, throwable);
                 final TweetsPastRetrievedEvent tweetsPastRetrievedEvent = new TweetsPastRetrievedEvent(0, false);
                 mEventBus.post(tweetsPastRetrievedEvent);
             }
@@ -253,12 +314,64 @@ public class UpdateTimelineService extends BaseService {
                 final Type responseType = new TypeToken<List<TweetResource>>() {
                 }.getType();
                 final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
-                Log.i(TAG, "Retrieved tweets: " + tweetResources.size());
+                Log.i(TAG, "Retrieved past tweets: " + tweetResources.size());
 
                 boolean success = saveTweetsAndUsers(tweetResources);
 
                 final TweetsPastRetrievedEvent tweetsPastRetrievedEvent = new TweetsPastRetrievedEvent(tweetResources.size(), success);
                 mEventBus.post(tweetsPastRetrievedEvent);
+            }
+        };
+    }
+
+    private AsyncHttpResponseHandler getMentionsRefreshResponseHandler() {
+        return new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                Log.e(TAG, "Error retrieving mentions: " + responseString, throwable);
+                final MentionsRefreshedEvent mentionsRefreshedEvent = new MentionsRefreshedEvent(0, false);
+                mEventBus.post(mentionsRefreshedEvent);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers,
+                                  final String responseString) {
+                final Type responseType = new TypeToken<List<TweetResource>>() {
+                }.getType();
+                final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
+                Log.i(TAG, "Retrieved mentions: " + tweetResources.size());
+
+                boolean success = saveMentions(tweetResources);
+
+                final MentionsRefreshedEvent mentionsRefreshedEvent = new MentionsRefreshedEvent(tweetResources.size(), success);
+                mEventBus.post(mentionsRefreshedEvent);
+            }
+        };
+    }
+
+    private AsyncHttpResponseHandler getMentionsPastTweetsResponseHandler() {
+        return new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                Log.e(TAG, "Error retrieving past mentions: " + responseString, throwable);
+                final MentionsPastRetrievedEvent mentionsPastRetrievedEvent = new MentionsPastRetrievedEvent(0, false);
+                mEventBus.post(mentionsPastRetrievedEvent);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers,
+                                  final String responseString) {
+                final Type responseType = new TypeToken<List<TweetResource>>() {
+                }.getType();
+                final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
+                Log.i(TAG, "Retrieved past mentions: " + tweetResources.size());
+
+                boolean success = saveMentions(tweetResources);
+
+                final MentionsPastRetrievedEvent mentionsPastRetrievedEvent = new MentionsPastRetrievedEvent(tweetResources.size(), success);
+                mEventBus.post(mentionsPastRetrievedEvent);
             }
         };
     }

@@ -2,6 +2,8 @@ package com.sharathp.blabber.repositories.impl;
 
 import android.content.Context;
 
+import com.sharathp.blabber.models.Mentions;
+import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.models.User;
@@ -34,6 +36,22 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     }
 
     @Override
+    public MentionsWithUser getLatestMention() {
+        final Query query = Query.select(MentionsWithUser.PROPERTIES)
+                .orderBy(Order.desc(MentionsWithUser.CREATED_AT))
+                .limit(1);
+        return mDatabase.fetchByQuery(MentionsWithUser.class, query);
+    }
+
+    @Override
+    public MentionsWithUser getEarliestMention() {
+        final Query query = Query.select(MentionsWithUser.PROPERTIES)
+                .orderBy(Order.asc(Tweet.CREATED_AT))
+                .limit(1);
+        return mDatabase.fetchByQuery(MentionsWithUser.class, query);
+    }
+
+    @Override
     public Tweet getLatestTweet() {
         final Query query = Query.select(Tweet.PROPERTIES)
                 .orderBy(Order.desc(Tweet.CREATED_AT))
@@ -57,6 +75,11 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     @Override
     public boolean checkAndInsertTweets(final Collection<Tweet> tweets) {
         return checkAndInsertElements(tweets);
+    }
+
+    @Override
+    public boolean checkAndInsertMentions(final Collection<Mentions> mentions) {
+        return checkAndInsertElements(mentions);
     }
 
     @Override

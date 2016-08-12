@@ -100,6 +100,7 @@ public class TweetsActivity extends AppCompatActivity implements TweetCallback, 
             @Override
             public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
                 final UserResource userResource = mGson.fromJson(responseString, UserResource.class);
+                mLocalPreferencesDAO.setUserId(userResource.getId());
                 mLocalPreferencesDAO.setUserRealName(userResource.getName());
                 mLocalPreferencesDAO.setUserScreenName(userResource.getScreenName());
                 mLocalPreferencesDAO.setUserProfileImageUrl(userResource.getProfileImageUrl());

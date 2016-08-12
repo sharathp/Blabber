@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.models.UserTimeline;
@@ -46,6 +47,7 @@ public class DatabaseModule {
         registerSimpleDataChangedNotifier(contentResolver, database, Tweet.TABLE, Tweet.CONTENT_URI);
         registerSimpleDataChangedNotifier(contentResolver, database, User.TABLE, User.CONTENT_URI);
         registerSimpleDataChangedNotifier(contentResolver, database, UserTimeline.TABLE, UserTimeline.CONTENT_URI);
+        registerSimpleDataChangedNotifier(contentResolver, database, Mentions.TABLE, Mentions.CONTENT_URI);
         return database;
     }
 
