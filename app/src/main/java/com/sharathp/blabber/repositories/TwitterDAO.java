@@ -15,6 +15,8 @@ public interface TwitterDAO {
     // even though this seems unnecessary, this helps keep track of all clients easily..
     SquidSupportCursorLoader<TweetWithUser> getTweets(Query query);
 
+    SquidSupportCursorLoader<MentionsWithUser> getMentions(Query query);
+
     Tweet getLatestTweet();
 
     Tweet getEarliestTweet();

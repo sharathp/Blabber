@@ -36,6 +36,13 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     }
 
     @Override
+    public SquidSupportCursorLoader<MentionsWithUser> getMentions(Query query) {
+        final SquidSupportCursorLoader<MentionsWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, MentionsWithUser.class, query);
+        loader.setNotificationUri(Mentions.CONTENT_URI);
+        return loader;
+    }
+
+    @Override
     public MentionsWithUser getLatestMention() {
         final Query query = Query.select(MentionsWithUser.PROPERTIES)
                 .orderBy(Order.desc(MentionsWithUser.CREATED_AT))
@@ -46,7 +53,7 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     @Override
     public MentionsWithUser getEarliestMention() {
         final Query query = Query.select(MentionsWithUser.PROPERTIES)
-                .orderBy(Order.asc(Tweet.CREATED_AT))
+                .orderBy(Order.asc(MentionsWithUser.CREATED_AT))
                 .limit(1);
         return mDatabase.fetchByQuery(MentionsWithUser.class, query);
     }
@@ -79,7 +86,32 @@ public class SQLiteTwitterDAO implements TwitterDAO {
 
     @Override
     public boolean checkAndInsertMentions(final Collection<Mentions> mentions) {
-        return checkAndInsertElements(mentions);
+        boolean success = true;
+        mDatabase.beginTransaction();
+        try {
+            for (final Mentions mention: mentions) {
+                final Query query = Query.select(Mentions.PROPERTIES)
+                                    .where(Mentions.TWEET_ID.eq(mention.getId()));
+
+                // insert if it doesn't exist
+                if(mDatabase.fetchByQuery(Mentions.class, query) == null) {
+                    success = mDatabase.persist(mention);
+                } else {
+                    success = true;
+                }
+
+                // short-circuit and exit the loop
+                if (! success) {
+                    break;
+                }
+            }
+            if (success) {
+                mDatabase.setTransactionSuccessful();
+            }
+        } finally {
+            mDatabase.endTransaction();
+        }
+        return success;
     }
 
     @Override
@@ -89,7 +121,7 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     }
 
     private <T extends AndroidTableModel> boolean checkAndInsertElements(final Collection<T> models) {
-        boolean success = false;
+        boolean success = true;
         mDatabase.beginTransaction();
         try {
             for (final T model: models) {

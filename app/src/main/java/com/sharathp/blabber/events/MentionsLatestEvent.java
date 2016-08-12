@@ -1,10 +1,10 @@
 package com.sharathp.blabber.events;
 
-public class MentionsRefreshedEvent {
+public class MentionsLatestEvent {
     private final int tweetsCount;
     private final boolean success;
 
-    public MentionsRefreshedEvent(final int tweetsCount, final boolean success) {
+    public MentionsLatestEvent(final int tweetsCount, final boolean success) {
         this.tweetsCount = tweetsCount;
         this.success = success;
     }
