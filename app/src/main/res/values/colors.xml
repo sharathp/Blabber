@@ -25,6 +25,7 @@
     <color name="text_embedded_user_name">#0084B4</color>
     <color name="text_content">#292F33</color>
     <color name="text_time">#899AA7</color>
+    <color name="tab_normal">#899AA7</color>
 
     <color name="text_color_link">@color/color_twitter_blue</color>
 

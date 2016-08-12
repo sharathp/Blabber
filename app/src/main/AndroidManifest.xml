@@ -37,12 +37,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.TweetsActivity"/>
+        <activity android:name=".activities.HomeActivity"/>
 
         <activity android:name=".activities.TweetDetailActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.TweetsActivity" />
+                android:value=".activities.HomeActivity" />
 
         </activity>
 
