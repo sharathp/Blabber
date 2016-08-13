@@ -1,19 +1,12 @@
 package com.sharathp.blabber.events;
 
-public class UserTimelinePastRetrievedEvent {
-    private final long userId;
+public class MentionsPastEvent {
     private final int tweetsCount;
     private final boolean success;
 
-    public UserTimelinePastRetrievedEvent(final long userId, final int tweetsCount,
-                                          final boolean success) {
-        this.userId = userId;
+    public MentionsPastEvent(final int tweetsCount, final boolean success) {
         this.tweetsCount = tweetsCount;
         this.success = success;
-    }
-
-    public long getUserId() {
-        return userId;
     }
 
     public int getTweetsCount() {

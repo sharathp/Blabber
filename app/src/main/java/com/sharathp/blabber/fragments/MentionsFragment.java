@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentTimelineBinding;
-import com.sharathp.blabber.events.MentionsPastRetrievedEvent;
+import com.sharathp.blabber.events.MentionsPastEvent;
 import com.sharathp.blabber.events.MentionsLatestEvent;
 import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.repositories.TwitterDAO;
@@ -141,7 +141,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(final MentionsPastRetrievedEvent event) {
+    public void onEventMainThread(final MentionsPastEvent event) {
         if (event.isSuccess()) {
             if (event.getTweetsCount() == 0) {
                 markNoMoreItemsToLoad();

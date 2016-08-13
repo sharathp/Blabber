@@ -12,13 +12,15 @@ import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
-import com.sharathp.blabber.events.MentionsPastRetrievedEvent;
+import com.sharathp.blabber.events.HomeTimelineLatestEvent;
+import com.sharathp.blabber.events.HomeTimelinePastEvent;
 import com.sharathp.blabber.events.MentionsLatestEvent;
+import com.sharathp.blabber.events.MentionsPastEvent;
 import com.sharathp.blabber.events.StatusSubmittedEvent;
-import com.sharathp.blabber.events.TweetsPastRetrievedEvent;
-import com.sharathp.blabber.events.TweetsRefreshedEvent;
 import com.sharathp.blabber.events.UserTimelineLatestEvent;
-import com.sharathp.blabber.events.UserTimelinePastRetrievedEvent;
+import com.sharathp.blabber.events.UserTimelinePastEvent;
+import com.sharathp.blabber.models.HomeTimeline;
+import com.sharathp.blabber.models.HomeTimelineWithUser;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
@@ -53,13 +55,13 @@ public class UpdateTimelineService extends BaseService {
     private static final String EXTRA_IN_REPLY_TO_STATUS_ID = UpdateTimelineService.class.getName() + ".IN_REPLY_TO_STATUS_ID";
 
 
-    @IntDef({OP_REFRESH_LATEST, OP_REFRESH_PAST, OP_DELETE_EXISTING_AND_REFRESH,
+    @IntDef({OP_HOME_TIMELINE_LATEST, OP_HOME_TIMELINE_PAST, OP_DELETE_EXISTING_AND_REFRESH,
             OP_TWEET, OP_TWEET_FAVORITE, OP_TWEET_UNFAVORITE,OP_MENTION_LATEST,
             OP_MENTION_PAST, OP_USER_TIMELINE_LATEST, OP_USER_TIMELINE_PAST})
     private @interface OperationType {}
 
-    private static final int OP_REFRESH_LATEST = 1;
-    private static final int OP_REFRESH_PAST = 2;
+    private static final int OP_HOME_TIMELINE_LATEST = 1;
+    private static final int OP_HOME_TIMELINE_PAST = 2;
     private static final int OP_DELETE_EXISTING_AND_REFRESH = 3;
     private static final int OP_TWEET = 4;
     private static final int OP_TWEET_FAVORITE = 5;
@@ -84,12 +86,12 @@ public class UpdateTimelineService extends BaseService {
     @Inject
     LocalPreferencesDAO mLocalPreferencesDAO;
 
-    public static Intent createIntentForLatestItems(final Context context) {
-        return createIntent(context, OP_REFRESH_LATEST);
+    public static Intent createIntentForLatestHomeTimeline(final Context context) {
+        return createIntent(context, OP_HOME_TIMELINE_LATEST);
     }
 
-    public static Intent createIntentForPastItems(final Context context) {
-        return createIntent(context, OP_REFRESH_PAST);
+    public static Intent createIntentForPastHomeTimeline(final Context context) {
+        return createIntent(context, OP_HOME_TIMELINE_PAST);
     }
 
     public static Intent createIntentForDeleteExistingItemsAndRetrieveLasterItems(final Context context) {
@@ -144,20 +146,21 @@ public class UpdateTimelineService extends BaseService {
         final int operationType = intentData.getInt(EXTRA_OPERATION_TYPE, -1);
 
         switch (operationType) {
-            case OP_REFRESH_LATEST: {
+            case OP_HOME_TIMELINE_LATEST: {
                 Log.i(TAG, "Retrieved Latest tweets");
-                retrieveLatestTweets(null);
+                retrieveLatestHomeTimeline(null);
                 break;
             }
-            case OP_REFRESH_PAST: {
+            case OP_HOME_TIMELINE_PAST: {
                 Log.i(TAG, "Retrieved past tweets");
-                retrievePastTweets();
+                retrievePastHomeTimeline();
                 break;
             }
             case OP_DELETE_EXISTING_AND_REFRESH: {
-                Log.i(TAG, "Deleting and retrieving latest tweets");
-                deleteExistingData();
-                retrieveLatestTweets(null);
+//                Log.i(TAG, "Deleting and retrieving latest tweets");
+//                deleteExistingData();
+//                retrieveLatestHomeTimeline(null);
+
                 break;
             }
             case OP_TWEET: {
@@ -205,7 +208,7 @@ public class UpdateTimelineService extends BaseService {
 
             @Override
             public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
-                retrieveLatestTweets(new StatusSubmittedEvent(status, true));
+                retrieveLatestHomeTimeline(new StatusSubmittedEvent(status, true));
             }
         });
     }
@@ -228,15 +231,6 @@ public class UpdateTimelineService extends BaseService {
         mTwitterClient.getPastUserTimeLineTweets(maxId - 1, userId, getPastUserTimelineResponseHandler(userId));
     }
 
-    private void retrievePastMentions() {
-        final MentionsWithUser pastMention = mTwitterDAO.getEarliestMention();
-        Long maxId = null;
-        if (pastMention != null) {
-            maxId = pastMention.getId();
-        }
-        mTwitterClient.getPastMentionTweets(maxId - 1, getMentionsPastTweetsResponseHandler());
-    }
-
     private void retrieveLatestMentions() {
         final MentionsWithUser latestMention = mTwitterDAO.getLatestMention();
         Long sinceId = null;
@@ -246,22 +240,31 @@ public class UpdateTimelineService extends BaseService {
         mTwitterClient.getLatestMentionTweets(sinceId, getMentionsRefreshResponseHandler());
     }
 
-    private void retrievePastTweets() {
-        final Tweet tweet = mTwitterDAO.getEarliestTweet();
+    private void retrievePastMentions() {
+        final MentionsWithUser pastMention = mTwitterDAO.getEarliestMention();
         Long maxId = null;
-        if (tweet != null) {
-            maxId = tweet.getId();
+        if (pastMention != null) {
+            maxId = pastMention.getId();
         }
-        mTwitterClient.getPastTweets(maxId - 1, getPastTweetsResponseHandler());
+        mTwitterClient.getPastMentionTweets(maxId - 1, getMentionsPastTweetsResponseHandler());
     }
 
-    private void retrieveLatestTweets(final Object additionalEventToPostOnceComplete) {
-        final Tweet tweet = mTwitterDAO.getLatestTweet();
+    private void retrieveLatestHomeTimeline(final Object additionalEventToPostOnceComplete) {
+        final HomeTimelineWithUser homeTimelineWithUser = mTwitterDAO.getLatestHomeTimeline();
         Long sinceId = null;
-        if (tweet != null) {
-            sinceId = tweet.getId();
+        if (homeTimelineWithUser != null) {
+            sinceId = homeTimelineWithUser.getId();
         }
-        mTwitterClient.getLatestTweets(sinceId, getRefreshTweetsResponseHandler(additionalEventToPostOnceComplete));
+        mTwitterClient.getLatestHomeTimeline(sinceId, getLatestHomeTimelineResponseHandler(additionalEventToPostOnceComplete));
+    }
+
+    private void retrievePastHomeTimeline() {
+        final HomeTimelineWithUser homeTimelineWithUser = mTwitterDAO.getEarliestHomeTimeline();
+        Long maxId = null;
+        if (homeTimelineWithUser != null) {
+            maxId = homeTimelineWithUser.getId();
+        }
+        mTwitterClient.getPastHomeTimeline(maxId - 1, getPastHomeTimelineResponseHandler());
     }
 
     private boolean saveTweets(final List<TweetResource> tweetResources) {
@@ -345,14 +348,36 @@ public class UpdateTimelineService extends BaseService {
         return success;
     }
 
-    private AsyncHttpResponseHandler getRefreshTweetsResponseHandler(final Object additionalEventToPostOnceComplete) {
+    private boolean saveHomeTimelines(List<TweetResource> tweetResources) {
+        boolean success = saveTweetsAndUsers(tweetResources);
+
+        if (! success) {
+            Log.i(TAG, "Unable to save tweets, not saving home timeline");
+            return success;
+        }
+
+        final long userId = mLocalPreferencesDAO.getUserId();
+        final List<HomeTimeline> homeTimelines = new ArrayList<>();
+        for (final TweetResource tweetResource : tweetResources) {
+            homeTimelines.add(new HomeTimeline()
+                    .setTweetId(tweetResource.getId())
+                    .setUserTimeLineId(userId));
+        }
+        success = mTwitterDAO.checkAndInsertHomeTimelines(homeTimelines);
+        if (! success) {
+            Log.i(TAG, "Unable to save home timelines");
+        }
+        return success;
+    }
+
+    private AsyncHttpResponseHandler getLatestHomeTimelineResponseHandler(final Object additionalEventToPostOnceComplete) {
         return new TextHttpResponseHandler() {
             @Override
             public void onFailure(final int statusCode, final Header[] headers,
                                   final String responseString, final Throwable throwable) {
                 Log.e(TAG, "Error retrieving tweets: " + responseString, throwable);
-                final TweetsRefreshedEvent tweetsRefreshedEvent = new TweetsRefreshedEvent(0, false);
-                mEventBus.post(tweetsRefreshedEvent);
+                final HomeTimelineLatestEvent homeTimelineLatestEvent = new HomeTimelineLatestEvent(0, false);
+                mEventBus.post(homeTimelineLatestEvent);
                 if (additionalEventToPostOnceComplete != null) {
                     mEventBus.post(additionalEventToPostOnceComplete);
                 }
@@ -366,10 +391,10 @@ public class UpdateTimelineService extends BaseService {
                 final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
                 Log.i(TAG, "Retrieved tweets: " + tweetResources.size());
 
-                boolean success = saveTweetsAndUsers(tweetResources);
+                boolean success = saveHomeTimelines(tweetResources);
 
-                final TweetsRefreshedEvent tweetsRefreshedEvent = new TweetsRefreshedEvent(tweetResources.size(), success);
-                mEventBus.post(tweetsRefreshedEvent);
+                final HomeTimelineLatestEvent homeTimelineLatestEvent = new HomeTimelineLatestEvent(tweetResources.size(), success);
+                mEventBus.post(homeTimelineLatestEvent);
                 if (additionalEventToPostOnceComplete != null) {
                     mEventBus.post(additionalEventToPostOnceComplete);
                 }
@@ -377,14 +402,14 @@ public class UpdateTimelineService extends BaseService {
         };
     }
 
-    private AsyncHttpResponseHandler getPastTweetsResponseHandler() {
+    private AsyncHttpResponseHandler getPastHomeTimelineResponseHandler() {
         return new TextHttpResponseHandler() {
             @Override
             public void onFailure(final int statusCode, final Header[] headers,
                                   final String responseString, final Throwable throwable) {
                 Log.e(TAG, "Error retrieving past tweets: " + responseString, throwable);
-                final TweetsPastRetrievedEvent tweetsPastRetrievedEvent = new TweetsPastRetrievedEvent(0, false);
-                mEventBus.post(tweetsPastRetrievedEvent);
+                final HomeTimelinePastEvent homeTimelinePastEvent = new HomeTimelinePastEvent(0, false);
+                mEventBus.post(homeTimelinePastEvent);
             }
 
             @Override
@@ -395,10 +420,10 @@ public class UpdateTimelineService extends BaseService {
                 final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
                 Log.i(TAG, "Retrieved past tweets: " + tweetResources.size());
 
-                boolean success = saveTweetsAndUsers(tweetResources);
+                boolean success = saveHomeTimelines(tweetResources);
 
-                final TweetsPastRetrievedEvent tweetsPastRetrievedEvent = new TweetsPastRetrievedEvent(tweetResources.size(), success);
-                mEventBus.post(tweetsPastRetrievedEvent);
+                final HomeTimelinePastEvent homeTimelinePastEvent = new HomeTimelinePastEvent(tweetResources.size(), success);
+                mEventBus.post(homeTimelinePastEvent);
             }
         };
     }
@@ -435,7 +460,7 @@ public class UpdateTimelineService extends BaseService {
             public void onFailure(final int statusCode, final Header[] headers,
                                   final String responseString, final Throwable throwable) {
                 Log.e(TAG, "Error retrieving past mentions: " + responseString, throwable);
-                final MentionsPastRetrievedEvent mentionsPastRetrievedEvent = new MentionsPastRetrievedEvent(0, false);
+                final MentionsPastEvent mentionsPastRetrievedEvent = new MentionsPastEvent(0, false);
                 mEventBus.post(mentionsPastRetrievedEvent);
             }
 
@@ -449,7 +474,7 @@ public class UpdateTimelineService extends BaseService {
 
                 boolean success = saveMentions(tweetResources);
 
-                final MentionsPastRetrievedEvent mentionsPastRetrievedEvent = new MentionsPastRetrievedEvent(tweetResources.size(), success);
+                final MentionsPastEvent mentionsPastRetrievedEvent = new MentionsPastEvent(tweetResources.size(), success);
                 mEventBus.post(mentionsPastRetrievedEvent);
             }
         };
@@ -489,7 +514,7 @@ public class UpdateTimelineService extends BaseService {
                                   final String responseString, final Throwable throwable) {
                 Log.e(TAG, "Error retrieving past timeline: " + responseString, throwable);
 
-                final UserTimelinePastRetrievedEvent userTimelinePastRetrievedEvent = new UserTimelinePastRetrievedEvent(userId, 0, false);
+                final UserTimelinePastEvent userTimelinePastRetrievedEvent = new UserTimelinePastEvent(userId, 0, false);
                 mEventBus.post(userTimelinePastRetrievedEvent);
             }
 
@@ -503,7 +528,7 @@ public class UpdateTimelineService extends BaseService {
 
                 final boolean success = saveUserTimelines(userId, tweetResources);
 
-                final UserTimelinePastRetrievedEvent userTimelinePastRetrievedEvent = new UserTimelinePastRetrievedEvent(userId, tweetResources.size(), success);
+                final UserTimelinePastEvent userTimelinePastRetrievedEvent = new UserTimelinePastEvent(userId, tweetResources.size(), success);
                 mEventBus.post(userTimelinePastRetrievedEvent);
             }
         };
