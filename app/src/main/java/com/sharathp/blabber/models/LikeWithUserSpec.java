@@ -67,4 +67,6 @@ public class LikeWithUserSpec {
     public static final Property.StringProperty RETWEETED_SCREEN_NAME = Tweet.RETWEETED_SCREEN_NAME;
 
     public static final Property.StringProperty RETWEETED_PROFILE_IMAGE_URL = Tweet.RETWEETED_PROFILE_IMAGE_URL;
+
+    public static final Property.IntegerProperty RETWEETED_FAVORITE_COUNT = Tweet.RETWEETED_FAVORITE_COUNT;
 }

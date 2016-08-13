@@ -50,6 +50,7 @@
     <dimen name="detail_time_margin_top">16dp</dimen>
     <dimen name="detail_text_content">20sp</dimen>
     <dimen name="detail_divider_margin">12dp</dimen>
+    <dimen name="detail_likes_margin_left">24dp</dimen>
 
     <dimen name="detail_action_height">24dp</dimen>
     <dimen name="detail_action_width">24dp</dimen>

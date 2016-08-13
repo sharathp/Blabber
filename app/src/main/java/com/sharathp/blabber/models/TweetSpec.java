@@ -62,4 +62,6 @@ public class TweetSpec {
     public String retweetedScreenName;
 
     public String retweetedProfileImageUrl;
+
+    public int retweetedFavoriteCount;
 }

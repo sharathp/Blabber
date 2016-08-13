@@ -173,7 +173,12 @@ public class TweetViewHolder<T extends AbstractModel & ITweetWithUser> extends S
     }
 
     private void setLikes() {
-        mLikeCountTextView.setText(Integer.toString(item.getFavoriteCount()));
+        int favoriteCount = item.getFavoriteCount();
+        if (item.getRetweetedUserName() != null) {
+            favoriteCount = item.getRetweetedFavoriteCount();
+        }
+
+        mLikeCountTextView.setText(Integer.toString(favoriteCount));
         if (item.getFavorited()) {
             mLikeActionImageView.setImageResource(R.drawable.ic_like_active);
         } else {

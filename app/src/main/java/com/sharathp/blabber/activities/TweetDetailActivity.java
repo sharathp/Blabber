@@ -138,7 +138,11 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
     }
 
     private void setLikes() {
-        final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_retweets), mTweetWithUser.getFavoriteCount());
+        int favoriteCount = mTweetWithUser.getFavoriteCount();
+        if (mTweetWithUser.getRetweetedUserName() != null) {
+            favoriteCount = mTweetWithUser.getRetweetedFavoriteCount();
+        }
+        final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_likes), favoriteCount);
         mBinding.tvLikes.setText(spannable);
         if (mTweetWithUser.getFavorited()) {
             mBinding.ivLikeAction.setImageResource(R.drawable.ic_like_active);
@@ -146,7 +150,7 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
     }
 
     private void setRetweets() {
-        final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_likes), mTweetWithUser.getRetweetCount());
+        final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_retweets), mTweetWithUser.getRetweetCount());
         mBinding.tvRetweets.setText(spannable);
         if (mTweetWithUser.getRetweeted()) {
             mBinding.ivRetweetAction.setImageResource(R.drawable.ic_retweet_active);
