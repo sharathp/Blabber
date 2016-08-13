@@ -134,6 +134,7 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
+            populateLoggedInUserDetails();
             return true;
         }
 
