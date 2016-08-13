@@ -65,7 +65,7 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
         mBinding.appbarLayout.addOnOffsetChangedListener(this);
         mMaxScrollSize = mBinding.appbarLayout.getTotalScrollRange();
 
-        mBinding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+//        mBinding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         ImageUtils.loadProfileImageWithRounderCorners(this, mBinding.ivProfile, mUser.getProfileImageUrl());
         ImageUtils.loadImage(this, mBinding.ivProfileBackdrop, mUser.getProfileBackgroundImageUrl());
@@ -79,7 +79,8 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
             mBinding.tvUserDesc.setText(mUser.getDescription());
         }
 
-
+        setFollowing();
+        setFollowers();
     }
 
     @Override
@@ -121,8 +122,6 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
                     .scaleY(1).scaleX(1)
                     .start();
         }
-        setFollowing();
-        setFollowers();
     }
 
     private void setFollowing() {

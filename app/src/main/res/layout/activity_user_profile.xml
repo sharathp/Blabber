@@ -38,32 +38,27 @@
                 android:layout_width="96dp"
                 android:layout_height="96dp"
                 android:layout_marginTop="-48dp"
+                android:layout_marginLeft="@dimen/profile_header_margin"
                 android:background="@null"
                 android:elevation="8dp"
-                android:layout_gravity="center"
+                android:layout_gravity="left"
                 app:layout_scrollFlags="scroll" />
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_height="wrap_content"
-                android:minHeight="?attr/actionBarSize"
-                android:layout_width="match_parent"
-                android:layout_marginTop="-50dp"
-                app:layout_scrollFlags="scroll|enterAlways"
-                app:navigationIcon="@drawable/ic_arrow_back"
-                app:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/space_content"
+                android:layout_marginTop="-50dp"
+                android:paddingTop="@dimen/space_content"
+                android:paddingRight="@dimen/space_content"
+                android:paddingBottom="@dimen/space_content"
+                android:paddingLeft="@dimen/profile_header_margin"
                 app:layout_scrollFlags="scroll|enterAlways">
 
                 <TextView
                     android:id="@+id/tv_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
+                    android:layout_marginTop="50dp"
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:textStyle="bold"
@@ -76,7 +71,6 @@
                     android:layout_below="@id/tv_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:textSize="@dimen/text_screen_name"
