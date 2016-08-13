@@ -157,7 +157,7 @@ public class UpdateTimelineService extends BaseService {
                 break;
             }
             case OP_DELETE_EXISTING_AND_REFRESH: {
-//                Log.i(TAG, "Deleting and retrieving latest tweets");
+                Log.i(TAG, "******** OP_DELETE_EXISTING_AND_REFRESH NOT SUPPORTED ********");
 //                deleteExistingData();
 //                retrieveLatestHomeTimeline(null);
 

@@ -33,7 +33,7 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     }
 
     @Override
-    public SquidSupportCursorLoader<HomeTimelineWithUser> getTweets(final Query query) {
+    public SquidSupportCursorLoader<HomeTimelineWithUser> getHomeTimeline(final Query query) {
         final SquidSupportCursorLoader<HomeTimelineWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, HomeTimelineWithUser.class, query);
         loader.setNotificationUri(HomeTimeline.CONTENT_URI);
         return loader;

@@ -38,7 +38,6 @@ import com.sharathp.blabber.models.ITweetWithUser;
 import com.sharathp.blabber.repositories.LocalPreferencesDAO;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
 import com.sharathp.blabber.repositories.rest.resources.UserResource;
-import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.util.ImageUtils;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 
@@ -196,13 +195,6 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
 
         final Intent intent = TweetDetailActivity.createIntent(this, tweet);
         startActivity(intent);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        // stop service
-        stopService(UpdateTimelineService.createIntentForLatestItems(this));
     }
 
     @Override

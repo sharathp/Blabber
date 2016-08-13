@@ -90,7 +90,7 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         showLoading();
-        refreshTweets();
+        refreshHomeTimeline();
         getLoaderManager().initLoader(TWEET_ITEM_LOADER_ID, null, this);
     }
 
@@ -110,7 +110,7 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
     public Loader<SquidCursor<HomeTimelineWithUser>> onCreateLoader(final int id, final Bundle args) {
         final Query query = Query.select(HomeTimelineWithUser.PROPERTIES)
                 .orderBy(Order.desc(HomeTimelineWithUser.CREATED_AT));
-        return mTwitterDAO.getTweets(query);
+        return mTwitterDAO.getHomeTimeline(query);
     }
 
     @Override
@@ -159,7 +159,7 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
         moviesRecyclerView.setAdapter(mHomeTimeLineAdapter);
         moviesRecyclerView.setLayoutManager(mLayoutManager);
         moviesRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
-        mBinding.srlTweets.setOnRefreshListener(() -> deleteAndRefreshTweets());
+        mBinding.srlTweets.setOnRefreshListener(() -> refreshHomeTimeline());
         mEndlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(mLayoutManager) {
             @Override
             public void onLoadMore(final int page, final int totalItemsCount) {
@@ -169,19 +169,7 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
         mBinding.rvTweets.addOnScrollListener(mEndlessRecyclerViewScrollListener);
     }
 
-    private void deleteAndRefreshTweets() {
-        if (! NetworkUtils.isOnline(getContext())) {
-            Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
-            mBinding.srlTweets.setRefreshing(false);
-            return;
-        }
-
-        final Intent intent = UpdateTimelineService.createIntentForDeleteExistingItemsAndRetrieveLasterItems(getActivity());
-        getActivity().startService(intent);
-        markMoreItemsToLoad();
-    }
-
-    private void refreshTweets() {
+    private void refreshHomeTimeline() {
         if (! NetworkUtils.isOnline(getContext())) {
             Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
             mBinding.srlTweets.setRefreshing(false);

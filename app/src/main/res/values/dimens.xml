@@ -28,6 +28,8 @@
 
     <dimen name="drawer_margin_top">60dp</dimen>
 
+    <dimen name="loader_padding">16dp</dimen>
+
     <dimen name="text_drawer_title">24sp</dimen>
 
     <dimen name="text_retweeted">14sp</dimen>
