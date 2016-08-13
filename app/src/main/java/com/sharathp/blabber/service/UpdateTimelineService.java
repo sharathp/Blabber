@@ -18,6 +18,7 @@ import com.sharathp.blabber.events.MentionsLatestEvent;
 import com.sharathp.blabber.events.MentionsPastEvent;
 import com.sharathp.blabber.events.StatusSubmittedEvent;
 import com.sharathp.blabber.events.UserLikeLatestEvent;
+import com.sharathp.blabber.events.UserLikePastEvent;
 import com.sharathp.blabber.events.UserProfileRetrieved;
 import com.sharathp.blabber.events.UserTimelineLatestEvent;
 import com.sharathp.blabber.events.UserTimelinePastEvent;
@@ -683,8 +684,8 @@ public class UpdateTimelineService extends BaseService {
                                   final String responseString, final Throwable throwable) {
                 Log.e(TAG, "Error retrieving past likes: " + responseString, throwable);
 
-                final UserLikeLatestEvent userLikeLatestEvent = new UserLikeLatestEvent(userId, 0, false);
-                mEventBus.post(userLikeLatestEvent);
+                final UserLikePastEvent userLikePastEvent = new UserLikePastEvent(userId, 0, false);
+                mEventBus.post(userLikePastEvent);
             }
 
             @Override
@@ -697,8 +698,8 @@ public class UpdateTimelineService extends BaseService {
 
                 final boolean success = saveUserLikes(userId, tweetResources);
 
-                final UserLikeLatestEvent userLikeLatestEvent = new UserLikeLatestEvent(userId, tweetResources.size(), success);
-                mEventBus.post(userLikeLatestEvent);
+                final UserLikePastEvent userLikePastEvent = new UserLikePastEvent(userId, tweetResources.size(), success);
+                mEventBus.post(userLikePastEvent);
             }
         };
     }
