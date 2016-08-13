@@ -42,7 +42,6 @@ public class TwitterClient extends OAuthBaseClient {
     private static final String RELATIVE_URL_MENTION = "/statuses/mentions_timeline.json";
     private static final String RELATIVE_URL_USER_TIMELINE = "/statuses/user_timeline.json";
 
-
     private static final String REQ_STATUS_ID = "id";
     private static final String REQ_PARAM_MAX_ID = "max_id";
     private static final String REQ_PARAM_SINCE_ID = "since_id";
@@ -69,13 +68,13 @@ public class TwitterClient extends OAuthBaseClient {
         client.post(apiUrl, requestParams, handler);
     }
 
-    public void getPastTweets(final Long maxId, final AsyncHttpResponseHandler handler) {
+    public void getPastHomeTimeline(final Long maxId, final AsyncHttpResponseHandler handler) {
         final String apiUrl = getApiUrl(RELATIVE_URL_HOME_TIMELINE);
         final RequestParams requestParams = getTweetsRequestParams(maxId, null);
         client.get(apiUrl, requestParams, handler);
     }
 
-    public void getLatestTweets(final Long sinceId, final AsyncHttpResponseHandler handler) {
+    public void getLatestHomeTimeline(final Long sinceId, final AsyncHttpResponseHandler handler) {
         final String apiUrl = getApiUrl(RELATIVE_URL_HOME_TIMELINE);
         final RequestParams requestParams = getTweetsRequestParams(null, sinceId);
         client.get(apiUrl, requestParams, handler);

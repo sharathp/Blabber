@@ -19,7 +19,7 @@ import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentTimelineBinding;
 import com.sharathp.blabber.events.UserTimelineLatestEvent;
-import com.sharathp.blabber.events.UserTimelinePastRetrievedEvent;
+import com.sharathp.blabber.events.UserTimelinePastEvent;
 import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
 import com.sharathp.blabber.repositories.TwitterDAO;
@@ -149,7 +149,7 @@ public class UserTimelineFragment extends Fragment implements LoaderManager.Load
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(final UserTimelinePastRetrievedEvent event) {
+    public void onEventMainThread(final UserTimelinePastEvent event) {
         if (event.isSuccess()) {
             if (event.getTweetsCount() == 0) {
                 markNoMoreItemsToLoad();

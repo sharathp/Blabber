@@ -2,10 +2,11 @@ package com.sharathp.blabber.repositories.impl;
 
 import android.content.Context;
 
+import com.sharathp.blabber.models.HomeTimeline;
+import com.sharathp.blabber.models.HomeTimelineWithUser;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
-import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
 import com.sharathp.blabber.models.UserTimeline;
@@ -32,9 +33,9 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     }
 
     @Override
-    public SquidSupportCursorLoader<TweetWithUser> getTweets(final Query query) {
-        final SquidSupportCursorLoader<TweetWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, TweetWithUser.class, query);
-        loader.setNotificationUri(Tweet.CONTENT_URI);
+    public SquidSupportCursorLoader<HomeTimelineWithUser> getTweets(final Query query) {
+        final SquidSupportCursorLoader<HomeTimelineWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, HomeTimelineWithUser.class, query);
+        loader.setNotificationUri(HomeTimeline.CONTENT_URI);
         return loader;
     }
 
@@ -46,7 +47,7 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     }
 
     @Override
-    public SquidSupportCursorLoader<MentionsWithUser> getMentions(Query query) {
+    public SquidSupportCursorLoader<MentionsWithUser> getMentions(final Query query) {
         final SquidSupportCursorLoader<MentionsWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, MentionsWithUser.class, query);
         loader.setNotificationUri(Mentions.CONTENT_URI);
         return loader;
@@ -87,19 +88,19 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     }
 
     @Override
-    public Tweet getLatestTweet() {
-        final Query query = Query.select(Tweet.PROPERTIES)
-                .orderBy(Order.desc(Tweet.CREATED_AT))
+    public HomeTimelineWithUser getLatestHomeTimeline() {
+        final Query query = Query.select(HomeTimelineWithUser.PROPERTIES)
+                .orderBy(Order.desc(HomeTimelineWithUser.CREATED_AT))
                 .limit(1);
-        return mDatabase.fetchByQuery(Tweet.class, query);
+        return mDatabase.fetchByQuery(HomeTimelineWithUser.class, query);
     }
 
     @Override
-    public Tweet getEarliestTweet() {
-        final Query query = Query.select(Tweet.PROPERTIES)
-                .orderBy(Order.asc(Tweet.CREATED_AT))
+    public HomeTimelineWithUser getEarliestHomeTimeline() {
+        final Query query = Query.select(HomeTimelineWithUser.PROPERTIES)
+                .orderBy(Order.asc(HomeTimelineWithUser.CREATED_AT))
                 .limit(1);
-        return mDatabase.fetchByQuery(Tweet.class, query);
+        return mDatabase.fetchByQuery(HomeTimelineWithUser.class, query);
     }
 
     @Override
@@ -154,6 +155,36 @@ public class SQLiteTwitterDAO implements TwitterDAO {
                 // insert if it doesn't exist
                 if(mDatabase.fetchByQuery(UserTimeline.class, query) == null) {
                     success = mDatabase.persist(userTimeline);
+                } else {
+                    success = true;
+                }
+
+                // short-circuit and exit the loop
+                if (! success) {
+                    break;
+                }
+            }
+            if (success) {
+                mDatabase.setTransactionSuccessful();
+            }
+        } finally {
+            mDatabase.endTransaction();
+        }
+        return success;
+    }
+
+    @Override
+    public boolean checkAndInsertHomeTimelines(final List<HomeTimeline> homeTimelines) {
+        boolean success = true;
+        mDatabase.beginTransaction();
+        try {
+            for (final HomeTimeline homeTimeline: homeTimelines) {
+                final Query query = Query.select(HomeTimeline.PROPERTIES)
+                        .where(HomeTimeline.TWEET_ID.eq(homeTimeline.getId()));
+
+                // insert if it doesn't exist
+                if(mDatabase.fetchByQuery(HomeTimeline.class, query) == null) {
+                    success = mDatabase.persist(homeTimeline);
                 } else {
                     success = true;
                 }

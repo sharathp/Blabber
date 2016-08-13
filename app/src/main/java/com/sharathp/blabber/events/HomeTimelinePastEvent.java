@@ -1,10 +1,10 @@
 package com.sharathp.blabber.events;
 
-public class TweetsRefreshedEvent {
+public class HomeTimelinePastEvent {
     private final int tweetsCount;
     private final boolean success;
 
-    public TweetsRefreshedEvent(final int tweetsCount, final boolean success) {
+    public HomeTimelinePastEvent(final int tweetsCount, final boolean success) {
         this.tweetsCount = tweetsCount;
         this.success = success;
     }

@@ -18,16 +18,16 @@ import android.widget.Toast;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentTimelineBinding;
-import com.sharathp.blabber.events.TweetsPastRetrievedEvent;
-import com.sharathp.blabber.events.TweetsRefreshedEvent;
-import com.sharathp.blabber.models.TweetWithUser;
+import com.sharathp.blabber.events.HomeTimelineLatestEvent;
+import com.sharathp.blabber.events.HomeTimelinePastEvent;
+import com.sharathp.blabber.models.HomeTimelineWithUser;
 import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.util.NetworkUtils;
 import com.sharathp.blabber.views.DividerItemDecoration;
 import com.sharathp.blabber.views.EndlessRecyclerViewScrollListener;
+import com.sharathp.blabber.views.adapters.HomeTimeLineAdapter;
 import com.sharathp.blabber.views.adapters.TweetCallback;
-import com.sharathp.blabber.views.adapters.TweetsAdapter;
 import com.yahoo.squidb.data.SquidCursor;
 import com.yahoo.squidb.sql.Order;
 import com.yahoo.squidb.sql.Query;
@@ -38,7 +38,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import javax.inject.Inject;
 
-public class HomeTimelineFragment extends Fragment implements LoaderManager.LoaderCallbacks<SquidCursor<TweetWithUser>> {
+public class HomeTimelineFragment extends Fragment implements LoaderManager.LoaderCallbacks<SquidCursor<HomeTimelineWithUser>> {
     private static final int TWEET_ITEM_LOADER_ID = 0;
 
     @Inject
@@ -51,7 +51,7 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
 
     private FragmentTimelineBinding mBinding;
     private LinearLayoutManager mLayoutManager;
-    private TweetsAdapter mTweetsAdapter;
+    private HomeTimeLineAdapter mHomeTimeLineAdapter;
     private EndlessRecyclerViewScrollListener mEndlessRecyclerViewScrollListener;
 
     public static HomeTimelineFragment createInstance() {
@@ -107,14 +107,14 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
     }
 
     @Override
-    public Loader<SquidCursor<TweetWithUser>> onCreateLoader(final int id, final Bundle args) {
-        final Query query = Query.select(TweetWithUser.PROPERTIES)
-                .orderBy(Order.desc(TweetWithUser.CREATED_AT));
+    public Loader<SquidCursor<HomeTimelineWithUser>> onCreateLoader(final int id, final Bundle args) {
+        final Query query = Query.select(HomeTimelineWithUser.PROPERTIES)
+                .orderBy(Order.desc(HomeTimelineWithUser.CREATED_AT));
         return mTwitterDAO.getTweets(query);
     }
 
     @Override
-    public void onLoadFinished(final Loader<SquidCursor<TweetWithUser>> loader, final SquidCursor<TweetWithUser> data) {
+    public void onLoadFinished(final Loader<SquidCursor<HomeTimelineWithUser>> loader, final SquidCursor<HomeTimelineWithUser> data) {
         if (data.getCount() > 0) {
             // hide no tweets message
             hideMessageContainer();
@@ -124,16 +124,16 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
             showNoTweetsMessage();
             markNoMoreItemsToLoad();
         }
-        mTweetsAdapter.swapCursor(data);
+        mHomeTimeLineAdapter.swapCursor(data);
     }
 
     @Override
-    public void onLoaderReset(final Loader<SquidCursor<TweetWithUser>> loader) {
-        mTweetsAdapter.swapCursor(null);
+    public void onLoaderReset(final Loader<SquidCursor<HomeTimelineWithUser>> loader) {
+        mHomeTimeLineAdapter.swapCursor(null);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(final TweetsRefreshedEvent event) {
+    public void onEventMainThread(final HomeTimelineLatestEvent event) {
         mBinding.srlTweets.setRefreshing(false);
         if (! event.isSuccess()) {
             Toast.makeText(getActivity(), R.string.message_refresh_failed, Toast.LENGTH_LONG).show();
@@ -141,7 +141,7 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(final TweetsPastRetrievedEvent event) {
+    public void onEventMainThread(final HomeTimelinePastEvent event) {
         if (event.isSuccess()) {
             if (event.getTweetsCount() == 0) {
                 markNoMoreItemsToLoad();
@@ -153,10 +153,10 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
     }
 
     private void initViews() {
-        mTweetsAdapter = new TweetsAdapter(mCallback);
+        mHomeTimeLineAdapter = new HomeTimeLineAdapter(mCallback);
         final RecyclerView moviesRecyclerView = mBinding.rvTweets;
         mLayoutManager = new LinearLayoutManager(getActivity());
-        moviesRecyclerView.setAdapter(mTweetsAdapter);
+        moviesRecyclerView.setAdapter(mHomeTimeLineAdapter);
         moviesRecyclerView.setLayoutManager(mLayoutManager);
         moviesRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
         mBinding.srlTweets.setOnRefreshListener(() -> deleteAndRefreshTweets());
@@ -188,7 +188,7 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
             return;
         }
 
-        final Intent intent = UpdateTimelineService.createIntentForLatestItems(getActivity());
+        final Intent intent = UpdateTimelineService.createIntentForLatestHomeTimeline(getActivity());
         getActivity().startService(intent);
         markMoreItemsToLoad();
     }
@@ -200,7 +200,7 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
             return;
         }
 
-        final Intent intent = UpdateTimelineService.createIntentForPastItems(getActivity());
+        final Intent intent = UpdateTimelineService.createIntentForPastHomeTimeline(getActivity());
         getActivity().startService(intent);
     }
 
@@ -230,11 +230,11 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
 
     private void markNoMoreItemsToLoad() {
         mEndlessRecyclerViewScrollListener.setEndReached(true);
-        mTweetsAdapter.setEndReached();
+        mHomeTimeLineAdapter.setEndReached();
     }
 
     private void markMoreItemsToLoad() {
         mEndlessRecyclerViewScrollListener.setEndReached(false);
-        mTweetsAdapter.clearEndReached();
+        mHomeTimeLineAdapter.clearEndReached();
     }
 }

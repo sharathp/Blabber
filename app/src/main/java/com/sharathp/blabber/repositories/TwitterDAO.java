@@ -1,9 +1,10 @@
 package com.sharathp.blabber.repositories;
 
+import com.sharathp.blabber.models.HomeTimeline;
+import com.sharathp.blabber.models.HomeTimelineWithUser;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
-import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
 import com.sharathp.blabber.models.UserTimeline;
@@ -16,15 +17,15 @@ import java.util.List;
 public interface TwitterDAO {
 
     // even though this seems unnecessary, this helps keep track of all clients easily..
-    SquidSupportCursorLoader<TweetWithUser> getTweets(Query query);
+    SquidSupportCursorLoader<HomeTimelineWithUser> getTweets(Query query);
 
     SquidSupportCursorLoader<UserTimeLineTweetWithUser> getUserTimeline(Query query);
 
     SquidSupportCursorLoader<MentionsWithUser> getMentions(Query query);
 
-    Tweet getLatestTweet();
+    HomeTimelineWithUser getLatestHomeTimeline();
 
-    Tweet getEarliestTweet();
+    HomeTimelineWithUser getEarliestHomeTimeline();
 
     MentionsWithUser getLatestMention();
 
@@ -41,6 +42,8 @@ public interface TwitterDAO {
     boolean checkAndInsertMentions(Collection<Mentions> mentions);
 
     boolean checkAndInsertUserTimelines(List<UserTimeline> userTimelines);
+
+    boolean checkAndInsertHomeTimelines(List<HomeTimeline> homeTimelines);
 
     boolean deleteExistingTweets();
 }
