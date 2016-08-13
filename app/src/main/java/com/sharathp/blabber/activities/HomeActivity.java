@@ -184,8 +184,6 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
                 break;
             }
         }
-
-        setHomeInfo();
         mDrawerLayout.closeDrawers();
     }
 
