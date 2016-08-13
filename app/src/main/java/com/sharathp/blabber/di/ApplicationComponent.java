@@ -9,6 +9,7 @@ import com.sharathp.blabber.di.modules.DatabaseModule;
 import com.sharathp.blabber.di.modules.RestModule;
 import com.sharathp.blabber.fragments.ComposeFragment;
 import com.sharathp.blabber.fragments.HomeTimelineFragment;
+import com.sharathp.blabber.fragments.LikesFragment;
 import com.sharathp.blabber.fragments.MentionsFragment;
 import com.sharathp.blabber.fragments.UserTimelineFragment;
 import com.sharathp.blabber.service.UpdateTimelineService;
@@ -38,4 +39,6 @@ public interface ApplicationComponent {
     void inject(UserTimelineFragment userTimelineFragment);
 
     void inject(UserProfileActivity userProfileActivity);
+
+    void inject(LikesFragment likesFragment);
 }

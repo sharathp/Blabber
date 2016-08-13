@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.sharathp.blabber.models.HomeTimeline;
 import com.sharathp.blabber.models.HomeTimelineWithUser;
+import com.sharathp.blabber.models.Like;
+import com.sharathp.blabber.models.LikeWithUser;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
@@ -52,6 +54,16 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     }
 
     @Override
+    public SquidSupportCursorLoader<LikeWithUser> getUserLikes(final Long userId) {
+        final Query query = Query.select(LikeWithUser.PROPERTIES)
+                .where(LikeWithUser.USER_LIKE_ID.eq(userId))
+                .orderBy(Order.desc(LikeWithUser.CREATED_AT));
+        final SquidSupportCursorLoader<LikeWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, LikeWithUser.class, query);
+        loader.setNotificationUri(Like.CONTENT_URI);
+        return loader;
+    }
+
+    @Override
     public SquidSupportCursorLoader<MentionsWithUser> getMentions() {
         final Query query = Query.select(MentionsWithUser.PROPERTIES)
                 .orderBy(Order.desc(MentionsWithUser.CREATED_AT));
@@ -95,6 +107,24 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     }
 
     @Override
+    public LikeWithUser getLatestUserLike(final Long userId) {
+        final Query query = Query.select(LikeWithUser.PROPERTIES)
+                .where(LikeWithUser.USER_LIKE_ID.eq(userId))
+                .orderBy(Order.desc(LikeWithUser.CREATED_AT))
+                .limit(1);
+        return mDatabase.fetchByQuery(LikeWithUser.class, query);
+    }
+
+    @Override
+    public LikeWithUser getEarliestUserLike(final Long userId) {
+        final Query query = Query.select(LikeWithUser.PROPERTIES)
+                .where(LikeWithUser.USER_LIKE_ID.eq(userId))
+                .orderBy(Order.asc(LikeWithUser.CREATED_AT))
+                .limit(1);
+        return mDatabase.fetchByQuery(LikeWithUser.class, query);
+    }
+
+    @Override
     public HomeTimelineWithUser getLatestHomeTimeline() {
         final Query query = Query.select(HomeTimelineWithUser.PROPERTIES)
                 .orderBy(Order.desc(HomeTimelineWithUser.CREATED_AT))
@@ -127,7 +157,7 @@ public class SQLiteTwitterDAO implements TwitterDAO {
         try {
             for (final Mentions mention: mentions) {
                 final Query query = Query.select(Mentions.PROPERTIES)
-                                    .where(Mentions.TWEET_ID.eq(mention.getId()));
+                                    .where(Mentions.TWEET_ID.eq(mention.getTweetId()));
 
                 // insert if it doesn't exist
                 if(mDatabase.fetchByQuery(Mentions.class, query) == null) {
@@ -151,13 +181,14 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     }
 
     @Override
-    public boolean checkAndInsertUserTimelines(final List<UserTimeline> userTimelines) {
+    public boolean checkAndInsertUserTimelines(final long userId, final List<UserTimeline> userTimelines) {
         boolean success = true;
         mDatabase.beginTransaction();
         try {
             for (final UserTimeline userTimeline: userTimelines) {
                 final Query query = Query.select(UserTimeline.PROPERTIES)
-                        .where(UserTimeline.TWEET_ID.eq(userTimeline.getId()));
+                        .where(UserTimeline.USER_TIME_LINE_ID.eq(userId))
+                        .where(UserTimeline.TWEET_ID.eq(userTimeline.getTweetId()));
 
                 // insert if it doesn't exist
                 if(mDatabase.fetchByQuery(UserTimeline.class, query) == null) {
@@ -192,6 +223,37 @@ public class SQLiteTwitterDAO implements TwitterDAO {
                 // insert if it doesn't exist
                 if(mDatabase.fetchByQuery(HomeTimeline.class, query) == null) {
                     success = mDatabase.persist(homeTimeline);
+                } else {
+                    success = true;
+                }
+
+                // short-circuit and exit the loop
+                if (! success) {
+                    break;
+                }
+            }
+            if (success) {
+                mDatabase.setTransactionSuccessful();
+            }
+        } finally {
+            mDatabase.endTransaction();
+        }
+        return success;
+    }
+
+    @Override
+    public boolean checkAndInsertLikes(final Long userId, final Collection<Like> likes) {
+        boolean success = true;
+        mDatabase.beginTransaction();
+        try {
+            for (final Like like: likes) {
+                final Query query = Query.select(Like.PROPERTIES)
+                        .where(Like.USER_LIKE_ID.eq(userId))
+                        .where(Like.TWEET_ID.eq(like.getTweetId()));
+
+                // insert if it doesn't exist
+                if(mDatabase.fetchByQuery(Like.class, query) == null) {
+                    success = mDatabase.persist(like);
                 } else {
                     success = true;
                 }

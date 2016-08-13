@@ -41,6 +41,7 @@ public class TwitterClient extends OAuthBaseClient {
 
     private static final String RELATIVE_URL_MENTION = "/statuses/mentions_timeline.json";
     private static final String RELATIVE_URL_USER_TIMELINE = "/statuses/user_timeline.json";
+    private static final String RELATIVE_URL_USER_LIKE = "/favorites/list.json";
     private static final String RELATIVE_URL_USER = "/users/show.json";
 
     private static final String REQ_STATUS_ID = "id";
@@ -104,6 +105,24 @@ public class TwitterClient extends OAuthBaseClient {
 
     public void getLatestUserTimeLineTweets(final Long sinceId, final Long userId, final AsyncHttpResponseHandler handler) {
         final String apiUrl = getApiUrl(RELATIVE_URL_USER_TIMELINE);
+        final RequestParams requestParams = getTweetsRequestParams(null, sinceId);
+        if (userId != null && userId > 0) {
+            addUserRequestParams(requestParams, userId);
+        }
+        client.get(apiUrl, requestParams, handler);
+    }
+
+    public void getPastUserLikes(final Long maxId, final Long userId, AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_USER_LIKE);
+        final RequestParams requestParams = getTweetsRequestParams(maxId, null);
+        if (userId != null && userId > 0) {
+            addUserRequestParams(requestParams, userId);
+        }
+        client.get(apiUrl, requestParams, handler);
+    }
+
+    public void getLatestUserLikes(final Long sinceId, final Long userId, final AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_USER_LIKE);
         final RequestParams requestParams = getTweetsRequestParams(null, sinceId);
         if (userId != null && userId > 0) {
             addUserRequestParams(requestParams, userId);

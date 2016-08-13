@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.sharathp.blabber.models.HomeTimeline;
+import com.sharathp.blabber.models.Like;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.User;
@@ -50,6 +51,7 @@ public class DatabaseModule {
         registerSimpleDataChangedNotifier(contentResolver, database, UserTimeline.TABLE, UserTimeline.CONTENT_URI);
         registerSimpleDataChangedNotifier(contentResolver, database, Mentions.TABLE, Mentions.CONTENT_URI);
         registerSimpleDataChangedNotifier(contentResolver, database, HomeTimeline.TABLE, HomeTimeline.CONTENT_URI);
+        registerSimpleDataChangedNotifier(contentResolver, database, Like.TABLE, Like.CONTENT_URI);
         return database;
     }
 

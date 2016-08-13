@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.sharathp.blabber.models.HomeTimeline;
 import com.sharathp.blabber.models.HomeTimelineWithUser;
+import com.sharathp.blabber.models.Like;
+import com.sharathp.blabber.models.LikeWithUser;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
@@ -42,7 +44,7 @@ public class BlabberDatabase extends SquidDatabase {
     protected Table[] getTables() {
         return new Table[]{
                 Tweet.TABLE, User.TABLE, UserTimeline.TABLE,
-                Mentions.TABLE, HomeTimeline.TABLE
+                Mentions.TABLE, HomeTimeline.TABLE, Like.TABLE
         };
     }
 
@@ -50,7 +52,8 @@ public class BlabberDatabase extends SquidDatabase {
     protected View[] getViews() {
         return new View[]{
             TweetWithUser.VIEW, UserTimeLineTweetWithUser.VIEW,
-                MentionsWithUser.VIEW, HomeTimelineWithUser.VIEW
+                MentionsWithUser.VIEW, HomeTimelineWithUser.VIEW,
+                LikeWithUser.VIEW
         };
     }
 
