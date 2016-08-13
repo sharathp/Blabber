@@ -90,7 +90,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         showLoading();
-        refreshTweets();
+        refreshMentions();
         getLoaderManager().initLoader(TWEET_ITEM_LOADER_ID, null, this);
     }
 
@@ -159,7 +159,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
         moviesRecyclerView.setAdapter(mMentionsAdapter);
         moviesRecyclerView.setLayoutManager(mLayoutManager);
         moviesRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
-        mBinding.srlTweets.setOnRefreshListener(() -> refreshTweets());
+        mBinding.srlTweets.setOnRefreshListener(() -> refreshMentions());
         mEndlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(mLayoutManager) {
             @Override
             public void onLoadMore(final int page, final int totalItemsCount) {
@@ -169,7 +169,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
         mBinding.rvTweets.addOnScrollListener(mEndlessRecyclerViewScrollListener);
     }
 
-    private void refreshTweets() {
+    private void refreshMentions() {
         if (! NetworkUtils.isOnline(getContext())) {
             Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
             mBinding.srlTweets.setRefreshing(false);

@@ -13,7 +13,7 @@ public class HomeTimelineWithUserSpec {
 
     @ViewQuery
     public static final Query QUERY = Query.select().from(HomeTimeline.TABLE)
-            .join(Join.inner(Tweet.TABLE, Mentions.TWEET_ID.eq(Tweet.ID)),
+            .join(Join.inner(Tweet.TABLE, HomeTimeline.TWEET_ID.eq(Tweet.ID)),
                     Join.inner(User.TABLE, Tweet.USER_ID.eq(User.ID)));
 
     public static final Property.LongProperty USER_TIME_LINE_ID = HomeTimeline.USER_TIME_LINE_ID;

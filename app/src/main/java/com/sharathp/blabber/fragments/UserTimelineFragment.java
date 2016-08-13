@@ -98,7 +98,7 @@ public class UserTimelineFragment extends Fragment implements LoaderManager.Load
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         showLoading();
-        retrieveLatestTimeline();
+        retrieveLatestUserTimeline();
         getLoaderManager().initLoader(TWEET_ITEM_LOADER_ID, null, this);
     }
 
@@ -167,7 +167,7 @@ public class UserTimelineFragment extends Fragment implements LoaderManager.Load
         moviesRecyclerView.setAdapter(mUserTimeLineAdapter);
         moviesRecyclerView.setLayoutManager(mLayoutManager);
         moviesRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
-        mBinding.srlTweets.setOnRefreshListener(() -> retrieveLatestTimeline());
+        mBinding.srlTweets.setOnRefreshListener(() -> retrieveLatestUserTimeline());
         mEndlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(mLayoutManager) {
             @Override
             public void onLoadMore(final int page, final int totalItemsCount) {
@@ -177,7 +177,7 @@ public class UserTimelineFragment extends Fragment implements LoaderManager.Load
         mBinding.rvTweets.addOnScrollListener(mEndlessRecyclerViewScrollListener);
     }
 
-    private void retrieveLatestTimeline() {
+    private void retrieveLatestUserTimeline() {
         if (! NetworkUtils.isOnline(getContext())) {
             Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
             mBinding.srlTweets.setRefreshing(false);

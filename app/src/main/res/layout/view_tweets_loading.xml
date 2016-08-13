@@ -2,7 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:padding="@dimen/space_content"
+    android:padding="@dimen/loader_padding"
     android:layout_height="@dimen/tweets_loading_indicator_height">
 
     <ProgressBar

@@ -17,7 +17,7 @@ import java.util.List;
 public interface TwitterDAO {
 
     // even though this seems unnecessary, this helps keep track of all clients easily..
-    SquidSupportCursorLoader<HomeTimelineWithUser> getTweets(Query query);
+    SquidSupportCursorLoader<HomeTimelineWithUser> getHomeTimeline(Query query);
 
     SquidSupportCursorLoader<UserTimeLineTweetWithUser> getUserTimeline(Query query);
 
