@@ -20,7 +20,6 @@ import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentTimelineBinding;
 import com.sharathp.blabber.events.UserTimelineLatestEvent;
 import com.sharathp.blabber.events.UserTimelinePastEvent;
-import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
 import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.service.UpdateTimelineService;
@@ -30,8 +29,6 @@ import com.sharathp.blabber.views.EndlessRecyclerViewScrollListener;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 import com.sharathp.blabber.views.adapters.UserTimeLineAdapter;
 import com.yahoo.squidb.data.SquidCursor;
-import com.yahoo.squidb.sql.Order;
-import com.yahoo.squidb.sql.Query;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -116,9 +113,7 @@ public class UserTimelineFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public Loader<SquidCursor<UserTimeLineTweetWithUser>> onCreateLoader(final int id, final Bundle args) {
-        final Query query = Query.select(TweetWithUser.PROPERTIES)
-                .orderBy(Order.desc(TweetWithUser.CREATED_AT));
-        return mTwitterDAO.getUserTimeline(query);
+        return mTwitterDAO.getUserTimeline(userId);
     }
 
     @Override

@@ -8,7 +8,6 @@ import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
 import com.sharathp.blabber.models.UserTimeline;
-import com.yahoo.squidb.sql.Query;
 import com.yahoo.squidb.support.SquidSupportCursorLoader;
 
 import java.util.Collection;
@@ -17,11 +16,11 @@ import java.util.List;
 public interface TwitterDAO {
 
     // even though this seems unnecessary, this helps keep track of all clients easily..
-    SquidSupportCursorLoader<HomeTimelineWithUser> getHomeTimeline(Query query);
+    SquidSupportCursorLoader<HomeTimelineWithUser> getHomeTimeline();
 
-    SquidSupportCursorLoader<UserTimeLineTweetWithUser> getUserTimeline(Query query);
+    SquidSupportCursorLoader<UserTimeLineTweetWithUser> getUserTimeline(Long userId);
 
-    SquidSupportCursorLoader<MentionsWithUser> getMentions(Query query);
+    SquidSupportCursorLoader<MentionsWithUser> getMentions();
 
     HomeTimelineWithUser getLatestHomeTimeline();
 
@@ -46,4 +45,6 @@ public interface TwitterDAO {
     boolean checkAndInsertHomeTimelines(List<HomeTimeline> homeTimelines);
 
     boolean deleteExistingTweets();
+
+    User getUser(Long userId);
 }

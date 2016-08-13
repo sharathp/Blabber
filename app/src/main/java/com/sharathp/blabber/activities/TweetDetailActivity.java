@@ -110,13 +110,13 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
         mBinding.tvContent.setText(mTweetWithUser.getText());
 
         Glide.clear(mBinding.ivProfileImage);
-        ImageUtils.loadProfileImage(this, mBinding.ivProfileImage, profileImageUrl);
+        ImageUtils.loadTweetsListProfileImageWithRounderCorners(this, mBinding.ivProfileImage, profileImageUrl);
 
         if (mTweetWithUser.getImageUrl() != null) {
             mBinding.ivMediaImage.setVisibility(View.VISIBLE);
             mBinding.ivMediaImage.setHeightRatio((float) mTweetWithUser.getImageHeight() / (float) mTweetWithUser.getImageWidth());
             Glide.clear(mBinding.ivMediaImage);
-            ImageUtils.loadImage(this, mBinding.ivMediaImage, mTweetWithUser.getImageUrl());
+            ImageUtils.loadImageWithRounderCorners(this, mBinding.ivMediaImage, mTweetWithUser.getImageUrl());
         } else {
             mBinding.ivMediaImage.setVisibility(View.GONE);
         }

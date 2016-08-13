@@ -42,7 +42,7 @@
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
-    <style name="HomeTabLayout" parent="Widget.Design.TabLayout">
+    <style name="BlabberTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorColor">@color/color_twitter_blue</item>
         <item name="tabIndicatorHeight">3dp</item>
         <item name="android:background">@android:color/white</item>

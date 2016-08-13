@@ -33,21 +33,28 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     }
 
     @Override
-    public SquidSupportCursorLoader<HomeTimelineWithUser> getHomeTimeline(final Query query) {
+    public SquidSupportCursorLoader<HomeTimelineWithUser> getHomeTimeline() {
+        final Query query = Query.select(HomeTimelineWithUser.PROPERTIES)
+                .orderBy(Order.desc(HomeTimelineWithUser.CREATED_AT));
         final SquidSupportCursorLoader<HomeTimelineWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, HomeTimelineWithUser.class, query);
         loader.setNotificationUri(HomeTimeline.CONTENT_URI);
         return loader;
     }
 
     @Override
-    public SquidSupportCursorLoader<UserTimeLineTweetWithUser> getUserTimeline(final Query query) {
+    public SquidSupportCursorLoader<UserTimeLineTweetWithUser> getUserTimeline(final Long userId) {
+        final Query query = Query.select(UserTimeLineTweetWithUser.PROPERTIES)
+                .where(UserTimeLineTweetWithUser.USER_TIME_LINE_ID.eq(userId))
+                .orderBy(Order.desc(UserTimeLineTweetWithUser.CREATED_AT));
         final SquidSupportCursorLoader<UserTimeLineTweetWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, UserTimeLineTweetWithUser.class, query);
         loader.setNotificationUri(UserTimeline.CONTENT_URI);
         return loader;
     }
 
     @Override
-    public SquidSupportCursorLoader<MentionsWithUser> getMentions(final Query query) {
+    public SquidSupportCursorLoader<MentionsWithUser> getMentions() {
+        final Query query = Query.select(MentionsWithUser.PROPERTIES)
+                .orderBy(Order.desc(MentionsWithUser.CREATED_AT));
         final SquidSupportCursorLoader<MentionsWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, MentionsWithUser.class, query);
         loader.setNotificationUri(Mentions.CONTENT_URI);
         return loader;
@@ -207,6 +214,11 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     public boolean deleteExistingTweets() {
         mDatabase.deleteAll(Tweet.class);
         return true;
+    }
+
+    @Override
+    public User getUser(final Long userId) {
+        return mDatabase.fetch(User.class, userId);
     }
 
     private <T extends AndroidTableModel> boolean checkAndInsertElements(final Collection<T> models) {

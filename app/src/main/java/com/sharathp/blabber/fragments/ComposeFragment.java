@@ -131,7 +131,7 @@ public class ComposeFragment extends DialogFragment {
         // dismiss the screen on tapping close
         mBinding.ivClose.setOnClickListener(v -> dismiss());
 
-        ImageUtils.loadProfileImage(getActivity(), mBinding.ivProfileImage, mLocalPreferencesDAO.getUserProfileImageUrl());
+        ImageUtils.loadTweetsListProfileImageWithRounderCorners(getActivity(), mBinding.ivProfileImage, mLocalPreferencesDAO.getUserProfileImageUrl());
     }
 
     @Override

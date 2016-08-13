@@ -3,6 +3,7 @@ package com.sharathp.blabber.di;
 import com.sharathp.blabber.activities.HomeActivity;
 import com.sharathp.blabber.activities.LoginActivity;
 import com.sharathp.blabber.activities.TweetDetailActivity;
+import com.sharathp.blabber.activities.UserProfileActivity;
 import com.sharathp.blabber.di.modules.ApplicationModule;
 import com.sharathp.blabber.di.modules.DatabaseModule;
 import com.sharathp.blabber.di.modules.RestModule;
@@ -35,4 +36,6 @@ public interface ApplicationComponent {
     void inject(MentionsFragment mentionsFragment);
 
     void inject(UserTimelineFragment userTimelineFragment);
+
+    void inject(UserProfileActivity userProfileActivity);
 }
