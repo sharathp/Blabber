@@ -17,11 +17,14 @@ import com.sharathp.blabber.events.HomeTimelinePastEvent;
 import com.sharathp.blabber.events.MentionsLatestEvent;
 import com.sharathp.blabber.events.MentionsPastEvent;
 import com.sharathp.blabber.events.StatusSubmittedEvent;
+import com.sharathp.blabber.events.UserLikeLatestEvent;
 import com.sharathp.blabber.events.UserProfileRetrieved;
 import com.sharathp.blabber.events.UserTimelineLatestEvent;
 import com.sharathp.blabber.events.UserTimelinePastEvent;
 import com.sharathp.blabber.models.HomeTimeline;
 import com.sharathp.blabber.models.HomeTimelineWithUser;
+import com.sharathp.blabber.models.Like;
+import com.sharathp.blabber.models.LikeWithUser;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
@@ -63,7 +66,8 @@ public class UpdateTimelineService extends BaseService {
 
     @IntDef({OP_HOME_TIMELINE_LATEST, OP_HOME_TIMELINE_PAST, OP_DELETE_EXISTING_AND_REFRESH,
             OP_TWEET, OP_TWEET_FAVORITE, OP_TWEET_UNFAVORITE,OP_MENTION_LATEST,
-            OP_MENTION_PAST, OP_USER_TIMELINE_LATEST, OP_USER_TIMELINE_PAST, OP_USER})
+            OP_MENTION_PAST, OP_USER_TIMELINE_LATEST, OP_USER_TIMELINE_PAST, OP_USER,
+            OP_USER_LIKE_LATEST, OP_USER_LIKE_PAST})
     private @interface OperationType {}
 
     private static final int OP_HOME_TIMELINE_LATEST = 1;
@@ -77,6 +81,8 @@ public class UpdateTimelineService extends BaseService {
     private static final int OP_USER_TIMELINE_LATEST= 9;
     private static final int OP_USER_TIMELINE_PAST = 10;
     private static final int OP_USER = 11;
+    private static final int OP_USER_LIKE_LATEST= 12;
+    private static final int OP_USER_LIKE_PAST = 13;
 
     @Inject
     EventBus mEventBus;
@@ -136,6 +142,18 @@ public class UpdateTimelineService extends BaseService {
 
     public static Intent createIntentForPastUserTimeline(final Context context, final long userId) {
         final Intent intent =  createIntent(context, OP_USER_TIMELINE_PAST);
+        intent.putExtra(EXTRA_USER_ID, userId);
+        return intent;
+    }
+
+    public static Intent createIntentForLatestUserLikes(final Context context, final long userId) {
+        final Intent intent = createIntent(context, OP_USER_LIKE_LATEST);
+        intent.putExtra(EXTRA_USER_ID, userId);
+        return intent;
+    }
+
+    public static Intent createIntentForPastUserLikes(final Context context, final long userId) {
+        final Intent intent =  createIntent(context, OP_USER_LIKE_PAST);
         intent.putExtra(EXTRA_USER_ID, userId);
         return intent;
     }
@@ -211,6 +229,16 @@ public class UpdateTimelineService extends BaseService {
                 retrieveUserProfile(intentData.getLong(EXTRA_USER_ID, -1));
                 break;
             }
+            case OP_USER_LIKE_LATEST: {
+                Log.i(TAG, "Retrieving Latest user likes");
+                retrieveLatestUserLikes(intentData.getLong(EXTRA_USER_ID, -1));
+                break;
+            }
+            case OP_USER_LIKE_PAST: {
+                Log.i(TAG, "Retrieving Past user likes");
+                retrievePastUserLikes(intentData.getLong(EXTRA_USER_ID, -1));
+                break;
+            }
             default: {
                 Log.w(TAG, "Invalid value for: " + EXTRA_OPERATION_TYPE + ": " + operationType);
             }
@@ -269,6 +297,24 @@ public class UpdateTimelineService extends BaseService {
             maxId = pastUserTimeline.getId();
         }
         mTwitterClient.getPastUserTimeLineTweets(maxId - 1, userId, getPastUserTimelineResponseHandler(userId));
+    }
+
+    private void retrieveLatestUserLikes(final long userId) {
+        final LikeWithUser latestLikeWithUser = mTwitterDAO.getLatestUserLike(userId);
+        Long sinceId = null;
+        if (latestLikeWithUser != null) {
+            sinceId = latestLikeWithUser.getId();
+        }
+        mTwitterClient.getLatestUserLikes(sinceId, userId, getLatestUserLikeResponseHandler(userId));
+    }
+
+    private void retrievePastUserLikes(final long userId) {
+        final LikeWithUser pastLikeWithUser = mTwitterDAO.getEarliestUserLike(userId);
+        Long maxId = null;
+        if (pastLikeWithUser != null) {
+            maxId = pastLikeWithUser.getId();
+        }
+        mTwitterClient.getPastUserLikes(maxId - 1, userId, getPastUserLikeResponseHandler(userId));
     }
 
     private void retrieveLatestMentions() {
@@ -389,9 +435,30 @@ public class UpdateTimelineService extends BaseService {
                     .setTweetId(tweetResource.getId())
                     .setUserTimeLineId(userId));
         }
-        success = mTwitterDAO.checkAndInsertUserTimelines(userTimelines);
+        success = mTwitterDAO.checkAndInsertUserTimelines(userId, userTimelines);
         if (! success) {
             Log.i(TAG, "Unable to save user timelines");
+        }
+        return success;
+    }
+
+    private boolean saveUserLikes(final Long userId, final List<TweetResource> tweetResources) {
+        boolean success = saveTweetsAndUsers(tweetResources);
+
+        if (! success) {
+            Log.i(TAG, "Unable to save tweets, not saving likes");
+            return success;
+        }
+
+        final List<Like> likes = new ArrayList<>();
+        for (final TweetResource tweetResource : tweetResources) {
+            likes.add(new Like()
+                    .setTweetId(tweetResource.getId())
+                    .setUserLikeId(userId));
+        }
+        success = mTwitterDAO.checkAndInsertLikes(userId, likes);
+        if (! success) {
+            Log.i(TAG, "Unable to save user likes");
         }
         return success;
     }
@@ -578,6 +645,60 @@ public class UpdateTimelineService extends BaseService {
 
                 final UserTimelinePastEvent userTimelinePastRetrievedEvent = new UserTimelinePastEvent(userId, tweetResources.size(), success);
                 mEventBus.post(userTimelinePastRetrievedEvent);
+            }
+        };
+    }
+
+    private AsyncHttpResponseHandler getLatestUserLikeResponseHandler(final Long userId) {
+        return new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                Log.e(TAG, "Error retrieving latest user likes: " + responseString, throwable);
+
+                final UserLikeLatestEvent userLikeLatestEvent = new UserLikeLatestEvent(userId, 0, false);
+                mEventBus.post(userLikeLatestEvent);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers,
+                                  final String responseString) {
+                final Type responseType = new TypeToken<List<TweetResource>>() {
+                }.getType();
+                final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
+                Log.i(TAG, "Retrieved latest user likes: " + tweetResources.size());
+
+                final boolean success = saveUserLikes(userId, tweetResources);
+
+                final UserLikeLatestEvent userLikeLatestEvent = new UserLikeLatestEvent(userId, tweetResources.size(), success);
+                mEventBus.post(userLikeLatestEvent);
+            }
+        };
+    }
+
+    private AsyncHttpResponseHandler getPastUserLikeResponseHandler(final Long userId) {
+        return new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                Log.e(TAG, "Error retrieving past likes: " + responseString, throwable);
+
+                final UserLikeLatestEvent userLikeLatestEvent = new UserLikeLatestEvent(userId, 0, false);
+                mEventBus.post(userLikeLatestEvent);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers,
+                                  final String responseString) {
+                final Type responseType = new TypeToken<List<TweetResource>>() {
+                }.getType();
+                final List<TweetResource> tweetResources = mGson.fromJson(responseString, responseType);
+                Log.i(TAG, "Retrieved past user likes: " + tweetResources.size());
+
+                final boolean success = saveUserLikes(userId, tweetResources);
+
+                final UserLikeLatestEvent userLikeLatestEvent = new UserLikeLatestEvent(userId, tweetResources.size(), success);
+                mEventBus.post(userLikeLatestEvent);
             }
         };
     }

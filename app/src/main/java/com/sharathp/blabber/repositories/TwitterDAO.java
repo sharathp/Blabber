@@ -2,6 +2,8 @@ package com.sharathp.blabber.repositories;
 
 import com.sharathp.blabber.models.HomeTimeline;
 import com.sharathp.blabber.models.HomeTimelineWithUser;
+import com.sharathp.blabber.models.Like;
+import com.sharathp.blabber.models.LikeWithUser;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
@@ -20,6 +22,8 @@ public interface TwitterDAO {
 
     SquidSupportCursorLoader<UserTimeLineTweetWithUser> getUserTimeline(Long userId);
 
+    SquidSupportCursorLoader<LikeWithUser> getUserLikes(Long userId);
+
     SquidSupportCursorLoader<MentionsWithUser> getMentions();
 
     HomeTimelineWithUser getLatestHomeTimeline();
@@ -34,15 +38,21 @@ public interface TwitterDAO {
 
     UserTimeLineTweetWithUser getEarliestUserTimeline(Long userId);
 
+    LikeWithUser getLatestUserLike(final Long userId);
+
+    LikeWithUser getEarliestUserLike(final Long userId);
+
     boolean checkAndInsertUsers(Collection<User> users);
 
     boolean checkAndInsertTweets(Collection<Tweet> tweets);
 
     boolean checkAndInsertMentions(Collection<Mentions> mentions);
 
-    boolean checkAndInsertUserTimelines(List<UserTimeline> userTimelines);
+    boolean checkAndInsertUserTimelines(long userId, List<UserTimeline> userTimelines);
 
     boolean checkAndInsertHomeTimelines(List<HomeTimeline> homeTimelines);
+
+    boolean checkAndInsertLikes(Long userId, Collection<Like> likes);
 
     boolean deleteExistingTweets();
 
