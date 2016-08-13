@@ -21,7 +21,6 @@ import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentComposeBinding;
 import com.sharathp.blabber.events.StatusSubmittedEvent;
 import com.sharathp.blabber.models.ITweetWithUser;
-import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.repositories.LocalPreferencesDAO;
 import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.util.ImageUtils;
@@ -38,7 +37,7 @@ public class ComposeFragment extends DialogFragment {
 
     private FragmentComposeBinding mBinding;
     private int mMaxCharacterCount;
-    private TweetWithUser mReplyTo;
+    private ITweetWithUser mReplyTo;
 
     private ComposeCallback mCallback;
 

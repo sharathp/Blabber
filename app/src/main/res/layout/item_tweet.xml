@@ -108,9 +108,8 @@
 
         <ImageView
             android:id="@+id/iv_reply_action"
-            android:layout_width="match_parent"
+            android:layout_width="@dimen/list_action_width"
             android:layout_height="@dimen/list_action_height"
-            android:layout_weight="1"
             android:src="@drawable/ic_reply"/>
 
         <LinearLayout
