@@ -79,12 +79,22 @@ public class TweetViewHolder<T extends AbstractModel & ITweetWithUser> extends S
         }
     };
 
+    private View.OnClickListener mProfileImageClickListner = new View.OnClickListener() {
+        @Override
+        public void onClick(final View view) {
+            if (mTweetCallback != null) {
+                mTweetCallback.onProfileImageSelected(item);
+            }
+        }
+    };
+
     public TweetViewHolder(final View itemView, final TweetCallback tweetCallback, final T item) {
         super(itemView, item);
         ButterKnife.bind(this, itemView);
 
         itemView.setOnClickListener(mOnClickListener);
         mReplyActionImageView.setOnClickListener(mReplyClickListener);
+        mProfileImageView.setOnClickListener(mProfileImageClickListner);
 
         mTweetCallback = tweetCallback;
     }

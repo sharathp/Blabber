@@ -35,6 +35,7 @@
     <dimen name="text_screen_name">14sp</dimen>
     <dimen name="text_content">16sp</dimen>
     <dimen name="text_time">14sp</dimen>
+    <dimen name="text_desc">16sp</dimen>
 
     <dimen name="fab_elevation">4dp</dimen>
     <dimen name="close_compose_width">24dp</dimen>
@@ -66,8 +67,8 @@
 
     <dimen name="profile_appbar_height">180dp</dimen>
     <dimen name="text_profile_desc">14sp</dimen>
-    <dimen name="profile_followers_margin">32dp</dimen>
-    <dimen name="profile_header_margin">24dp</dimen>
+    <dimen name="profile_followers_margin">24dp</dimen>
+    <dimen name="profile_header_margin">18dp</dimen>
 
 
 </resources>

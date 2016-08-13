@@ -104,6 +104,12 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
     }
 
     @Override
+    public void onProfileImageSelected(final ITweetWithUser tweet) {
+        final Intent intent = UserProfileActivity.createIntent(this, tweet.getUserId());
+        startActivity(intent);
+    }
+
+    @Override
     public void onOffsetChanged(final AppBarLayout appBarLayout, final int i) {
         if (mMaxScrollSize == 0) {
             mMaxScrollSize = appBarLayout.getTotalScrollRange();
