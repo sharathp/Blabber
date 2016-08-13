@@ -79,7 +79,7 @@ public class TweetViewHolder<T extends AbstractModel & ITweetWithUser> extends S
         }
     };
 
-    private View.OnClickListener mProfileImageClickListner = new View.OnClickListener() {
+    private View.OnClickListener mProfileImageClickListener = new View.OnClickListener() {
         @Override
         public void onClick(final View view) {
             if (mTweetCallback != null) {
@@ -88,13 +88,43 @@ public class TweetViewHolder<T extends AbstractModel & ITweetWithUser> extends S
         }
     };
 
+    private View.OnClickListener mLikeClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(final View view) {
+            if (mTweetCallback != null) {
+                if (item.getFavorited()) {
+                    // already favorited, unfavorite
+                    mTweetCallback.onUnfavorited(item);
+                } else {
+                    // unfavorited, favorite
+                    mTweetCallback.onFavorited(item);
+                }
+            }
+        }
+    };
+
+    private View.OnClickListener mRetweetClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(final View view) {
+            if (mTweetCallback != null) {
+                if (item.getRetweeted()) {
+                    // TODO - implement unretweet
+                } else {
+                    mTweetCallback.onRetweeted(item);
+                }
+            }
+        }
+    };
+
     public TweetViewHolder(final View itemView, final TweetCallback tweetCallback, final T item) {
         super(itemView, item);
         ButterKnife.bind(this, itemView);
 
-        itemView.setOnClickListener(mOnClickListener);
         mReplyActionImageView.setOnClickListener(mReplyClickListener);
-        mProfileImageView.setOnClickListener(mProfileImageClickListner);
+        mProfileImageView.setOnClickListener(mProfileImageClickListener);
+        mLikeActionImageView.setOnClickListener(mLikeClickListener);
+        mRetweetActionImageView.setOnClickListener(mRetweetClickListener);
+        itemView.setOnClickListener(mOnClickListener);
 
         mTweetCallback = tweetCallback;
     }

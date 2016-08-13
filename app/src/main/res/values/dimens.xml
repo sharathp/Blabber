@@ -57,6 +57,7 @@
     <dimen name="list_action_height">18dp</dimen>
     <dimen name="list_action_width">18dp</dimen>
     <dimen name="text_list_action_count">12sp</dimen>
+    <dimen name="list_action_container_top_margin">16dp</dimen>
 
     <dimen name="tweets_loading_indicator_height">100dp</dimen>
     <dimen name="loader_padding">16dp</dimen>
