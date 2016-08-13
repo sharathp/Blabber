@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Toast;
 
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
@@ -28,6 +29,7 @@ import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
 import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.util.ImageUtils;
+import com.sharathp.blabber.util.NetworkUtils;
 import com.sharathp.blabber.util.PermissionUtils;
 import com.sharathp.blabber.util.ViewUtils;
 import com.sharathp.blabber.views.adapters.TweetCallback;
@@ -74,8 +76,14 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
         mUserId = getIntent().getLongExtra(EXTRA_USER_ID, -1);
 //        mBinding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        final Intent intent = UpdateTimelineService.createIntentForUserProfile(this, mUserId);
-        startService(intent);
+        if (NetworkUtils.isOnline(this)) {
+            final Intent intent = UpdateTimelineService.createIntentForUserProfile(this, mUserId);
+            startService(intent);
+        } else {
+            mBinding.pbLoadingProgressBar.setVisibility(View.GONE);
+            Toast.makeText(this, R.string.message_no_internet, Toast.LENGTH_SHORT).show();
+            tryRetrievingOfflineData();
+        }
     }
 
     @Override
@@ -147,22 +155,21 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
     public void onEventMainThread(final UserProfileRetrieved event) {
         mBinding.pbLoadingProgressBar.setVisibility(View.GONE);
         if (event.isSuccess()) {
-            mBinding.vpProfile.setVisibility(View.VISIBLE);
-            mBinding.appbarLayout.setVisibility(View.VISIBLE);
             mUser = mTwitterDAO.getUser(mUserId);
-            mBinding.vpProfile.setAdapter(new ProfilePagerAdapter(getSupportFragmentManager(), this, mUser.getId()));
-            mBinding.tlProfile.setupWithViewPager(mBinding.vpProfile);
-            mBinding.appbarLayout.addOnOffsetChangedListener(this);
-            mMaxScrollSize = mBinding.appbarLayout.getTotalScrollRange();
             populateUserProfile();
         } else {
-            mBinding.tvProfileError.setVisibility(View.VISIBLE);
+            Toast.makeText(this, R.string.message_profile_failed, Toast.LENGTH_SHORT).show();
+            tryRetrievingOfflineData();
         }
     }
 
     private void populateUserProfile() {
-        ImageUtils.loadProfileImageWithRounderCorners(this, mBinding.ivProfile, mUser.getProfileImageUrl());
-
+        mBinding.vpProfile.setVisibility(View.VISIBLE);
+        mBinding.appbarLayout.setVisibility(View.VISIBLE);
+        mBinding.vpProfile.setAdapter(new ProfilePagerAdapter(getSupportFragmentManager(), this, mUser.getId()));
+        mBinding.tlProfile.setupWithViewPager(mBinding.vpProfile);
+        mBinding.appbarLayout.addOnOffsetChangedListener(this);
+        mMaxScrollSize = mBinding.appbarLayout.getTotalScrollRange();
 
         String url = mUser.getProfileBackgroundImageUrl();
 
@@ -171,6 +178,7 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
         }
 
         ImageUtils.loadImage(this, mBinding.ivProfileBackdrop, url);
+        ImageUtils.loadProfileImageWithRounderCorners(this, mBinding.ivProfile, mUser.getProfileImageUrl());
 
         mBinding.tvName.setText(mUser.getRealName());
         mBinding.tvUserName.setText("@" + mUser.getScreenName());
@@ -183,6 +191,18 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
 
         setFollowing();
         setFollowers();
+    }
+
+    private void tryRetrievingOfflineData() {
+        mUser = mTwitterDAO.getUser(mUserId);
+
+        if (mUser == null) {
+            mBinding.tvProfileError.setVisibility(View.VISIBLE);
+            Toast.makeText(this, R.string.warning_no_offline_profile, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        populateUserProfile();
     }
 
     private void setFollowing() {

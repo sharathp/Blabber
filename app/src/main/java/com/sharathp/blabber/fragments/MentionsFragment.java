@@ -132,7 +132,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
     public void onEventMainThread(final MentionsLatestEvent event) {
         mBinding.srlTweets.setRefreshing(false);
         if (! event.isSuccess()) {
-            Toast.makeText(getActivity(), R.string.message_refresh_failed, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.message_refresh_failed, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -144,7 +144,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
             }
         } else {
             markNoMoreItemsToLoad();
-            Toast.makeText(getActivity(), R.string.message_past_tweets_failed, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.message_past_tweets_failed, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -167,7 +167,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
 
     private void refreshMentions() {
         if (! NetworkUtils.isOnline(getContext())) {
-            Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_SHORT).show();
             mBinding.srlTweets.setRefreshing(false);
             return;
         }
@@ -180,7 +180,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
     private void retrievePastTweets() {
         if (! NetworkUtils.isOnline(getContext())) {
             markNoMoreItemsToLoad();
-            Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_SHORT).show();
             return;
         }
 
