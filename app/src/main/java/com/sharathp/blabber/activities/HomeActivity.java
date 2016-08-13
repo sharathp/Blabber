@@ -39,8 +39,6 @@ import com.sharathp.blabber.util.ImageUtils;
 import com.sharathp.blabber.util.PermissionUtils;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 
-import org.greenrobot.eventbus.EventBus;
-
 import javax.inject.Inject;
 
 import cz.msebera.android.httpclient.Header;
@@ -55,9 +53,6 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
     private FloatingActionButton mComposeFab;
 
     private ActionBarDrawerToggle mDrawerToggle;
-
-    @Inject
-    EventBus mEventBus;
 
     @Inject
     LocalPreferencesDAO mLocalPreferencesDAO;
@@ -209,7 +204,13 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
 
     @Override
     public void onProfileImageSelected(final ITweetWithUser tweet) {
-        final Intent intent = UserProfileActivity.createIntent(this, tweet.getUserId());
+        long userId = tweet.getUserId();
+
+        if (tweet.getRetweetedUserId() != null && tweet.getRetweetedUserId() > 1) {
+            userId = tweet.getRetweetedUserId();
+        }
+
+        final Intent intent = UserProfileActivity.createIntent(this, userId);
         startActivity(intent);
     }
 

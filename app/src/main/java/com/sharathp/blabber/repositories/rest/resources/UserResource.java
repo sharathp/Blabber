@@ -26,6 +26,9 @@ public class UserResource {
     @SerializedName("profile_background_image_url")
     String profileBackgroundImageUrl;
 
+    @SerializedName("profile_banner_url")
+    String profileBannerUrl;
+
     @SerializedName("friends_count")
     int friendsCount;
 
@@ -88,6 +91,14 @@ public class UserResource {
         this.profileBackgroundImageUrl = profileBackgroundImageUrl;
     }
 
+    public String getProfileBannerUrl() {
+        return profileBannerUrl;
+    }
+
+    public void setProfileBannerUrl(String profileBannerUrl) {
+        this.profileBannerUrl = profileBannerUrl;
+    }
+
     public int getFriendsCount() {
         return friendsCount;
     }
@@ -113,6 +124,7 @@ public class UserResource {
         user.setFollowersCount(followersCount);
         user.setDescription(description);
         user.setProfileBackgroundImageUrl(profileBackgroundImageUrl);
+        user.setProfileBannerUrl(profileBannerUrl);
         user.setFriendsCount(friendsCount);
         user.setIsFollowing(following);
         return user;
