@@ -47,4 +47,6 @@ public interface ITweetWithUser {
     String getRetweetedScreenName();
 
     String getRetweetedProfileImageUrl();
+
+    Integer getRetweetedFavoriteCount();
 }

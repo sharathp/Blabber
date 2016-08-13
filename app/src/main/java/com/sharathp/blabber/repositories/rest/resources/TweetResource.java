@@ -162,6 +162,7 @@ public class TweetResource {
             tweet.setRetweetedUserName(retweetedStatus.getUser().getName());
             tweet.setRetweetedScreenName(retweetedStatus.getUser().getScreenName());
             tweet.setRetweetedProfileImageUrl((retweetedStatus.getUser().getProfileImageUrl()));
+            tweet.setRetweetedFavoriteCount(retweetedStatus.getFavoriteCount());
         }
 
         if (mExtendedEntitiesResource != null

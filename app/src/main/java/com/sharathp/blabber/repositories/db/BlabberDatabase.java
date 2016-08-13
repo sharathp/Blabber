@@ -9,7 +9,6 @@ import com.sharathp.blabber.models.LikeWithUser;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.models.Tweet;
-import com.sharathp.blabber.models.TweetWithUser;
 import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
 import com.sharathp.blabber.models.UserTimeline;
@@ -51,7 +50,7 @@ public class BlabberDatabase extends SquidDatabase {
     @Override
     protected View[] getViews() {
         return new View[]{
-            TweetWithUser.VIEW, UserTimeLineTweetWithUser.VIEW,
+            UserTimeLineTweetWithUser.VIEW,
                 MentionsWithUser.VIEW, HomeTimelineWithUser.VIEW,
                 LikeWithUser.VIEW
         };
