@@ -33,8 +33,8 @@ public class TwitterClient extends OAuthBaseClient {
     private static final String RELATIVE_URL_HOME_TIMELINE = "/statuses/home_timeline.json";
     private static final String RELATIVE_URL_CREDENTIALS = "/account/verify_credentials.json";
     private static final String RELATIVE_URL_STATUS_UPDATE = "/statuses/update.json";
-    private static final String RELATIVE_URL_FAVORITE = "/favorites/create.json";
-    private static final String RELATIVE_URL_UNFAVORITE = "/favorites/destroy.json";
+    private static final String RELATIVE_URL_FAVORITE = "/favorites/create.json?id=%d";
+    private static final String RELATIVE_URL_UNFAVORITE = "/favorites/destroy.json?id=%d";
     private static final String RELATIVE_URL_RETWEET = "/statuses/retweet/%d.json";
     private static final String RELATIVE_URL_UNRETWEET = "/statuses/unretweet/%d.json";
     private static final String RELATIVE_URL_STATUS = "/statuses/show/%d.json";
@@ -138,12 +138,12 @@ public class TwitterClient extends OAuthBaseClient {
 
     public void getTweet(final Long statusId, final AsyncHttpResponseHandler handler) {
         final String apiUrl = getApiUrl(String.format(RELATIVE_URL_STATUS, statusId));
-        client.post(apiUrl, getStatusRequestParams(statusId), handler);
+        client.get(apiUrl, null, handler);
     }
 
     public void unretweet(final Long statusId, final AsyncHttpResponseHandler handler) {
         final String apiUrl = getApiUrl(String.format(RELATIVE_URL_RETWEET, statusId));
-        client.post(apiUrl, getStatusRequestParams(statusId), handler);
+        client.post(apiUrl, null, handler);
     }
 
     public void retweet(final Long statusId, final AsyncHttpResponseHandler handler ) {
@@ -152,13 +152,13 @@ public class TwitterClient extends OAuthBaseClient {
     }
 
     public void favorite(final Long statusId, final AsyncHttpResponseHandler handler) {
-        final String apiUrl = getApiUrl(RELATIVE_URL_FAVORITE);
-        client.post(apiUrl, getStatusRequestParams(statusId), handler);
+        final String apiUrl = getApiUrl(String.format(RELATIVE_URL_FAVORITE, statusId));
+        client.post(apiUrl, null, handler);
     }
 
     public void unfavorite(final Long statusId, final AsyncHttpResponseHandler handler ) {
-        final String apiUrl = getApiUrl(RELATIVE_URL_UNFAVORITE);
-        client.post(apiUrl, getStatusRequestParams(statusId), handler);
+        final String apiUrl = getApiUrl(String.format(RELATIVE_URL_UNFAVORITE, statusId));
+        client.post(apiUrl, null, handler);
     }
 
     private RequestParams getStatusRequestParams(final Long statusId) {

@@ -207,19 +207,19 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
     @Override
     public void onFavorited(final ITweetWithUser tweet) {
         final Intent intent = UpdateTimelineService.createIntentForFavorite(this, tweet.getId());
-        startActivity(intent);
+        startService(intent);
     }
 
     @Override
     public void onUnfavorited(final ITweetWithUser tweet) {
         final Intent intent = UpdateTimelineService.createIntentForUnFavorite(this, tweet.getId());
-        startActivity(intent);
+        startService(intent);
     }
 
     @Override
     public void onRetweeted(final ITweetWithUser tweet) {
         final Intent intent = UpdateTimelineService.createIntentForRetweet(this, tweet.getId());
-        startActivity(intent);
+        startService(intent);
     }
 
     @Override
