@@ -67,6 +67,7 @@
     <dimen name="profile_appbar_height">180dp</dimen>
     <dimen name="text_profile_desc">14sp</dimen>
     <dimen name="profile_followers_margin">32dp</dimen>
+    <dimen name="profile_header_margin">24dp</dimen>
 
 
 </resources>
