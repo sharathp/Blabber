@@ -28,6 +28,9 @@
     <string name="text_retweets">RETWEETS</string>
     <string name="text_likes">LIKES</string>
 
+    <string name="text_following">FOLLOWING</string>
+    <string name="text_followers">FOLLOWERS</string>
+
     <string name="str_pattern_reply_to">Replying to %s</string>
     <string name="str_pattern_retweeted_name">%s Retweeted</string>
     <string name="welcome_to_blabber">Welcome To Blabber</string>
