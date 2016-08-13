@@ -21,6 +21,7 @@ ext {
     GLIDE_TRANSFORMATIONS_VERSION = "2.0.1"
     CALLIGRAPHY_VERSION = "2.2.0"
     FENSTER_VERSION = "0.0.2"
+    CIRCLE_IMAGE_VIEW_VERSION = "2.1.0"
 }
 
 apt {
@@ -103,6 +104,7 @@ dependencies {
     compile "org.greenrobot:eventbus:$EVENT_BUS_VERSION"
 
     compile "com.facebook.stetho:stetho:$STETHO_VERSION"
+    compile "de.hdodenhof:circleimageview:$CIRCLE_IMAGE_VIEW_VERSION"
 
     testCompile "junit:junit:$JUNIT_VERSION"
 }

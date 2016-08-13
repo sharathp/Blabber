@@ -117,13 +117,13 @@ public class TweetViewHolder<T extends AbstractModel & ITweetWithUser> extends S
         mContentTextView.setText(item.getText());
 
         Glide.clear(mProfileImageView);
-        ImageUtils.loadProfileImage(itemView.getContext(), mProfileImageView, profileImageUrl);
+        ImageUtils.loadTweetsListProfileImageWithRounderCorners(itemView.getContext(), mProfileImageView, profileImageUrl);
 
         if (item.getImageUrl() != null) {
             mMediaImageView.setVisibility(View.VISIBLE);
             mMediaImageView.setHeightRatio((float) item.getImageHeight() / (float) item.getImageWidth());
             Glide.clear(mMediaImageView);
-            ImageUtils.loadImage(itemView.getContext(), mMediaImageView, item.getImageUrl());
+            ImageUtils.loadImageWithRounderCorners(itemView.getContext(), mMediaImageView, item.getImageUrl());
         } else {
             mMediaImageView.setVisibility(View.GONE);
         }

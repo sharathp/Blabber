@@ -29,8 +29,6 @@ import com.sharathp.blabber.views.EndlessRecyclerViewScrollListener;
 import com.sharathp.blabber.views.adapters.HomeTimeLineAdapter;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 import com.yahoo.squidb.data.SquidCursor;
-import com.yahoo.squidb.sql.Order;
-import com.yahoo.squidb.sql.Query;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -108,9 +106,7 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public Loader<SquidCursor<HomeTimelineWithUser>> onCreateLoader(final int id, final Bundle args) {
-        final Query query = Query.select(HomeTimelineWithUser.PROPERTIES)
-                .orderBy(Order.desc(HomeTimelineWithUser.CREATED_AT));
-        return mTwitterDAO.getHomeTimeline(query);
+        return mTwitterDAO.getHomeTimeline();
     }
 
     @Override

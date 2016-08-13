@@ -92,7 +92,7 @@ public class TwitterClient extends OAuthBaseClient {
         client.get(apiUrl, requestParams, handler);
     }
 
-    public void getLatestUserTimeLineTweets(final Long maxId, final Long userId, final AsyncHttpResponseHandler handler) {
+    public void getPastUserTimeLineTweets(final Long maxId, final Long userId, final AsyncHttpResponseHandler handler) {
         final String apiUrl = getApiUrl(RELATIVE_URL_USER_TIMELINE);
         final RequestParams requestParams = getTweetsRequestParams(maxId, null);
         if (userId != null && userId > 0) {
@@ -101,7 +101,7 @@ public class TwitterClient extends OAuthBaseClient {
         client.get(apiUrl, requestParams, handler);
     }
 
-    public void getPastUserTimeLineTweets(final Long sinceId, final Long userId, final AsyncHttpResponseHandler handler) {
+    public void getLatestUserTimeLineTweets(final Long sinceId, final Long userId, final AsyncHttpResponseHandler handler) {
         final String apiUrl = getApiUrl(RELATIVE_URL_USER_TIMELINE);
         final RequestParams requestParams = getTweetsRequestParams(null, sinceId);
         if (userId != null && userId > 0) {

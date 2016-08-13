@@ -5,10 +5,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
@@ -39,6 +36,7 @@ import com.sharathp.blabber.repositories.LocalPreferencesDAO;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
 import com.sharathp.blabber.repositories.rest.resources.UserResource;
 import com.sharathp.blabber.util.ImageUtils;
+import com.sharathp.blabber.util.PermissionUtils;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 
 import org.greenrobot.eventbus.EventBus;
@@ -125,7 +123,7 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
         final String userImageUrl = mLocalPreferencesDAO.getUserProfileImageUrl();
 
         profileNameTextView.setText(userName);
-        ImageUtils.loadProfileImage(this, profileImageView, userImageUrl);
+        ImageUtils.loadTweetsListProfileImageWithRounderCorners(this, profileImageView, userImageUrl);
     }
 
     private void setHomeInfo() {
@@ -175,6 +173,11 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
                 // already on home, do nothing
                 break;
             }
+            case R.id.nav_profile: {
+                final Intent intent = UserProfileActivity.createIntent(this, mLocalPreferencesDAO.getUserId());
+                startActivity(intent);
+                break;
+            }
             default: {
                 Log.w(TAG, "Unknown menu item: " + menuItem.getTitle());
                 mComposeFab.setVisibility(View.VISIBLE);
@@ -182,14 +185,13 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
             }
         }
 
-        menuItem.setChecked(true);
-        getSupportActionBar().setTitle(menuItem.getTitle());
+        setHomeInfo();
         mDrawerLayout.closeDrawers();
     }
 
     @Override
     public void onTweetSelected(final ITweetWithUser tweet) {
-        if (! requestWritePermissions()) {
+        if (!PermissionUtils.requestWritePermissions(this)) {
             return;
         }
 
@@ -215,21 +217,6 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
         composeFragment.setCallback(this);
     }
 
-    private boolean requestWritePermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Settings.System.canWrite(this)) {
-                return true;
-            } else {
-                Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                intent.setData(Uri.parse("package:" + getPackageName()));
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                return false;
-            }
-        }
-        return true;
-    }
-
     static class HomePagerAdapter extends FragmentPagerAdapter {
         private static final int POSITION_HOME_TIMELINE = 0;
         private static final int POSITION_MENTIONS = 1;
@@ -237,11 +224,11 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
         private final int PAGE_COUNT = 2;
         private int tabTitleIds[] = new int[]{R.string.home_tab_title_home_timeline,
                 R.string.home_tab_title_mentions};
-        private Context context;
+        private Context mContext;
 
-        public HomePagerAdapter(final FragmentManager fm, final Context context) {
+        HomePagerAdapter(final FragmentManager fm, final Context context) {
             super(fm);
-            this.context = context;
+            mContext = context;
         }
 
         @Override
@@ -264,7 +251,7 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
 
         @Override
         public CharSequence getPageTitle(final int position) {
-            return context.getResources().getString(tabTitleIds[position]);
+            return mContext.getResources().getString(tabTitleIds[position]);
         }
     }
 }

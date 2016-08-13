@@ -18,8 +18,8 @@ import android.widget.Toast;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.FragmentTimelineBinding;
-import com.sharathp.blabber.events.MentionsPastEvent;
 import com.sharathp.blabber.events.MentionsLatestEvent;
+import com.sharathp.blabber.events.MentionsPastEvent;
 import com.sharathp.blabber.models.MentionsWithUser;
 import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.service.UpdateTimelineService;
@@ -29,8 +29,6 @@ import com.sharathp.blabber.views.EndlessRecyclerViewScrollListener;
 import com.sharathp.blabber.views.adapters.MentionsAdapter;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 import com.yahoo.squidb.data.SquidCursor;
-import com.yahoo.squidb.sql.Order;
-import com.yahoo.squidb.sql.Query;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -108,9 +106,7 @@ public class MentionsFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public Loader<SquidCursor<MentionsWithUser>> onCreateLoader(final int id, final Bundle args) {
-        final Query query = Query.select(MentionsWithUser.PROPERTIES)
-                .orderBy(Order.desc(MentionsWithUser.CREATED_AT));
-        return mTwitterDAO.getMentions(query);
+        return mTwitterDAO.getMentions();
     }
 
     @Override
