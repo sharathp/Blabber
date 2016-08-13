@@ -29,6 +29,8 @@ public class UserSpec {
 
     public String profileBackgroundImageUrl;
 
+    public String profileBannerUrl;
+
     public int friendsCount;
 
     public boolean following;

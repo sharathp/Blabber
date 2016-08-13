@@ -15,6 +15,7 @@
             app:contentScrim="?attr/colorPrimary"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
+            android:visibility="gone"
             android:theme="@style/ToolbarTheme">
 
             <android.support.design.widget.CollapsingToolbarLayout
@@ -45,6 +46,7 @@
                 app:layout_scrollFlags="scroll" />
 
             <RelativeLayout
+                android:id="@+id/rl_profile_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-50dp"
@@ -114,7 +116,6 @@
                         android:layout_toRightOf="@id/tv_following"/>
 
                 </LinearLayout>
-
             </RelativeLayout>
 
             <android.support.design.widget.TabLayout
@@ -132,7 +133,23 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:visibility="gone"/>
+
+        <ProgressBar
+            android:id="@+id/pb_loading_progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/ic_progress_indeterminate" />
+
+        <TextView
+            android:id="@+id/tv_profile_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/error_profile_retrieval"
+            android:visibility="gone" />
 
     </android.support.design.widget.CoordinatorLayout>
 

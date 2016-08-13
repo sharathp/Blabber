@@ -41,6 +41,7 @@ public class TwitterClient extends OAuthBaseClient {
 
     private static final String RELATIVE_URL_MENTION = "/statuses/mentions_timeline.json";
     private static final String RELATIVE_URL_USER_TIMELINE = "/statuses/user_timeline.json";
+    private static final String RELATIVE_URL_USER = "/users/show.json";
 
     private static final String REQ_STATUS_ID = "id";
     private static final String REQ_PARAM_MAX_ID = "max_id";
@@ -96,7 +97,7 @@ public class TwitterClient extends OAuthBaseClient {
         final String apiUrl = getApiUrl(RELATIVE_URL_USER_TIMELINE);
         final RequestParams requestParams = getTweetsRequestParams(maxId, null);
         if (userId != null && userId > 0) {
-            requestParams.put(REQ_PARAM_USER_ID, userId);
+            addUserRequestParams(requestParams, userId);
         }
         client.get(apiUrl, requestParams, handler);
     }
@@ -105,8 +106,14 @@ public class TwitterClient extends OAuthBaseClient {
         final String apiUrl = getApiUrl(RELATIVE_URL_USER_TIMELINE);
         final RequestParams requestParams = getTweetsRequestParams(null, sinceId);
         if (userId != null && userId > 0) {
-            requestParams.put(REQ_PARAM_USER_ID, userId);
+            addUserRequestParams(requestParams, userId);
         }
+        client.get(apiUrl, requestParams, handler);
+    }
+
+    public void getLatestUserProfile(final Long userId, final AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_USER);
+        final RequestParams requestParams = getUserRequestParams(userId);
         client.get(apiUrl, requestParams, handler);
     }
 
@@ -139,6 +146,16 @@ public class TwitterClient extends OAuthBaseClient {
         final RequestParams requestParams = new RequestParams();
         requestParams.put(REQ_STATUS_ID, statusId);
         return requestParams;
+    }
+
+    private RequestParams getUserRequestParams(final Long userId) {
+        final RequestParams requestParams = new RequestParams();
+        addUserRequestParams(requestParams, userId);
+        return requestParams;
+    }
+
+    private void addUserRequestParams(final RequestParams requestParams, final Long userId) {
+        requestParams.put(REQ_PARAM_USER_ID, userId);
     }
 
     private RequestParams getTweetsRequestParams(final Long maxId, final Long sinceId) {

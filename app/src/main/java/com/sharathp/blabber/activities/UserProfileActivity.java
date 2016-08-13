@@ -17,6 +17,7 @@ import android.view.View;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityUserProfileBinding;
+import com.sharathp.blabber.events.UserProfileRetrieved;
 import com.sharathp.blabber.fragments.ComposeFragment;
 import com.sharathp.blabber.fragments.LikesFragment;
 import com.sharathp.blabber.fragments.MediaFragment;
@@ -24,10 +25,16 @@ import com.sharathp.blabber.fragments.UserTimelineFragment;
 import com.sharathp.blabber.models.ITweetWithUser;
 import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.repositories.TwitterDAO;
+import com.sharathp.blabber.repositories.rest.TwitterClient;
+import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.util.ImageUtils;
 import com.sharathp.blabber.util.PermissionUtils;
 import com.sharathp.blabber.util.ViewUtils;
 import com.sharathp.blabber.views.adapters.TweetCallback;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import javax.inject.Inject;
 
@@ -39,9 +46,16 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
     @Inject
     TwitterDAO mTwitterDAO;
 
+    @Inject
+    TwitterClient mTwitterClient;
+
+    @Inject
+    EventBus mEventBus;
+
     private int mMaxScrollSize;
     private boolean mIsAvatarShown = true;
     private ActivityUserProfileBinding mBinding;
+    private long mUserId;
     private User mUser;
 
     public static Intent createIntent(final Context context, final Long userId) {
@@ -57,30 +71,23 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_user_profile);
 
-        final Long userId = getIntent().getLongExtra(EXTRA_USER_ID, -1);
-        mUser = mTwitterDAO.getUser(userId);
-
-        mBinding.vpProfile.setAdapter(new ProfilePagerAdapter(getSupportFragmentManager(), this, mUser.getId()));
-        mBinding.tlProfile.setupWithViewPager(mBinding.vpProfile);
-        mBinding.appbarLayout.addOnOffsetChangedListener(this);
-        mMaxScrollSize = mBinding.appbarLayout.getTotalScrollRange();
-
+        mUserId = getIntent().getLongExtra(EXTRA_USER_ID, -1);
 //        mBinding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        ImageUtils.loadProfileImageWithRounderCorners(this, mBinding.ivProfile, mUser.getProfileImageUrl());
-        ImageUtils.loadImage(this, mBinding.ivProfileBackdrop, mUser.getProfileBackgroundImageUrl());
+        final Intent intent = UpdateTimelineService.createIntentForUserProfile(this, mUserId);
+        startService(intent);
+    }
 
-        mBinding.tvName.setText(mUser.getRealName());
-        mBinding.tvUserName.setText("@" + mUser.getScreenName());
+    @Override
+    public void onStart() {
+        super.onStart();
+        mEventBus.register(this);
+    }
 
-        if (TextUtils.isEmpty(mUser.getDescription())) {
-            mBinding.tvUserDesc.setVisibility(View.GONE);
-        } else {
-            mBinding.tvUserDesc.setText(mUser.getDescription());
-        }
-
-        setFollowing();
-        setFollowers();
+    @Override
+    public void onStop() {
+        mEventBus.unregister(this);
+        super.onStop();
     }
 
     @Override
@@ -105,7 +112,13 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
 
     @Override
     public void onProfileImageSelected(final ITweetWithUser tweet) {
-        final Intent intent = UserProfileActivity.createIntent(this, tweet.getUserId());
+        long userId = tweet.getUserId();
+
+        if (tweet.getRetweetedUserId() != null && tweet.getRetweetedUserId() > 1) {
+            userId = tweet.getRetweetedUserId();
+        }
+
+        final Intent intent = UserProfileActivity.createIntent(this, userId);
         startActivity(intent);
     }
 
@@ -128,6 +141,48 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
                     .scaleY(1).scaleX(1)
                     .start();
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(final UserProfileRetrieved event) {
+        mBinding.pbLoadingProgressBar.setVisibility(View.GONE);
+        if (event.isSuccess()) {
+            mBinding.vpProfile.setVisibility(View.VISIBLE);
+            mBinding.appbarLayout.setVisibility(View.VISIBLE);
+            mUser = mTwitterDAO.getUser(mUserId);
+            mBinding.vpProfile.setAdapter(new ProfilePagerAdapter(getSupportFragmentManager(), this, mUser.getId()));
+            mBinding.tlProfile.setupWithViewPager(mBinding.vpProfile);
+            mBinding.appbarLayout.addOnOffsetChangedListener(this);
+            mMaxScrollSize = mBinding.appbarLayout.getTotalScrollRange();
+            populateUserProfile();
+        } else {
+            mBinding.tvProfileError.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void populateUserProfile() {
+        ImageUtils.loadProfileImageWithRounderCorners(this, mBinding.ivProfile, mUser.getProfileImageUrl());
+
+
+        String url = mUser.getProfileBackgroundImageUrl();
+
+        if (! TextUtils.isEmpty(mUser.getProfileBannerUrl())) {
+            url = mUser.getProfileBannerUrl();
+        }
+
+        ImageUtils.loadImage(this, mBinding.ivProfileBackdrop, url);
+
+        mBinding.tvName.setText(mUser.getRealName());
+        mBinding.tvUserName.setText("@" + mUser.getScreenName());
+
+        if (TextUtils.isEmpty(mUser.getDescription())) {
+            mBinding.tvUserDesc.setVisibility(View.GONE);
+        } else {
+            mBinding.tvUserDesc.setText(mUser.getDescription());
+        }
+
+        setFollowing();
+        setFollowers();
     }
 
     private void setFollowing() {
