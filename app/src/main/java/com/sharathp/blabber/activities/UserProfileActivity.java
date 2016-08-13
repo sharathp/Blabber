@@ -61,6 +61,8 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
         mBinding.appbarLayout.addOnOffsetChangedListener(this);
         mMaxScrollSize = mBinding.appbarLayout.getTotalScrollRange();
 
+        mBinding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
         ImageUtils.loadProfileImageWithRounderCorners(this, mBinding.ivProfile, mUser.getProfileImageUrl());
         ImageUtils.loadImage(this, mBinding.ivProfileBackdrop, mUser.getProfileBackgroundImageUrl());
         mBinding.tvName.setText(mUser.getRealName());
