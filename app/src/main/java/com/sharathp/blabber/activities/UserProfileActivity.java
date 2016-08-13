@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -26,12 +27,16 @@ import com.sharathp.blabber.views.adapters.TweetCallback;
 
 import javax.inject.Inject;
 
-public class UserProfileActivity extends AppCompatActivity implements TweetCallback, ComposeFragment.ComposeCallback {
+public class UserProfileActivity extends AppCompatActivity implements TweetCallback,
+        ComposeFragment.ComposeCallback, AppBarLayout.OnOffsetChangedListener {
     private static final String EXTRA_USER_ID = UserProfileActivity.class.getSimpleName() + ":USER_ID";
+    private static final int PERCENTAGE_TO_ANIMATE_AVATAR = 30;
 
     @Inject
     TwitterDAO mTwitterDAO;
 
+    private int mMaxScrollSize;
+    private boolean mIsAvatarShown = true;
     private ActivityUserProfileBinding mBinding;
     private User mUser;
 
@@ -53,6 +58,8 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
 
         mBinding.vpProfile.setAdapter(new ProfilePagerAdapter(getSupportFragmentManager(), this, mUser.getId()));
         mBinding.tlProfile.setupWithViewPager(mBinding.vpProfile);
+        mBinding.appbarLayout.addOnOffsetChangedListener(this);
+        mMaxScrollSize = mBinding.appbarLayout.getTotalScrollRange();
 
         ImageUtils.loadProfileImageWithRounderCorners(this, mBinding.ivProfile, mUser.getProfileImageUrl());
         ImageUtils.loadImage(this, mBinding.ivProfileBackdrop, mUser.getProfileBackgroundImageUrl());
@@ -77,6 +84,27 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
     @Override
     public void onTweetReplied(final ITweetWithUser tweet) {
         openCompose(tweet);
+    }
+
+    @Override
+    public void onOffsetChanged(final AppBarLayout appBarLayout, final int i) {
+        if (mMaxScrollSize == 0) {
+            mMaxScrollSize = appBarLayout.getTotalScrollRange();
+        }
+
+        final int percentage = Math.abs(i * 100 / mMaxScrollSize);
+
+        if (percentage >= PERCENTAGE_TO_ANIMATE_AVATAR && mIsAvatarShown) {
+            mIsAvatarShown = false;
+            mBinding.ivProfile.animate().scaleY(0).scaleX(0).setDuration(200).start();
+        }
+
+        if (percentage <= PERCENTAGE_TO_ANIMATE_AVATAR && !mIsAvatarShown) {
+            mIsAvatarShown = true;
+            mBinding.ivProfile.animate()
+                    .scaleY(1).scaleX(1)
+                    .start();
+        }
     }
 
     private void openCompose(final ITweetWithUser tweetWithUser) {
