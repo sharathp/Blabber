@@ -9,4 +9,10 @@ public interface TweetCallback {
     void onTweetReplied(ITweetWithUser tweet);
 
     void onProfileImageSelected(ITweetWithUser tweet);
+
+    void onFavorited(ITweetWithUser tweet);
+
+    void onUnfavorited(ITweetWithUser tweet);
+
+    void onRetweeted(ITweetWithUser tweet);
 }

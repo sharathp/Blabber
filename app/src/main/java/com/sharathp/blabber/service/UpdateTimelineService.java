@@ -12,11 +12,14 @@ import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
+import com.sharathp.blabber.events.FavoritedEvent;
 import com.sharathp.blabber.events.HomeTimelineLatestEvent;
 import com.sharathp.blabber.events.HomeTimelinePastEvent;
 import com.sharathp.blabber.events.MentionsLatestEvent;
 import com.sharathp.blabber.events.MentionsPastEvent;
+import com.sharathp.blabber.events.RetweetedEvent;
 import com.sharathp.blabber.events.StatusSubmittedEvent;
+import com.sharathp.blabber.events.UnfavoritedEvent;
 import com.sharathp.blabber.events.UserLikeLatestEvent;
 import com.sharathp.blabber.events.UserLikePastEvent;
 import com.sharathp.blabber.events.UserProfileRetrieved;
@@ -60,13 +63,14 @@ public class UpdateTimelineService extends BaseService {
 
     private static final String EXTRA_OPERATION_TYPE = UpdateTimelineService.class.getName() + ".OPERATION_TYPE";
     private static final String EXTRA_USER_ID = UpdateTimelineService.class.getName() + ".USER_ID";
+    private static final String EXTRA_STATUS_ID = UpdateTimelineService.class.getName() + ".EXTRA_STATUS_ID";
 
     private static final String EXTRA_STATUS = UpdateTimelineService.class.getName() + ".EXTRA_STATUS";
     private static final String EXTRA_IN_REPLY_TO_STATUS_ID = UpdateTimelineService.class.getName() + ".IN_REPLY_TO_STATUS_ID";
 
 
     @IntDef({OP_HOME_TIMELINE_LATEST, OP_HOME_TIMELINE_PAST, OP_DELETE_EXISTING_AND_REFRESH,
-            OP_TWEET, OP_TWEET_FAVORITE, OP_TWEET_UNFAVORITE,OP_MENTION_LATEST,
+            OP_TWEET, OP_TWEET_FAVORITE, OP_TWEET_UNFAVORITE,OP_RETWEET, OP_MENTION_LATEST,
             OP_MENTION_PAST, OP_USER_TIMELINE_LATEST, OP_USER_TIMELINE_PAST, OP_USER,
             OP_USER_LIKE_LATEST, OP_USER_LIKE_PAST})
     private @interface OperationType {}
@@ -77,13 +81,14 @@ public class UpdateTimelineService extends BaseService {
     private static final int OP_TWEET = 4;
     private static final int OP_TWEET_FAVORITE = 5;
     private static final int OP_TWEET_UNFAVORITE = 6;
-    private static final int OP_MENTION_LATEST= 7;
-    private static final int OP_MENTION_PAST = 8;
-    private static final int OP_USER_TIMELINE_LATEST= 9;
-    private static final int OP_USER_TIMELINE_PAST = 10;
-    private static final int OP_USER = 11;
-    private static final int OP_USER_LIKE_LATEST= 12;
-    private static final int OP_USER_LIKE_PAST = 13;
+    private static final int OP_RETWEET = 7;
+    private static final int OP_MENTION_LATEST= 8;
+    private static final int OP_MENTION_PAST = 9;
+    private static final int OP_USER_TIMELINE_LATEST= 10;
+    private static final int OP_USER_TIMELINE_PAST = 11;
+    private static final int OP_USER = 12;
+    private static final int OP_USER_LIKE_LATEST= 13;
+    private static final int OP_USER_LIKE_PAST = 14;
 
     @Inject
     EventBus mEventBus;
@@ -124,6 +129,24 @@ public class UpdateTimelineService extends BaseService {
         if (inReplyToStatusId != null) {
             intent.putExtra(EXTRA_IN_REPLY_TO_STATUS_ID, inReplyToStatusId);
         }
+        return intent;
+    }
+
+    public static Intent createIntentForFavorite(final Context context, final Long statusId) {
+        final Intent intent = createIntent(context, OP_TWEET_FAVORITE);
+        intent.putExtra(EXTRA_STATUS_ID, statusId);
+        return intent;
+    }
+
+    public static Intent createIntentForUnFavorite(final Context context, final Long statusId) {
+        final Intent intent = createIntent(context, OP_TWEET_UNFAVORITE);
+        intent.putExtra(EXTRA_STATUS_ID, statusId);
+        return intent;
+    }
+
+    public static Intent createIntentForRetweet(final Context context, final Long statusId) {
+        final Intent intent = createIntent(context, OP_RETWEET);
+        intent.putExtra(EXTRA_STATUS_ID, statusId);
         return intent;
     }
 
@@ -196,13 +219,31 @@ public class UpdateTimelineService extends BaseService {
                 break;
             }
             case OP_TWEET: {
-                Log.i(TAG, "Tweeting/Retweeting");
+                Log.i(TAG, "Tweeting/Replying");
                 final String status = intentData.getString(EXTRA_STATUS);
                 Long inReplyToStatusId = intentData.getLong(EXTRA_IN_REPLY_TO_STATUS_ID, -1);
                 if (inReplyToStatusId == -1) {
                     inReplyToStatusId = null;
                 }
                 tweet(status, inReplyToStatusId);
+                break;
+            }
+            case OP_TWEET_FAVORITE: {
+                Log.i(TAG, "Favoriting");
+                Long statusId = intentData.getLong(EXTRA_STATUS_ID, -1);
+                favorite(statusId);
+                break;
+            }
+            case OP_TWEET_UNFAVORITE: {
+                Log.i(TAG, "Unfavoriting");
+                Long statusId = intentData.getLong(EXTRA_STATUS_ID, -1);
+                unfavorite(statusId);
+                break;
+            }
+            case OP_RETWEET: {
+                Log.i(TAG, "Retweeting");
+                Long statusId = intentData.getLong(EXTRA_STATUS_ID, -1);
+                retweet(statusId);
                 break;
             }
             case OP_MENTION_LATEST: {
@@ -282,6 +323,57 @@ public class UpdateTimelineService extends BaseService {
         });
     }
 
+    private void retweet(final Long statusId) {
+        mTwitterClient.retweet(statusId, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                final RetweetedEvent retweetedEvent = new RetweetedEvent(statusId, false);
+                mEventBus.post(retweetedEvent);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
+                final RetweetedEvent retweetedEvent = new RetweetedEvent(statusId, true);
+                updateTweet(statusId, retweetedEvent);
+            }
+        });
+    }
+
+    private void unfavorite(final Long statusId) {
+        mTwitterClient.unfavorite(statusId, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                final UnfavoritedEvent unfavoritedEvent = new UnfavoritedEvent(statusId, false);
+                mEventBus.post(unfavoritedEvent);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
+                final UnfavoritedEvent unfavoritedEvent = new UnfavoritedEvent(statusId, true);
+                updateTweet(statusId, unfavoritedEvent);
+            }
+        });
+    }
+
+    private void favorite(final Long statusId) {
+        mTwitterClient.favorite(statusId, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                final FavoritedEvent favoritedEvent = new FavoritedEvent(statusId, false);
+                mEventBus.post(favoritedEvent);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
+                final FavoritedEvent favoritedEvent = new FavoritedEvent(statusId, true);
+                updateTweet(statusId, favoritedEvent);
+            }
+        });
+    }
+
     private void retrieveLatestUserTimeline(final long userId) {
         final UserTimeLineTweetWithUser latestUserTimeline = mTwitterDAO.getLatestUserTimeline(userId);
         Long sinceId = null;
@@ -352,6 +444,24 @@ public class UpdateTimelineService extends BaseService {
             maxId = homeTimelineWithUser.getId();
         }
         mTwitterClient.getPastHomeTimeline(maxId - 1, getPastHomeTimelineResponseHandler());
+    }
+
+    private void updateTweet(final Long statusId, final Object eventToPost) {
+        mTwitterClient.getTweet(statusId, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers, final String responseString, final Throwable throwable) {
+                Log.e(TAG, "Unable to retrieve tweet: " + statusId, throwable);
+                mEventBus.post(eventToPost);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
+                Log.i(TAG, "Retrieved tweet: " + statusId);
+                final TweetResource tweetResource = mGson.fromJson(responseString, TweetResource.class);
+                mTwitterDAO.updateTweet(tweetResource.convertToTweet());
+                mEventBus.post(eventToPost);
+            }
+        });
     }
 
     private boolean saveTweets(final List<TweetResource> tweetResources) {
