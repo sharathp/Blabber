@@ -10,6 +10,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
+import android.view.View;
 
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
@@ -23,6 +26,7 @@ import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.util.ImageUtils;
 import com.sharathp.blabber.util.PermissionUtils;
+import com.sharathp.blabber.util.ViewUtils;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 
 import javax.inject.Inject;
@@ -65,7 +69,17 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
 
         ImageUtils.loadProfileImageWithRounderCorners(this, mBinding.ivProfile, mUser.getProfileImageUrl());
         ImageUtils.loadImage(this, mBinding.ivProfileBackdrop, mUser.getProfileBackgroundImageUrl());
+
         mBinding.tvName.setText(mUser.getRealName());
+        mBinding.tvUserName.setText("@" + mUser.getScreenName());
+
+        if (TextUtils.isEmpty(mUser.getDescription())) {
+            mBinding.tvUserDesc.setVisibility(View.GONE);
+        } else {
+            mBinding.tvUserDesc.setText(mUser.getDescription());
+        }
+
+
     }
 
     @Override
@@ -107,6 +121,18 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
                     .scaleY(1).scaleX(1)
                     .start();
         }
+        setFollowing();
+        setFollowers();
+    }
+
+    private void setFollowing() {
+        final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_following), mUser.getFriendsCount());
+        mBinding.tvFollowing.setText(spannable);
+    }
+
+    private void setFollowers() {
+        final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_followers), mUser.getFollowersCount());
+        mBinding.tvFollowers.setText(spannable);
     }
 
     private void openCompose(final ITweetWithUser tweetWithUser) {

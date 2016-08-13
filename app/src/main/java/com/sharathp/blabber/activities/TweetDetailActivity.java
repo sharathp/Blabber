@@ -9,10 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
 import android.view.Display;
 import android.view.View;
 
@@ -25,6 +22,7 @@ import com.sharathp.blabber.fragments.ComposeFragment;
 import com.sharathp.blabber.models.ITweetWithUser;
 import com.sharathp.blabber.util.BlabberDateUtils;
 import com.sharathp.blabber.util.ImageUtils;
+import com.sharathp.blabber.util.ViewUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -140,7 +138,7 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
     }
 
     private void setLikes() {
-        final SpannableStringBuilder spannable = getSpannedText(getString(R.string.text_retweets), mTweetWithUser.getFavoriteCount());
+        final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_retweets), mTweetWithUser.getFavoriteCount());
         mBinding.tvLikes.setText(spannable);
         if (mTweetWithUser.getFavorited()) {
             mBinding.ivLikeAction.setImageResource(R.drawable.ic_like_active);
@@ -148,20 +146,11 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
     }
 
     private void setRetweets() {
-        final SpannableStringBuilder spannable = getSpannedText(getString(R.string.text_likes), mTweetWithUser.getRetweetCount());
+        final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_likes), mTweetWithUser.getRetweetCount());
         mBinding.tvRetweets.setText(spannable);
         if (mTweetWithUser.getRetweeted()) {
             mBinding.ivRetweetAction.setImageResource(R.drawable.ic_retweet_active);
         }
-    }
-
-    private SpannableStringBuilder getSpannedText(final String label, final int count) {
-        final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-        spannableStringBuilder.append(Integer.toString(count));
-        spannableStringBuilder.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableStringBuilder.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.detail_text_likes_retweets_numbers)), 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableStringBuilder.append(" ").append(label);
-        return spannableStringBuilder;
     }
 
     @Override
