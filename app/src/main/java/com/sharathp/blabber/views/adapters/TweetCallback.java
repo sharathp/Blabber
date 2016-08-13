@@ -7,4 +7,6 @@ public interface TweetCallback {
     void onTweetSelected(ITweetWithUser tweet);
 
     void onTweetReplied(ITweetWithUser tweet);
+
+    void onProfileImageSelected(ITweetWithUser tweet);
 }
