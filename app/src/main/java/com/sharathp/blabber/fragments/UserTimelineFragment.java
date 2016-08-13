@@ -139,7 +139,7 @@ public class UserTimelineFragment extends Fragment implements LoaderManager.Load
     public void onEventMainThread(final UserTimelineLatestEvent event) {
         mBinding.srlTweets.setRefreshing(false);
         if (! event.isSuccess()) {
-            Toast.makeText(getActivity(), R.string.message_refresh_failed, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.message_refresh_failed, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -151,7 +151,7 @@ public class UserTimelineFragment extends Fragment implements LoaderManager.Load
             }
         } else {
             markNoMoreItemsToLoad();
-            Toast.makeText(getActivity(), R.string.message_past_tweets_failed, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.message_past_tweets_failed, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -174,7 +174,7 @@ public class UserTimelineFragment extends Fragment implements LoaderManager.Load
 
     private void retrieveLatestUserTimeline() {
         if (! NetworkUtils.isOnline(getContext())) {
-            Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_SHORT).show();
             mBinding.srlTweets.setRefreshing(false);
             return;
         }
@@ -187,7 +187,7 @@ public class UserTimelineFragment extends Fragment implements LoaderManager.Load
     private void retrievePastTimeline() {
         if (! NetworkUtils.isOnline(getContext())) {
             markNoMoreItemsToLoad();
-            Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.message_no_internet, Toast.LENGTH_SHORT).show();
             return;
         }
 

@@ -40,4 +40,5 @@
     <string name="profile_tab_title_tweets">Tweets</string>
     <string name="profile_tab_title_media">Media</string>
     <string name="profile_tab_title_likes">Likes</string>
+    <string name="warning_no_offline_profile">No offline data saved for this user</string>
 </resources>
