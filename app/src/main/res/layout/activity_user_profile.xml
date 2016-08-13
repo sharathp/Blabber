@@ -149,6 +149,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/error_profile_retrieval"
+            android:padding="@dimen/space_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textColor="@color/color_twitter_blue"
+            android:textSize="@dimen/text_error_profile"
+            android:textStyle="bold"
             android:visibility="gone" />
 
     </android.support.design.widget.CoordinatorLayout>
