@@ -35,6 +35,7 @@ import com.sharathp.blabber.models.ITweetWithUser;
 import com.sharathp.blabber.repositories.LocalPreferencesDAO;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
 import com.sharathp.blabber.repositories.rest.resources.UserResource;
+import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.util.ImageUtils;
 import com.sharathp.blabber.util.PermissionUtils;
 import com.sharathp.blabber.views.adapters.TweetCallback;
@@ -201,6 +202,24 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
     @Override
     public void onTweetReplied(final ITweetWithUser tweet) {
         openCompose(tweet);
+    }
+
+    @Override
+    public void onFavorited(final ITweetWithUser tweet) {
+        final Intent intent = UpdateTimelineService.createIntentForFavorite(this, tweet.getId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onUnfavorited(final ITweetWithUser tweet) {
+        final Intent intent = UpdateTimelineService.createIntentForUnFavorite(this, tweet.getId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onRetweeted(final ITweetWithUser tweet) {
+        final Intent intent = UpdateTimelineService.createIntentForRetweet(this, tweet.getId());
+        startActivity(intent);
     }
 
     @Override

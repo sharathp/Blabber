@@ -57,4 +57,6 @@ public interface TwitterDAO {
     boolean deleteExistingTweets();
 
     User getUser(Long userId);
+
+    boolean updateTweet(Tweet tweet);
 }

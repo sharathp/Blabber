@@ -119,6 +119,24 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
     }
 
     @Override
+    public void onFavorited(final ITweetWithUser tweet) {
+        final Intent intent = UpdateTimelineService.createIntentForFavorite(this, tweet.getId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onUnfavorited(final ITweetWithUser tweet) {
+        final Intent intent = UpdateTimelineService.createIntentForUnFavorite(this, tweet.getId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onRetweeted(final ITweetWithUser tweet) {
+        final Intent intent = UpdateTimelineService.createIntentForRetweet(this, tweet.getId());
+        startActivity(intent);
+    }
+
+    @Override
     public void onProfileImageSelected(final ITweetWithUser tweet) {
         long userId = tweet.getUserId();
 

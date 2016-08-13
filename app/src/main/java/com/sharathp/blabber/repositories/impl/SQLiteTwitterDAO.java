@@ -19,6 +19,7 @@ import com.yahoo.squidb.sql.Order;
 import com.yahoo.squidb.sql.Query;
 import com.yahoo.squidb.support.SquidSupportCursorLoader;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class SQLiteTwitterDAO implements TwitterDAO {
                 .orderBy(Order.desc(HomeTimelineWithUser.CREATED_AT));
         final SquidSupportCursorLoader<HomeTimelineWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, HomeTimelineWithUser.class, query);
         loader.setNotificationUri(HomeTimeline.CONTENT_URI);
+        loader.setNotificationUri(Tweet.CONTENT_URI);
         return loader;
     }
 
@@ -50,6 +52,7 @@ public class SQLiteTwitterDAO implements TwitterDAO {
                 .orderBy(Order.desc(UserTimeLineTweetWithUser.CREATED_AT));
         final SquidSupportCursorLoader<UserTimeLineTweetWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, UserTimeLineTweetWithUser.class, query);
         loader.setNotificationUri(UserTimeline.CONTENT_URI);
+        loader.setNotificationUri(Tweet.CONTENT_URI);
         return loader;
     }
 
@@ -60,6 +63,7 @@ public class SQLiteTwitterDAO implements TwitterDAO {
                 .orderBy(Order.desc(LikeWithUser.CREATED_AT));
         final SquidSupportCursorLoader<LikeWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, LikeWithUser.class, query);
         loader.setNotificationUri(Like.CONTENT_URI);
+        loader.setNotificationUri(Tweet.CONTENT_URI);
         return loader;
     }
 
@@ -69,6 +73,7 @@ public class SQLiteTwitterDAO implements TwitterDAO {
                 .orderBy(Order.desc(MentionsWithUser.CREATED_AT));
         final SquidSupportCursorLoader<MentionsWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, MentionsWithUser.class, query);
         loader.setNotificationUri(Mentions.CONTENT_URI);
+        loader.setNotificationUri(Tweet.CONTENT_URI);
         return loader;
     }
 
@@ -281,6 +286,11 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     @Override
     public User getUser(final Long userId) {
         return mDatabase.fetch(User.class, userId);
+    }
+
+    @Override
+    public boolean updateTweet(final Tweet tweet) {
+        return checkAndInsertTweets(Arrays.asList(tweet));
     }
 
     private <T extends AndroidTableModel> boolean checkAndInsertElements(final Collection<T> models) {
