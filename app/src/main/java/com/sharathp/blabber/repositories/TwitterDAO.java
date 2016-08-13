@@ -59,4 +59,6 @@ public interface TwitterDAO {
     User getUser(Long userId);
 
     boolean updateTweet(Tweet tweet);
+
+    Tweet getTweet(Long tweetId);
 }

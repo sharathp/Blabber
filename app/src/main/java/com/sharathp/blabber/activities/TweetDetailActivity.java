@@ -12,19 +12,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
 import android.view.Display;
 import android.view.View;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.malmstein.fenster.controller.MediaFensterPlayerController;
 import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityDetailTweetBinding;
+import com.sharathp.blabber.events.FavoritedEvent;
+import com.sharathp.blabber.events.RetweetedEvent;
+import com.sharathp.blabber.events.UnfavoritedEvent;
 import com.sharathp.blabber.fragments.ComposeFragment;
 import com.sharathp.blabber.models.ITweetWithUser;
+import com.sharathp.blabber.models.Tweet;
+import com.sharathp.blabber.repositories.TwitterDAO;
+import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.util.BlabberDateUtils;
 import com.sharathp.blabber.util.ImageUtils;
 import com.sharathp.blabber.util.ViewUtils;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Date;
 
@@ -36,8 +45,14 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
     @Inject
     EventBus mEventBus;
 
+    @Inject
+    TwitterDAO mTwitterDAO;
+
     private ITweetWithUser mTweetWithUser;
     private ActivityDetailTweetBinding mBinding;
+
+    private boolean mFavorited;
+    private boolean mRetweeted;
 
     public static Intent createIntent(final Context context, final ITweetWithUser tweetWithUser) {
         final Intent intent = new Intent(context, TweetDetailActivity.class);
@@ -55,6 +70,18 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
         getSupportActionBar().setTitle(R.string.title_activity_detail);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         bindTweet();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mEventBus.register(this);
+    }
+
+    @Override
+    public void onStop() {
+        mEventBus.unregister(this);
+        super.onStop();
     }
 
     @Override
@@ -81,6 +108,9 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
     }
 
     private void bindTweet() {
+        mFavorited = mTweetWithUser.getFavorited();
+        mRetweeted = mTweetWithUser.getRetweeted();
+
         String userName = mTweetWithUser.getUserRealName();
         String screenName = mTweetWithUser.getUserScreenName();
         String profileImageUrl = mTweetWithUser.getUserImageUrl();
@@ -125,8 +155,9 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
             mBinding.flVideo.setVisibility(View.GONE);
         }
 
-        setLikes();
-        setRetweets();
+        setLikes(mTweetWithUser.getFavoriteCount(), mTweetWithUser.getRetweetedUserName(),
+                mTweetWithUser.getRetweetedFavoriteCount(), mTweetWithUser.getFavorited());
+        setRetweets(mTweetWithUser.getRetweeted(),mTweetWithUser.getRetweetCount() );
 
         mBinding.ivReplyAction.setOnClickListener(view -> {
             final FragmentManager fm = getSupportFragmentManager();
@@ -135,30 +166,108 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
             composeFragment.show(fm, "compose_fragment");
             composeFragment.setCallback(this);
         });
+
+        mBinding.ivRetweetAction.setOnClickListener(view -> {
+            if (mRetweeted) {
+                // no-op for now
+            } else {
+                startService(UpdateTimelineService.createIntentForRetweet(this, mTweetWithUser.getId()));
+            }
+        });
+
+        mBinding.ivLikeAction.setOnClickListener(view -> {
+            if (mFavorited) {
+                // already favorited, unfavorite
+                startService(UpdateTimelineService.createIntentForUnFavorite(this, mTweetWithUser.getId()));
+            } else {
+                // unfavorited, favorite
+                startService(UpdateTimelineService.createIntentForFavorite(this, mTweetWithUser.getId()));
+            }
+        });
     }
 
-    private void setLikes() {
-        int favoriteCount = mTweetWithUser.getFavoriteCount();
-        if (mTweetWithUser.getRetweetedUserName() != null) {
-            favoriteCount = mTweetWithUser.getRetweetedFavoriteCount();
+    private void setLikes(final Integer favoriteCount, final String retweetedUserName,
+                          final Integer retweetedFavoriteCount, final boolean favorited) {
+        int correctCount = favoriteCount;
+        if (retweetedUserName != null) {
+            correctCount = retweetedFavoriteCount;
         }
-        final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_likes), favoriteCount);
+        final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_likes), correctCount);
         mBinding.tvLikes.setText(spannable);
-        if (mTweetWithUser.getFavorited()) {
+        if (favorited) {
             mBinding.ivLikeAction.setImageResource(R.drawable.ic_like_active);
+        } else {
+            mBinding.ivLikeAction.setImageResource(R.drawable.ic_like);
         }
     }
 
-    private void setRetweets() {
-        final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_retweets), mTweetWithUser.getRetweetCount());
+    private void setRetweets(final boolean retweeted, final Integer retweetCount) {
+        final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_retweets), retweetCount);
         mBinding.tvRetweets.setText(spannable);
-        if (mTweetWithUser.getRetweeted()) {
+        if (retweeted) {
             mBinding.ivRetweetAction.setImageResource(R.drawable.ic_retweet_active);
+        } else {
+            mBinding.ivRetweetAction.setImageResource(R.drawable.ic_retweet);
         }
+    }
+
+    private void updateLikes() {
+        final Tweet tweet = mTwitterDAO.getTweet(mTweetWithUser.getId());
+        mFavorited = tweet.isFavorited();
+        setLikes(tweet.getFavoriteCount(), tweet.getRetweetedUserName(),
+                tweet.getRetweetedFavoriteCount(), tweet.isFavorited());
+    }
+
+    private void updateRetweet() {
+        final Tweet tweet = mTwitterDAO.getTweet(mTweetWithUser.getId());
+        mRetweeted = tweet.isRetweeted();
+        setRetweets(tweet.isRetweeted(), tweet.getRetweetCount());
     }
 
     @Override
     public void onTweetSubmitted(final String tweet) {
         // no-op
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(final FavoritedEvent event) {
+        // not applicable for this tweet
+        if (! mTweetWithUser.getId().equals(event.getTweetId())) {
+            return;
+        }
+
+        if (! event.isSuccess()) {
+            Toast.makeText(this, R.string.message_favorite_failed, Toast.LENGTH_SHORT).show();
+        } else {
+            updateLikes();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(final UnfavoritedEvent event) {
+        // not applicable for this tweet
+        if (! mTweetWithUser.getId().equals(event.getTweetId())) {
+            return;
+        }
+
+        if (! event.isSuccess()) {
+            Toast.makeText(this, R.string.message_unfavorite_failed, Toast.LENGTH_SHORT).show();
+        } else {
+            updateLikes();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(final RetweetedEvent event) {
+        // not applicable for this tweet
+        if (! mTweetWithUser.getId().equals(event.getTweetId())) {
+            return;
+        }
+
+        if (! event.isSuccess()) {
+            Toast.makeText(this, R.string.message_retweet_failed, Toast.LENGTH_SHORT).show();
+        } else {
+            updateRetweet();
+        }
     }
 }

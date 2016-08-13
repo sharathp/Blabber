@@ -293,6 +293,11 @@ public class SQLiteTwitterDAO implements TwitterDAO {
         return checkAndInsertTweets(Arrays.asList(tweet));
     }
 
+    @Override
+    public Tweet getTweet(final Long tweetId) {
+        return mDatabase.fetch(Tweet.class, tweetId);
+    }
+
     private <T extends AndroidTableModel> boolean checkAndInsertElements(final Collection<T> models) {
         boolean success = true;
         mDatabase.beginTransaction();
