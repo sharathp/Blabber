@@ -2,6 +2,8 @@
     <string name="app_name">Blabber</string>
     <string name="login_label">Log in</string>
 
+    <string name="action_search">Search</string>
+
     <string name="label_new_tweet">Compose Tweet</string>
 
     <string name="home_tab_title_home_timeline">Timeline</string>

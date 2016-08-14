@@ -9,13 +9,19 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.sharathp.blabber.BlabberApplication;
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivitySearchBinding;
 import com.sharathp.blabber.events.SearchResultsPastEvent;
@@ -51,7 +57,6 @@ public class SearchActivity extends AppCompatActivity implements
     @Inject
     TwitterDAO mTwitterDAO;
 
-    private TweetCallback mCallback;
     private ActivitySearchBinding mBinding;
     private LinearLayoutManager mLayoutManager;
     private SearchAdapter mSearchAdapter;
@@ -72,6 +77,14 @@ public class SearchActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_search);
         mQuery = getIntent().getStringExtra(EXTRA_QUERY);
+
+        BlabberApplication.from(this).getComponent().inject(this);
+
+        setSupportActionBar(mBinding.toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mBinding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
         initViews();
         if (! TextUtils.isEmpty(mQuery)) {
             search();
@@ -90,8 +103,45 @@ public class SearchActivity extends AppCompatActivity implements
         super.onStop();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setIconified(false);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(final String query) {
+                mQuery = query;
+                searchView.clearFocus();
+                search();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(final String newText) {
+                return false;
+            }
+        });
+
+        // Customize searchview text and hint colors
+        final int searchEditId = android.support.v7.appcompat.R.id.search_src_text;
+        final EditText et = (EditText) searchView.findViewById(searchEditId);
+        final int color = getResources().getColor(R.color.color_twitter_blue);
+        et.setTextColor(color);
+        et.setHintTextColor(color);
+
+        if (mQuery != null) {
+            et.setText(mQuery);
+            searchView.clearFocus();
+        }
+
+        return true;
+    }
+
     private void initViews() {
-        mSearchAdapter = new SearchAdapter(mCallback);
+        mSearchAdapter = new SearchAdapter(this);
         final RecyclerView moviesRecyclerView = mBinding.rvTweets;
         mLayoutManager = new LinearLayoutManager(this);
         moviesRecyclerView.setAdapter(mSearchAdapter);
@@ -117,7 +167,7 @@ public class SearchActivity extends AppCompatActivity implements
         getSupportLoaderManager().destroyLoader(TWEET_ITEM_LOADER_ID);
         getSupportLoaderManager().restartLoader(TWEET_ITEM_LOADER_ID, null, this);
 
-        final Intent intent = null;
+        final Intent intent = UpdateTimelineService.createIntentForLatestSearch(this, mQuery);
         startService(intent);
         markMoreItemsToLoad();
     }
@@ -139,8 +189,7 @@ public class SearchActivity extends AppCompatActivity implements
             return;
         }
 
-        // TODO - kick-off an intent to force clear database and start fresh
-        final Intent intent = null;
+        final Intent intent = UpdateTimelineService.createIntentForPastSearch(this, mQuery, mMax);
         startService(intent);
     }
 

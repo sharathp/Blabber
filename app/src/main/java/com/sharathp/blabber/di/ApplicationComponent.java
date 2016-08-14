@@ -4,6 +4,7 @@ import com.sharathp.blabber.activities.FollowersActivity;
 import com.sharathp.blabber.activities.FollowingActivity;
 import com.sharathp.blabber.activities.HomeActivity;
 import com.sharathp.blabber.activities.LoginActivity;
+import com.sharathp.blabber.activities.SearchActivity;
 import com.sharathp.blabber.activities.TweetDetailActivity;
 import com.sharathp.blabber.activities.UserProfileActivity;
 import com.sharathp.blabber.di.modules.ApplicationModule;
@@ -47,4 +48,6 @@ public interface ApplicationComponent {
     void inject(FollowingActivity followingActivity);
 
     void inject(FollowersActivity followersActivity);
+
+    void inject(SearchActivity searchActivity);
 }
