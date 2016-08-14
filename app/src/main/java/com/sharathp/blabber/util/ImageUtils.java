@@ -1,6 +1,7 @@
 package com.sharathp.blabber.util;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -49,6 +50,10 @@ public class ImageUtils {
     }
 
     public static void loadImage(final Context context, final ImageView imageView, final String url) {
+        if (TextUtils.isEmpty(url)) {
+            return;
+        }
+
         Glide.with(context)
                 .load(getDesiredQualityImageUrl(url))
                 .centerCrop()
