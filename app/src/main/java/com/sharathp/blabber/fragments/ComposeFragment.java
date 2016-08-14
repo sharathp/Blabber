@@ -120,8 +120,16 @@ public class ComposeFragment extends DialogFragment {
         if (mReplyTo != null) {
             mBinding.tvReplyTo.setVisibility(View.VISIBLE);
             mBinding.ivDownIcon.setVisibility(View.VISIBLE);
-            mBinding.tvReplyTo.setText(String.format(getResources().getString(R.string.str_pattern_reply_to), mReplyTo.getUserRealName()));
-            mBinding.etTweetContent.setText("@" + mReplyTo.getUserScreenName() + " ");
+            String realName = mReplyTo.getUserRealName();
+            String screenName = mReplyTo.getUserScreenName();
+
+            if (mReplyTo.getRetweetedStatusId() != null && mReplyTo.getRetweetedStatusId() > 0) {
+                realName = mReplyTo.getRetweetedUserName();
+                screenName = mReplyTo.getRetweetedScreenName();
+            }
+
+            mBinding.tvReplyTo.setText(String.format(getResources().getString(R.string.str_pattern_reply_to), realName));
+            mBinding.etTweetContent.setText("@" + screenName + " ");
             mBinding.etTweetContent.setSelection(mBinding.etTweetContent.getText().length());
         }
 
@@ -178,6 +186,10 @@ public class ComposeFragment extends DialogFragment {
 
         if (mReplyTo != null) {
             inReplyToStatusId = mReplyTo.getId();
+
+            if (mReplyTo.getRetweetedStatusId() != null && mReplyTo.getRetweetedStatusId() > 0) {
+                inReplyToStatusId = mReplyTo.getRetweetedStatusId();
+            }
         }
 
         final Intent tweetService = UpdateTimelineService.createIntentForTweeting(getActivity(), tweet, inReplyToStatusId);
