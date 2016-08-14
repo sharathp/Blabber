@@ -150,11 +150,11 @@ public class HomeTimelineFragment extends Fragment implements LoaderManager.Load
 
     private void initViews() {
         mHomeTimeLineAdapter = new HomeTimeLineAdapter(mCallback);
-        final RecyclerView moviesRecyclerView = mBinding.rvTweets;
+        final RecyclerView tweetsRecyclerView = mBinding.rvTweets;
         mLayoutManager = new LinearLayoutManager(getActivity());
-        moviesRecyclerView.setAdapter(mHomeTimeLineAdapter);
-        moviesRecyclerView.setLayoutManager(mLayoutManager);
-        moviesRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
+        tweetsRecyclerView.setAdapter(mHomeTimeLineAdapter);
+        tweetsRecyclerView.setLayoutManager(mLayoutManager);
+        tweetsRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
         mBinding.srlTweets.setOnRefreshListener(() -> refreshHomeTimeline());
         mEndlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(mLayoutManager) {
             @Override
