@@ -33,23 +33,23 @@ public class TwitterClient extends OAuthBaseClient {
     private static final String REST_CONSUMER_SECRET = BuildConfig.TWITTER_API_SECRET;
     private static final String REST_CALLBACK_URL = "oauth://myblabber";
 
-    private static final String RELATIVE_URL_HOME_TIMELINE = "/statuses/home_timeline.json";
-    private static final String RELATIVE_URL_CREDENTIALS = "/account/verify_credentials.json";
-    private static final String RELATIVE_URL_STATUS_UPDATE = "/statuses/update.json";
-    private static final String RELATIVE_URL_FAVORITE = "/favorites/create.json?id=%d";
-    private static final String RELATIVE_URL_UNFAVORITE = "/favorites/destroy.json?id=%d";
-    private static final String RELATIVE_URL_RETWEET = "/statuses/retweet/%d.json";
-    private static final String RELATIVE_URL_UNRETWEET = "/statuses/unretweet/%d.json";
-    private static final String RELATIVE_URL_STATUS = "/statuses/show/%d.json";
+    private static final String RELATIVE_URL_HOME_TIMELINE = "statuses/home_timeline.json";
+    private static final String RELATIVE_URL_CREDENTIALS = "account/verify_credentials.json";
+    private static final String RELATIVE_URL_STATUS_UPDATE = "statuses/update.json";
+    private static final String RELATIVE_URL_FAVORITE = "favorites/create.json?id=%d";
+    private static final String RELATIVE_URL_UNFAVORITE = "favorites/destroy.json?id=%d";
+    private static final String RELATIVE_URL_RETWEET = "statuses/retweet/%d.json";
+    private static final String RELATIVE_URL_UNRETWEET = "statuses/unretweet/%d.json";
+    private static final String RELATIVE_URL_STATUS = "statuses/show/%d.json";
 
-    private static final String RELATIVE_URL_MENTION = "/statuses/mentions_timeline.json";
-    private static final String RELATIVE_URL_USER_TIMELINE = "/statuses/user_timeline.json";
-    private static final String RELATIVE_URL_USER_LIKE = "/favorites/list.json";
-    private static final String RELATIVE_URL_USER = "/users/show.json";
+    private static final String RELATIVE_URL_MENTION = "statuses/mentions_timeline.json";
+    private static final String RELATIVE_URL_USER_TIMELINE = "statuses/user_timeline.json";
+    private static final String RELATIVE_URL_USER_LIKE = "favorites/list.json";
+    private static final String RELATIVE_URL_USER = "users/show.json";
 
-    private static final String RELATIVE_URL_FOLLOWING = "/friends/ids.json";
-    private static final String RELATIVE_URL_FOLLOWERS = "/followers/ids.json";
-    private static final String RELATIVE_URL_USERS_LOOKUP = "/users/lookup.json";
+    private static final String RELATIVE_URL_FOLLOWING = "friends/ids.json";
+    private static final String RELATIVE_URL_FOLLOWERS = "followers/ids.json";
+    private static final String RELATIVE_URL_USERS_LOOKUP = "users/lookup.json";
 
     private static final String REQ_STATUS_ID = "id";
     private static final String REQ_PARAM_MAX_ID = "max_id";
@@ -201,7 +201,7 @@ public class TwitterClient extends OAuthBaseClient {
         final RequestParams requestParams = new RequestParams();
         requestParams.put(REQ_PARAM_USER_ID, userIdParam);
         requestParams.put(REQ_PARAM_INCULDE_ENTITIES, false);
-        client.get(apiUrl, handler);
+        client.get(apiUrl, requestParams, handler);
     }
 
     private RequestParams getUserRequestParams(final Long userId) {

@@ -126,13 +126,13 @@ public abstract class BaseFolloweeActivity extends AppCompatActivity implements 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_followee);
         mUserId = getIntent().getLongExtra(EXTRA_USER_ID, -1L);
         setSupportActionBar(mBinding.toolbar);
-        showLoading();
         initViews();
     }
 
     @Override
     protected void onPostCreate(@Nullable final Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        showLoading();
         refreshFollowees();
     }
 
@@ -164,25 +164,26 @@ public abstract class BaseFolloweeActivity extends AppCompatActivity implements 
     }
 
     private void showLoading() {
-        mBinding.rvFollowees.setVisibility(View.INVISIBLE);
+        mBinding.rvFollowees.setVisibility(View.GONE);
 
         mBinding.flMessageContainer.setVisibility(View.VISIBLE);
-        mBinding.tvFolloweesMessage.setVisibility(View.INVISIBLE);
+        mBinding.tvFolloweesMessage.setVisibility(View.GONE);
         mBinding.pbAllFolloweesLoadingBar.setVisibility(View.VISIBLE);
     }
 
     private void showNoFolloweesMessage() {
-        mBinding.rvFollowees.setVisibility(View.INVISIBLE);
+        mBinding.rvFollowees.setVisibility(View.GONE);
 
         mBinding.flMessageContainer.setVisibility(View.VISIBLE);
-        mBinding.pbAllFolloweesLoadingBar.setVisibility(View.INVISIBLE);
+        mBinding.pbAllFolloweesLoadingBar.setVisibility(View.GONE);
         mBinding.tvFolloweesMessage.setVisibility(View.VISIBLE);
+        mBinding.tvFolloweesMessage.setText(getNoFolloweesMessage());
     }
 
     private void hideMessageContainer() {
-        mBinding.flMessageContainer.setVisibility(View.INVISIBLE);
-        mBinding.tvFolloweesMessage.setVisibility(View.INVISIBLE);
-        mBinding.pbAllFolloweesLoadingBar.setVisibility(View.INVISIBLE);
+        mBinding.flMessageContainer.setVisibility(View.GONE);
+        mBinding.tvFolloweesMessage.setVisibility(View.GONE);
+        mBinding.pbAllFolloweesLoadingBar.setVisibility(View.GONE);
 
         mBinding.rvFollowees.setVisibility(View.VISIBLE);
     }
@@ -200,7 +201,6 @@ public abstract class BaseFolloweeActivity extends AppCompatActivity implements 
     private void refreshFollowees() {
         if (! NetworkUtils.isOnline(this)) {
             Toast.makeText(this, R.string.message_no_internet, Toast.LENGTH_SHORT).show();
-            mBinding.srlFollowees.setRefreshing(false);
             return;
         }
         doRefreshFollowees(mUserId, mRefreshFolloweeHandler);
@@ -264,4 +264,6 @@ public abstract class BaseFolloweeActivity extends AppCompatActivity implements 
     protected abstract void doRetrievePastFollowees(Long userId, Long nextCursor, AsyncHttpResponseHandler handler);
 
     protected abstract void doRefreshFollowees(Long userId, AsyncHttpResponseHandler handler);
+
+    protected abstract String getNoFolloweesMessage();
 }
