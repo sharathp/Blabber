@@ -1,49 +1,64 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/color_twitter_blue"
-                android:paddingBottom="@dimen/login_vertical_margin"
-                android:paddingLeft="@dimen/login_horizontal_margin"
-                android:paddingRight="@dimen/login_horizontal_margin"
-                android:paddingTop="@dimen/login_vertical_margin"
-                tools:context=".activities.LoginActivity">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
 
-    <ImageView
-        android:id="@+id/iv_tweet"
-        android:layout_marginTop="@dimen/login_bird_margin_top"
-        android:layout_width="@dimen/login_bird_width"
-        android:layout_height="@dimen/login_bird_height"
-        android:src="@drawable/ic_bird"/>
-
-
-    <TextView
-        android:id="@+id/tv_welcome"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/login_welcome_margin_top"
-        android:layout_below="@id/iv_tweet"
-        android:textStyle="bold"
-        android:textSize="@dimen/text_login_welcome"
-        android:textColor="@android:color/white"
-        android:layout_centerVertical="true"
-        android:text="@string/welcome_to_blabber"/>
+        android:layout_height="match_parent"
+        android:background="@color/color_twitter_blue"
+        android:paddingBottom="@dimen/login_vertical_margin"
+        android:paddingLeft="@dimen/login_horizontal_margin"
+        android:paddingRight="@dimen/login_horizontal_margin"
+        android:paddingTop="@dimen/login_vertical_margin"
+        tools:context=".activities.LoginActivity">
+
+        <ImageView
+            android:id="@+id/iv_tweet"
+            android:layout_width="@dimen/login_bird_width"
+            android:layout_height="@dimen/login_bird_height"
+            android:layout_marginTop="@dimen/login_bird_margin_top"
+            android:src="@drawable/ic_bird"/>
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:paddingTop="@dimen/login_button_vertical_padding"
-        android:paddingBottom="@dimen/login_button_vertical_padding"
-        android:paddingRight="@dimen/login_button_horizontal_padding"
-        android:paddingLeft="@dimen/login_button_horizontal_padding"
-        android:layout_marginTop="@dimen/login_welcome_button_top"
-        android:layout_below="@id/tv_welcome"
-        android:textStyle="bold"
-        android:textColor="@color/color_twitter_blue"
-        android:onClick="loginToRest"
-        android:background="@android:color/white"
-        android:text="@string/login_label"/>
+        <TextView
+            android:id="@+id/tv_welcome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/iv_tweet"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="@dimen/login_welcome_margin_top"
+            android:text="@string/welcome_to_blabber"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_login_welcome"
+            android:textStyle="bold"/>
 
-</RelativeLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_welcome"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/login_welcome_button_top"
+            android:background="@android:color/white"
+            android:onClick="loginToRest"
+            android:paddingBottom="@dimen/login_button_vertical_padding"
+            android:paddingLeft="@dimen/login_button_horizontal_padding"
+            android:paddingRight="@dimen/login_button_horizontal_padding"
+            android:paddingTop="@dimen/login_button_vertical_padding"
+            android:text="@string/login_label"
+            android:textColor="@color/color_twitter_blue"
+            android:textStyle="bold"/>
+
+        <ProgressBar
+            android:id="@+id/pb_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="true"
+            android:clickable="true"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/ic_progress_indeterminate"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+</layout>
