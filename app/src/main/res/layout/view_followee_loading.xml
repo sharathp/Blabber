@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/message_end_of_tweets"
+        android:text="@string/message_end_of_followees"
         android:textStyle="bold"
         android:visibility="gone"/>
 </FrameLayout>

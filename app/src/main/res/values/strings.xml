@@ -8,6 +8,8 @@
     <string name="home_tab_title_mentions">Mentions</string>
 
     <string name="message_end_of_tweets">End of Tweets</string>
+    <string name="message_end_of_followees">End of Followees</string>
+
     <string name="message_no_tweets">No Tweets</string>
     <string name="message_no_followers">No Followers</string>
     <string name="message_no_following">No Friends</string>

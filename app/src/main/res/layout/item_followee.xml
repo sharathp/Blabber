@@ -43,9 +43,8 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/tv_screen_name"
         android:layout_below="@id/tv_screen_name"
-        android:layout_marginTop="@dimen/detail_text_margin_top"
         android:lineSpacingMultiplier="1.1"
         android:textColor="@color/text_content"
-        android:textSize="@dimen/detail_text_content"/>
+        android:textSize="@dimen/text_followees_content"/>
 </RelativeLayout>
 
