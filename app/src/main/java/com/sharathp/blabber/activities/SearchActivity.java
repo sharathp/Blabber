@@ -164,12 +164,10 @@ public class SearchActivity extends AppCompatActivity implements
         }
 
         mMax = 0L;
-        getSupportLoaderManager().destroyLoader(TWEET_ITEM_LOADER_ID);
-        getSupportLoaderManager().restartLoader(TWEET_ITEM_LOADER_ID, null, this);
-
         final Intent intent = UpdateTimelineService.createIntentForLatestSearch(this, mQuery);
         startService(intent);
         markMoreItemsToLoad();
+        showLoading();
     }
 
     private void refreshSearchResults() {
@@ -199,7 +197,7 @@ public class SearchActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLoadFinished(final Loader<SquidCursor<SearchWithUser>> loader, SquidCursor<SearchWithUser> data) {
+    public void onLoadFinished(final Loader<SquidCursor<SearchWithUser>> loader, final SquidCursor<SearchWithUser> data) {
         if (data.getCount() > 0) {
             // hide no tweets message
             hideMessageContainer();
@@ -278,6 +276,11 @@ public class SearchActivity extends AppCompatActivity implements
         mBinding.srlTweets.setRefreshing(false);
         if (! event.isSuccess()) {
             Toast.makeText(this, R.string.message_search_refresh_failed, Toast.LENGTH_SHORT).show();
+        } else {
+            getSupportLoaderManager().restartLoader(TWEET_ITEM_LOADER_ID, null, this);
+            if (event.getTweetsCount() == 0 || event.getMaxId() < 1) {
+                markNoMoreItemsToLoad();
+            }
         }
         mMax = event.getMaxId();
     }
@@ -285,7 +288,7 @@ public class SearchActivity extends AppCompatActivity implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(final SearchResultsPastEvent event) {
         if (event.isSuccess()) {
-            if (event.getTweetsCount() == 0) {
+            if (event.getTweetsCount() == 0 || event.getMaxId() < 1) {
                 markNoMoreItemsToLoad();
             }
         } else {
