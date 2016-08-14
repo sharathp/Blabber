@@ -17,6 +17,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -139,6 +140,14 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
             return true;
         }
 
+        switch (item.getItemId()) {
+            case R.id.action_search: {
+                final Intent searchIntent = SearchActivity.createIntent(this, null);
+                startActivity(searchIntent);
+                return true;
+            }
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -154,6 +163,12 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
         super.onConfigurationChanged(newConfig);
 
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 
     private void setupDrawerContent() {
