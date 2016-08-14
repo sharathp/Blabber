@@ -929,7 +929,7 @@ public class UpdateTimelineService extends BaseService {
                 final boolean success = saveSearches(searchResultsResource.getStatuses(), query);
 
                 final SearchResultsRefreshEvent searchResultsRefreshEvent = new SearchResultsRefreshEvent(query,
-                        searchResultsResource.getStatuses().size(), success, searchResultsResource.getSearchMetaData().getMaxId());
+                        searchResultsResource.getStatuses().size(), success, searchResultsResource.getSearchMetaData().parseMaxFromNextResults());
                 mEventBus.post(searchResultsRefreshEvent);
             }
         };
@@ -954,7 +954,7 @@ public class UpdateTimelineService extends BaseService {
                 final boolean success = saveSearches(searchResultsResource.getStatuses(), query);
 
                 final SearchResultsPastEvent searchResultsPastEvent = new SearchResultsPastEvent(query,
-                        searchResultsResource.getStatuses().size(), success, searchResultsResource.getSearchMetaData().getMaxId());
+                        searchResultsResource.getStatuses().size(), success, searchResultsResource.getSearchMetaData().parseMaxFromNextResults());
                 mEventBus.post(searchResultsPastEvent);
             }
         };
