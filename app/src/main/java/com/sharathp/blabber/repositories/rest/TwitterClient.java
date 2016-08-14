@@ -28,7 +28,7 @@ import java.util.List;
 public class TwitterClient extends OAuthBaseClient {
     private static final Class<? extends Api> REST_API_CLASS = TwitterApi.class;
 
-    private static final String REST_URL = "https://api.twitter.com/1.1";
+    public static final String REST_URL = "https://api.twitter.com/1.1";
     private static final String REST_CONSUMER_KEY = BuildConfig.TWITTER_API_KEY;
     private static final String REST_CONSUMER_SECRET = BuildConfig.TWITTER_API_SECRET;
     private static final String REST_CALLBACK_URL = "oauth://myblabber";

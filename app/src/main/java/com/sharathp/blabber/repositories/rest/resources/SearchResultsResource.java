@@ -4,6 +4,7 @@ import android.net.UrlQuerySanitizer;
 import android.text.TextUtils;
 
 import com.google.gson.annotations.SerializedName;
+import com.sharathp.blabber.repositories.rest.TwitterClient;
 
 import java.util.List;
 
@@ -56,7 +57,8 @@ public class SearchResultsResource {
 
         public Long parseMaxFromNextResults() {
             final UrlQuerySanitizer sanitizer = new UrlQuerySanitizer();
-            sanitizer.parseQuery(nextResults);
+            sanitizer.setAllowUnregisteredParamaters(true);
+            sanitizer.parseUrl(TwitterClient.REST_URL + nextResults);
             final String maxId = sanitizer.getValue("max_id");
             if (TextUtils.isEmpty(maxId)) {
                 return 0L;

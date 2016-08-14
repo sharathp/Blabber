@@ -201,11 +201,9 @@ public class SearchActivity extends AppCompatActivity implements
         if (data.getCount() > 0) {
             // hide no tweets message
             hideMessageContainer();
-            markMoreItemsToLoad();
         } else {
             // show no tweets message
             showNoTweetsMessage();
-            markNoMoreItemsToLoad();
         }
         mSearchAdapter.swapCursor(data);
     }
