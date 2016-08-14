@@ -61,4 +61,6 @@ public interface TwitterDAO {
     boolean updateTweet(Tweet tweet);
 
     Tweet getTweet(Long tweetId);
+
+    int deleteLikesByUser(Long userId, Long tweetId);
 }

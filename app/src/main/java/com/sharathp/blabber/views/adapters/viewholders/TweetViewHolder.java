@@ -108,7 +108,7 @@ public class TweetViewHolder<T extends AbstractModel & ITweetWithUser> extends S
         public void onClick(final View view) {
             if (mTweetCallback != null) {
                 if (item.getRetweeted()) {
-                    // TODO - implement unretweet
+                    mTweetCallback.onUnRetweeted(item);
                 } else {
                     mTweetCallback.onRetweeted(item);
                 }

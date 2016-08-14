@@ -15,4 +15,6 @@ public interface TweetCallback {
     void onUnfavorited(ITweetWithUser tweet);
 
     void onRetweeted(ITweetWithUser tweet);
+
+    void onUnRetweeted(ITweetWithUser tweet);
 }

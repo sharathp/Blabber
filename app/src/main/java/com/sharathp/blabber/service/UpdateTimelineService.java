@@ -19,6 +19,7 @@ import com.sharathp.blabber.events.MentionsLatestEvent;
 import com.sharathp.blabber.events.MentionsPastEvent;
 import com.sharathp.blabber.events.RetweetedEvent;
 import com.sharathp.blabber.events.StatusSubmittedEvent;
+import com.sharathp.blabber.events.UnRetweetedEvent;
 import com.sharathp.blabber.events.UnfavoritedEvent;
 import com.sharathp.blabber.events.UserLikeLatestEvent;
 import com.sharathp.blabber.events.UserLikePastEvent;
@@ -70,9 +71,9 @@ public class UpdateTimelineService extends BaseService {
 
 
     @IntDef({OP_HOME_TIMELINE_LATEST, OP_HOME_TIMELINE_PAST, OP_DELETE_EXISTING_AND_REFRESH,
-            OP_TWEET, OP_TWEET_FAVORITE, OP_TWEET_UNFAVORITE,OP_RETWEET, OP_MENTION_LATEST,
-            OP_MENTION_PAST, OP_USER_TIMELINE_LATEST, OP_USER_TIMELINE_PAST, OP_USER,
-            OP_USER_LIKE_LATEST, OP_USER_LIKE_PAST})
+            OP_TWEET, OP_TWEET_FAVORITE, OP_TWEET_UNFAVORITE,OP_RETWEET, OP_UNRETWEET,
+            OP_MENTION_LATEST, OP_MENTION_PAST, OP_USER_TIMELINE_LATEST, OP_USER_TIMELINE_PAST,
+            OP_USER, OP_USER_LIKE_LATEST, OP_USER_LIKE_PAST})
     private @interface OperationType {}
 
     private static final int OP_HOME_TIMELINE_LATEST = 1;
@@ -82,13 +83,14 @@ public class UpdateTimelineService extends BaseService {
     private static final int OP_TWEET_FAVORITE = 5;
     private static final int OP_TWEET_UNFAVORITE = 6;
     private static final int OP_RETWEET = 7;
-    private static final int OP_MENTION_LATEST= 8;
-    private static final int OP_MENTION_PAST = 9;
-    private static final int OP_USER_TIMELINE_LATEST= 10;
-    private static final int OP_USER_TIMELINE_PAST = 11;
-    private static final int OP_USER = 12;
-    private static final int OP_USER_LIKE_LATEST= 13;
-    private static final int OP_USER_LIKE_PAST = 14;
+    private static final int OP_UNRETWEET = 8;
+    private static final int OP_MENTION_LATEST= 9;
+    private static final int OP_MENTION_PAST = 10;
+    private static final int OP_USER_TIMELINE_LATEST= 11;
+    private static final int OP_USER_TIMELINE_PAST = 12;
+    private static final int OP_USER = 13;
+    private static final int OP_USER_LIKE_LATEST= 14;
+    private static final int OP_USER_LIKE_PAST = 15;
 
     @Inject
     EventBus mEventBus;
@@ -146,6 +148,12 @@ public class UpdateTimelineService extends BaseService {
 
     public static Intent createIntentForRetweet(final Context context, final Long statusId) {
         final Intent intent = createIntent(context, OP_RETWEET);
+        intent.putExtra(EXTRA_STATUS_ID, statusId);
+        return intent;
+    }
+
+    public static Intent createIntentForUnRetweet(final Context context, final Long statusId) {
+        final Intent intent = createIntent(context, OP_UNRETWEET);
         intent.putExtra(EXTRA_STATUS_ID, statusId);
         return intent;
     }
@@ -246,6 +254,12 @@ public class UpdateTimelineService extends BaseService {
                 retweet(statusId);
                 break;
             }
+            case OP_UNRETWEET: {
+                Log.i(TAG, "UnRetweeting");
+                Long statusId = intentData.getLong(EXTRA_STATUS_ID, -1);
+                unretweet(statusId);
+                break;
+            }
             case OP_MENTION_LATEST: {
                 Log.i(TAG, "Retrieving Latest mentions");
                 retrieveLatestMentions();
@@ -340,6 +354,23 @@ public class UpdateTimelineService extends BaseService {
         });
     }
 
+    private void unretweet(final Long statusId) {
+        mTwitterClient.unretweet(statusId, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                final UnRetweetedEvent unretweetedEvent = new UnRetweetedEvent(statusId, false);
+                mEventBus.post(unretweetedEvent);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
+                final UnRetweetedEvent unretweetedEvent = new UnRetweetedEvent(statusId, true);
+                updateTweet(statusId, unretweetedEvent);
+            }
+        });
+    }
+
     private void unfavorite(final Long statusId) {
         mTwitterClient.unfavorite(statusId, new TextHttpResponseHandler() {
             @Override
@@ -353,6 +384,8 @@ public class UpdateTimelineService extends BaseService {
             public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
                 final UnfavoritedEvent unfavoritedEvent = new UnfavoritedEvent(statusId, true);
                 updateTweet(statusId, unfavoritedEvent);
+                final Long loggedInUserId = mLocalPreferencesDAO.getUserId();
+                mTwitterDAO.deleteLikesByUser(loggedInUserId, statusId);
             }
         });
     }

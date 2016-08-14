@@ -15,6 +15,7 @@ import com.sharathp.blabber.models.UserTimeline;
 import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.repositories.db.BlabberDatabase;
 import com.yahoo.squidb.android.AndroidTableModel;
+import com.yahoo.squidb.sql.Delete;
 import com.yahoo.squidb.sql.Order;
 import com.yahoo.squidb.sql.Query;
 import com.yahoo.squidb.support.SquidSupportCursorLoader;
@@ -160,19 +161,19 @@ public class SQLiteTwitterDAO implements TwitterDAO {
         boolean success = true;
         mDatabase.beginTransaction();
         try {
-            for (final Mentions mention: mentions) {
+            for (final Mentions mention : mentions) {
                 final Query query = Query.select(Mentions.PROPERTIES)
-                                    .where(Mentions.TWEET_ID.eq(mention.getTweetId()));
+                        .where(Mentions.TWEET_ID.eq(mention.getTweetId()));
 
                 // insert if it doesn't exist
-                if(mDatabase.fetchByQuery(Mentions.class, query) == null) {
+                if (mDatabase.fetchByQuery(Mentions.class, query) == null) {
                     success = mDatabase.persist(mention);
                 } else {
                     success = true;
                 }
 
                 // short-circuit and exit the loop
-                if (! success) {
+                if (!success) {
                     break;
                 }
             }
@@ -190,20 +191,20 @@ public class SQLiteTwitterDAO implements TwitterDAO {
         boolean success = true;
         mDatabase.beginTransaction();
         try {
-            for (final UserTimeline userTimeline: userTimelines) {
+            for (final UserTimeline userTimeline : userTimelines) {
                 final Query query = Query.select(UserTimeline.PROPERTIES)
                         .where(UserTimeline.USER_TIME_LINE_ID.eq(userId))
                         .where(UserTimeline.TWEET_ID.eq(userTimeline.getTweetId()));
 
                 // insert if it doesn't exist
-                if(mDatabase.fetchByQuery(UserTimeline.class, query) == null) {
+                if (mDatabase.fetchByQuery(UserTimeline.class, query) == null) {
                     success = mDatabase.persist(userTimeline);
                 } else {
                     success = true;
                 }
 
                 // short-circuit and exit the loop
-                if (! success) {
+                if (!success) {
                     break;
                 }
             }
@@ -221,19 +222,19 @@ public class SQLiteTwitterDAO implements TwitterDAO {
         boolean success = true;
         mDatabase.beginTransaction();
         try {
-            for (final HomeTimeline homeTimeline: homeTimelines) {
+            for (final HomeTimeline homeTimeline : homeTimelines) {
                 final Query query = Query.select(HomeTimeline.PROPERTIES)
                         .where(HomeTimeline.TWEET_ID.eq(homeTimeline.getId()));
 
                 // insert if it doesn't exist
-                if(mDatabase.fetchByQuery(HomeTimeline.class, query) == null) {
+                if (mDatabase.fetchByQuery(HomeTimeline.class, query) == null) {
                     success = mDatabase.persist(homeTimeline);
                 } else {
                     success = true;
                 }
 
                 // short-circuit and exit the loop
-                if (! success) {
+                if (!success) {
                     break;
                 }
             }
@@ -251,20 +252,20 @@ public class SQLiteTwitterDAO implements TwitterDAO {
         boolean success = true;
         mDatabase.beginTransaction();
         try {
-            for (final Like like: likes) {
+            for (final Like like : likes) {
                 final Query query = Query.select(Like.PROPERTIES)
                         .where(Like.USER_LIKE_ID.eq(userId))
                         .where(Like.TWEET_ID.eq(like.getTweetId()));
 
                 // insert if it doesn't exist
-                if(mDatabase.fetchByQuery(Like.class, query) == null) {
+                if (mDatabase.fetchByQuery(Like.class, query) == null) {
                     success = mDatabase.persist(like);
                 } else {
                     success = true;
                 }
 
                 // short-circuit and exit the loop
-                if (! success) {
+                if (!success) {
                     break;
                 }
             }
@@ -298,11 +299,18 @@ public class SQLiteTwitterDAO implements TwitterDAO {
         return mDatabase.fetch(Tweet.class, tweetId);
     }
 
+    @Override
+    public int deleteLikesByUser(final Long userId, final Long tweetId) {
+        return mDatabase.delete(Delete.from(Like.TABLE)
+                .where(Like.USER_LIKE_ID.eq(userId)
+                        .and(Like.TWEET_ID.eq(tweetId))));
+    }
+
     private <T extends AndroidTableModel> boolean checkAndInsertElements(final Collection<T> models) {
         boolean success = true;
         mDatabase.beginTransaction();
         try {
-            for (final T model: models) {
+            for (final T model : models) {
                 // insert if the row doesn't exist, else update
                 if (mDatabase.fetch(model.getClass(), model.getId(), model.getIdProperty()) == null) {
                     success = mDatabase.insertWithGivenId(model);
@@ -310,7 +318,7 @@ public class SQLiteTwitterDAO implements TwitterDAO {
                     success = mDatabase.saveExisting(model);
                 }
                 // short-circuit and exit the loop
-                if (! success) {
+                if (!success) {
                     break;
                 }
             }

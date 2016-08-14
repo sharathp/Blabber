@@ -142,13 +142,13 @@ public class TwitterClient extends OAuthBaseClient {
     }
 
     public void unretweet(final Long statusId, final AsyncHttpResponseHandler handler) {
-        final String apiUrl = getApiUrl(String.format(RELATIVE_URL_RETWEET, statusId));
+        final String apiUrl = getApiUrl(String.format(RELATIVE_URL_UNRETWEET, statusId));
         client.post(apiUrl, null, handler);
     }
 
     public void retweet(final Long statusId, final AsyncHttpResponseHandler handler ) {
-        final String apiUrl = getApiUrl(String.format(RELATIVE_URL_UNRETWEET, statusId));
-        client.post(apiUrl, getStatusRequestParams(statusId), handler);
+        final String apiUrl = getApiUrl(String.format(RELATIVE_URL_RETWEET, statusId));
+        client.post(apiUrl, null, handler);
     }
 
     public void favorite(final Long statusId, final AsyncHttpResponseHandler handler) {
