@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import com.sharathp.blabber.models.HomeTimeline;
 import com.sharathp.blabber.models.Like;
 import com.sharathp.blabber.models.Mentions;
+import com.sharathp.blabber.models.Search;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.models.UserTimeline;
@@ -52,6 +53,7 @@ public class DatabaseModule {
         registerSimpleDataChangedNotifier(contentResolver, database, Mentions.TABLE, Mentions.CONTENT_URI);
         registerSimpleDataChangedNotifier(contentResolver, database, HomeTimeline.TABLE, HomeTimeline.CONTENT_URI);
         registerSimpleDataChangedNotifier(contentResolver, database, Like.TABLE, Like.CONTENT_URI);
+        registerSimpleDataChangedNotifier(contentResolver, database, Search.TABLE, Search.CONTENT_URI);
         return database;
     }
 

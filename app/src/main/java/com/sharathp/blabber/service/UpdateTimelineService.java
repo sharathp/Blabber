@@ -18,6 +18,8 @@ import com.sharathp.blabber.events.HomeTimelinePastEvent;
 import com.sharathp.blabber.events.MentionsLatestEvent;
 import com.sharathp.blabber.events.MentionsPastEvent;
 import com.sharathp.blabber.events.RetweetedEvent;
+import com.sharathp.blabber.events.SearchResultsPastEvent;
+import com.sharathp.blabber.events.SearchResultsRefreshEvent;
 import com.sharathp.blabber.events.StatusSubmittedEvent;
 import com.sharathp.blabber.events.UnRetweetedEvent;
 import com.sharathp.blabber.events.UnfavoritedEvent;
@@ -32,6 +34,7 @@ import com.sharathp.blabber.models.Like;
 import com.sharathp.blabber.models.LikeWithUser;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
+import com.sharathp.blabber.models.Search;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
@@ -39,6 +42,7 @@ import com.sharathp.blabber.models.UserTimeline;
 import com.sharathp.blabber.repositories.LocalPreferencesDAO;
 import com.sharathp.blabber.repositories.TwitterDAO;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
+import com.sharathp.blabber.repositories.rest.resources.SearchResultsResource;
 import com.sharathp.blabber.repositories.rest.resources.TweetResource;
 import com.sharathp.blabber.repositories.rest.resources.UserResource;
 
@@ -64,16 +68,19 @@ public class UpdateTimelineService extends BaseService {
 
     private static final String EXTRA_OPERATION_TYPE = UpdateTimelineService.class.getName() + ".OPERATION_TYPE";
     private static final String EXTRA_USER_ID = UpdateTimelineService.class.getName() + ".USER_ID";
-    private static final String EXTRA_STATUS_ID = UpdateTimelineService.class.getName() + ".EXTRA_STATUS_ID";
+    private static final String EXTRA_STATUS_ID = UpdateTimelineService.class.getName() + ".STATUS_ID";
 
-    private static final String EXTRA_STATUS = UpdateTimelineService.class.getName() + ".EXTRA_STATUS";
+    private static final String EXTRA_STATUS = UpdateTimelineService.class.getName() + ".STATUS";
     private static final String EXTRA_IN_REPLY_TO_STATUS_ID = UpdateTimelineService.class.getName() + ".IN_REPLY_TO_STATUS_ID";
+
+    private static final String EXTRA_QUERY = UpdateTimelineService.class.getName() + ".QUERY";
+    private static final String EXTRA_MAX_ID = UpdateTimelineService.class.getName() + ".MAX_ID";
 
 
     @IntDef({OP_HOME_TIMELINE_LATEST, OP_HOME_TIMELINE_PAST, OP_DELETE_EXISTING_AND_REFRESH,
             OP_TWEET, OP_TWEET_FAVORITE, OP_TWEET_UNFAVORITE,OP_RETWEET, OP_UNRETWEET,
             OP_MENTION_LATEST, OP_MENTION_PAST, OP_USER_TIMELINE_LATEST, OP_USER_TIMELINE_PAST,
-            OP_USER, OP_USER_LIKE_LATEST, OP_USER_LIKE_PAST})
+            OP_USER, OP_USER_LIKE_LATEST, OP_USER_LIKE_PAST,OP_SEARCH_LATEST, OP_SEARCH_PAST})
     private @interface OperationType {}
 
     private static final int OP_HOME_TIMELINE_LATEST = 1;
@@ -91,6 +98,8 @@ public class UpdateTimelineService extends BaseService {
     private static final int OP_USER = 13;
     private static final int OP_USER_LIKE_LATEST= 14;
     private static final int OP_USER_LIKE_PAST = 15;
+    private static final int OP_SEARCH_LATEST= 16;
+    private static final int OP_SEARCH_PAST = 17;
 
     @Inject
     EventBus mEventBus;
@@ -187,6 +196,19 @@ public class UpdateTimelineService extends BaseService {
     public static Intent createIntentForPastUserLikes(final Context context, final long userId) {
         final Intent intent =  createIntent(context, OP_USER_LIKE_PAST);
         intent.putExtra(EXTRA_USER_ID, userId);
+        return intent;
+    }
+
+    public static Intent createIntentForPastSearch(final Context context, final String query, final Long maxId) {
+        final Intent intent =  createIntent(context, OP_SEARCH_PAST);
+        intent.putExtra(EXTRA_QUERY, query);
+        intent.putExtra(EXTRA_MAX_ID, maxId);
+        return intent;
+    }
+
+    public static Intent createIntentForLatestSearch(final Context context, final String query) {
+        final Intent intent =  createIntent(context, OP_SEARCH_LATEST);
+        intent.putExtra(EXTRA_QUERY, query);
         return intent;
     }
 
@@ -293,6 +315,16 @@ public class UpdateTimelineService extends BaseService {
             case OP_USER_LIKE_PAST: {
                 Log.i(TAG, "Retrieving Past user likes");
                 retrievePastUserLikes(intentData.getLong(EXTRA_USER_ID, -1));
+                break;
+            }
+            case OP_SEARCH_LATEST: {
+                Log.i(TAG, "Retrieving Latest search");
+                retrieveLatestSearch(intentData.getString(EXTRA_QUERY));
+                break;
+            }
+            case OP_SEARCH_PAST: {
+                Log.i(TAG, "Retrieving past search");
+                retrievePastSearch(intentData.getString(EXTRA_QUERY), intentData.getLong(EXTRA_MAX_ID));
                 break;
             }
             default: {
@@ -497,6 +529,16 @@ public class UpdateTimelineService extends BaseService {
         });
     }
 
+    private void retrieveLatestSearch(final String query) {
+        // previous search data is no longer required
+        mTwitterDAO.deleteAllSearchData();
+        mTwitterClient.getSearchResults(0L, query, getLatestSearchResponseHandler(query));
+    }
+
+    private void retrievePastSearch(final String query, final long maxId) {
+        mTwitterClient.getSearchResults(maxId, query, getPastSearchResponseHandler(query));
+    }
+
     private boolean saveTweets(final List<TweetResource> tweetResources) {
         final List<Tweet> tweets = new ArrayList<>();
         for (final TweetResource tweetResource : tweetResources) {
@@ -625,6 +667,27 @@ public class UpdateTimelineService extends BaseService {
         success = mTwitterDAO.checkAndInsertHomeTimelines(homeTimelines);
         if (! success) {
             Log.i(TAG, "Unable to save home timelines");
+        }
+        return success;
+    }
+
+    private boolean saveSearches(List<TweetResource> statuses, String query) {
+        boolean success = saveTweetsAndUsers(statuses);
+
+        if (! success) {
+            Log.i(TAG, "Unable to save tweets, not saving searches");
+            return success;
+        }
+
+        final List<Search> searches = new ArrayList<>();
+        for (final TweetResource tweetResource : statuses) {
+            searches.add(new Search()
+                    .setTweetId(tweetResource.getId())
+                    .setQuery(query));
+        }
+        success = mTwitterDAO.checkAndInsertSearches(searches);
+        if (! success) {
+            Log.i(TAG, "Unable to save searches");
         }
         return success;
     }
@@ -843,6 +906,56 @@ public class UpdateTimelineService extends BaseService {
 
                 final UserLikePastEvent userLikePastEvent = new UserLikePastEvent(userId, tweetResources.size(), success);
                 mEventBus.post(userLikePastEvent);
+            }
+        };
+    }
+
+    private AsyncHttpResponseHandler getLatestSearchResponseHandler(final String query) {
+        return new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                Log.e(TAG, "Error retrieving latest searches: " + responseString, throwable);
+                final SearchResultsRefreshEvent searchResultsRefreshEvent = new SearchResultsRefreshEvent(query, 0, false, 0L);
+                mEventBus.post(searchResultsRefreshEvent);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers,
+                                  final String responseString) {
+                final SearchResultsResource searchResultsResource = mGson.fromJson(responseString, SearchResultsResource.class);
+                Log.i(TAG, "Retrieved latest searches: " + searchResultsResource.getStatuses().size());
+
+                final boolean success = saveSearches(searchResultsResource.getStatuses(), query);
+
+                final SearchResultsRefreshEvent searchResultsRefreshEvent = new SearchResultsRefreshEvent(query,
+                        searchResultsResource.getStatuses().size(), success, searchResultsResource.getSearchMetaData().getMaxId());
+                mEventBus.post(searchResultsRefreshEvent);
+            }
+        };
+    }
+
+    private AsyncHttpResponseHandler getPastSearchResponseHandler(final String query) {
+        return new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers,
+                                  final String responseString, final Throwable throwable) {
+                Log.e(TAG, "Error retrieving past searches: " + responseString, throwable);
+                final SearchResultsPastEvent searchResultsPastEvent = new SearchResultsPastEvent(query, 0, false, 0L);
+                mEventBus.post(searchResultsPastEvent);
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers,
+                                  final String responseString) {
+                final SearchResultsResource searchResultsResource = mGson.fromJson(responseString, SearchResultsResource.class);
+                Log.i(TAG, "Retrieved past searches: " + searchResultsResource.getStatuses().size());
+
+                final boolean success = saveSearches(searchResultsResource.getStatuses(), query);
+
+                final SearchResultsPastEvent searchResultsPastEvent = new SearchResultsPastEvent(query,
+                        searchResultsResource.getStatuses().size(), success, searchResultsResource.getSearchMetaData().getMaxId());
+                mEventBus.post(searchResultsPastEvent);
             }
         };
     }

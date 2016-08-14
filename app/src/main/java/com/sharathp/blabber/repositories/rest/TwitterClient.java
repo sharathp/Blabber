@@ -50,6 +50,7 @@ public class TwitterClient extends OAuthBaseClient {
     private static final String RELATIVE_URL_FOLLOWING = "friends/ids.json";
     private static final String RELATIVE_URL_FOLLOWERS = "followers/ids.json";
     private static final String RELATIVE_URL_USERS_LOOKUP = "users/lookup.json";
+    private static final String RELATIVE_URL_SEARCH = "search/tweets.json";
 
     private static final String REQ_STATUS_ID = "id";
     private static final String REQ_PARAM_MAX_ID = "max_id";
@@ -59,7 +60,8 @@ public class TwitterClient extends OAuthBaseClient {
     private static final String REQ_PARAM_USER_ID = "user_id";
     private static final String REQ_PARAM_COUNT = "count";
     private static final String REQ_PARAM_CURSOR = "cursor";
-    private static final String REQ_PARAM_INCULDE_ENTITIES = "include_entities";
+    private static final String REQ_PARAM_INCLUDE_ENTITIES = "include_entities";
+    private static final String REQ_PARAM_QUERY = "q";
 
     public TwitterClient(final Context context) {
         super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
@@ -200,7 +202,15 @@ public class TwitterClient extends OAuthBaseClient {
         final String userIdParam = TextUtils.join(",", userIds);
         final RequestParams requestParams = new RequestParams();
         requestParams.put(REQ_PARAM_USER_ID, userIdParam);
-        requestParams.put(REQ_PARAM_INCULDE_ENTITIES, false);
+        requestParams.put(REQ_PARAM_INCLUDE_ENTITIES, false);
+        client.get(apiUrl, requestParams, handler);
+    }
+
+    public void getSearchResults(final Long maxId, final String query, AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_SEARCH);
+        final RequestParams requestParams = getTweetsRequestParams(maxId, null);
+        requestParams.put(REQ_PARAM_QUERY, query);
+        requestParams.put(REQ_PARAM_INCLUDE_ENTITIES, true);
         client.get(apiUrl, requestParams, handler);
     }
 

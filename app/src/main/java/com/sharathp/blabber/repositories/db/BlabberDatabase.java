@@ -8,6 +8,8 @@ import com.sharathp.blabber.models.Like;
 import com.sharathp.blabber.models.LikeWithUser;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
+import com.sharathp.blabber.models.Search;
+import com.sharathp.blabber.models.SearchWithUser;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
@@ -43,7 +45,8 @@ public class BlabberDatabase extends SquidDatabase {
     protected Table[] getTables() {
         return new Table[]{
                 Tweet.TABLE, User.TABLE, UserTimeline.TABLE,
-                Mentions.TABLE, HomeTimeline.TABLE, Like.TABLE
+                Mentions.TABLE, HomeTimeline.TABLE, Like.TABLE,
+                Search.TABLE
         };
     }
 
@@ -52,7 +55,7 @@ public class BlabberDatabase extends SquidDatabase {
         return new View[]{
             UserTimeLineTweetWithUser.VIEW,
                 MentionsWithUser.VIEW, HomeTimelineWithUser.VIEW,
-                LikeWithUser.VIEW
+                LikeWithUser.VIEW, SearchWithUser.VIEW
         };
     }
 
