@@ -45,6 +45,8 @@
 
         <activity android:name=".activities.FollowingActivity" />
 
+        <activity android:name=".activities.SearchActivity" />
+
         <activity android:name=".activities.TweetDetailActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

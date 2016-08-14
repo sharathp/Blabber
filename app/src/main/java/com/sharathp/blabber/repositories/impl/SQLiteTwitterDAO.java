@@ -8,6 +8,8 @@ import com.sharathp.blabber.models.Like;
 import com.sharathp.blabber.models.LikeWithUser;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
+import com.sharathp.blabber.models.Search;
+import com.sharathp.blabber.models.SearchWithUser;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
@@ -74,6 +76,17 @@ public class SQLiteTwitterDAO implements TwitterDAO {
                 .orderBy(Order.desc(MentionsWithUser.CREATED_AT));
         final SquidSupportCursorLoader<MentionsWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, MentionsWithUser.class, query);
         loader.setNotificationUri(Mentions.CONTENT_URI);
+        loader.setNotificationUri(Tweet.CONTENT_URI);
+        return loader;
+    }
+
+    @Override
+    public SquidSupportCursorLoader<SearchWithUser> getSearches(final String queryString) {
+        final Query query = Query.select(SearchWithUser.PROPERTIES)
+                .where(SearchWithUser.SEARCH_QUERY.eq(queryString))
+                .orderBy(Order.desc(SearchWithUser.CREATED_AT));
+        final SquidSupportCursorLoader<SearchWithUser> loader = new SquidSupportCursorLoader<>(mContext, mDatabase, SearchWithUser.class, query);
+        loader.setNotificationUri(Search.CONTENT_URI);
         loader.setNotificationUri(Tweet.CONTENT_URI);
         return loader;
     }
@@ -279,6 +292,37 @@ public class SQLiteTwitterDAO implements TwitterDAO {
     }
 
     @Override
+    public boolean checkAndInsertSearches(final Collection<Search> searches) {
+        boolean success = true;
+        mDatabase.beginTransaction();
+        try {
+            for (final Search search : searches) {
+                final Query query = Query.select(Search.PROPERTIES)
+                        .where(Search.QUERY.eq(search.getQuery()))
+                        .where(Search.TWEET_ID.eq(search.getTweetId()));
+
+                // insert if it doesn't exist
+                if (mDatabase.fetchByQuery(Search.class, query) == null) {
+                    success = mDatabase.persist(search);
+                } else {
+                    success = true;
+                }
+
+                // short-circuit and exit the loop
+                if (!success) {
+                    break;
+                }
+            }
+            if (success) {
+                mDatabase.setTransactionSuccessful();
+            }
+        } finally {
+            mDatabase.endTransaction();
+        }
+        return success;
+    }
+
+    @Override
     public boolean deleteExistingTweets() {
         mDatabase.deleteAll(Tweet.class);
         return true;
@@ -304,6 +348,11 @@ public class SQLiteTwitterDAO implements TwitterDAO {
         return mDatabase.delete(Delete.from(Like.TABLE)
                 .where(Like.USER_LIKE_ID.eq(userId)
                         .and(Like.TWEET_ID.eq(tweetId))));
+    }
+
+    @Override
+    public int deleteAllSearchData() {
+        return mDatabase.delete(Delete.from(Search.TABLE));
     }
 
     private <T extends AndroidTableModel> boolean checkAndInsertElements(final Collection<T> models) {

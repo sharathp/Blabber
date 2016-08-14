@@ -6,6 +6,8 @@ import com.sharathp.blabber.models.Like;
 import com.sharathp.blabber.models.LikeWithUser;
 import com.sharathp.blabber.models.Mentions;
 import com.sharathp.blabber.models.MentionsWithUser;
+import com.sharathp.blabber.models.Search;
+import com.sharathp.blabber.models.SearchWithUser;
 import com.sharathp.blabber.models.Tweet;
 import com.sharathp.blabber.models.User;
 import com.sharathp.blabber.models.UserTimeLineTweetWithUser;
@@ -25,6 +27,8 @@ public interface TwitterDAO {
     SquidSupportCursorLoader<LikeWithUser> getUserLikes(Long userId);
 
     SquidSupportCursorLoader<MentionsWithUser> getMentions();
+
+    SquidSupportCursorLoader<SearchWithUser> getSearches(String query);
 
     HomeTimelineWithUser getLatestHomeTimeline();
 
@@ -54,6 +58,8 @@ public interface TwitterDAO {
 
     boolean checkAndInsertLikes(Long userId, Collection<Like> likes);
 
+    boolean checkAndInsertSearches(Collection<Search> searches);
+
     boolean deleteExistingTweets();
 
     User getUser(Long userId);
@@ -63,4 +69,6 @@ public interface TwitterDAO {
     Tweet getTweet(Long tweetId);
 
     int deleteLikesByUser(Long userId, Long tweetId);
+
+    int deleteAllSearchData();
 }

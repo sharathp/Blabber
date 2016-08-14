@@ -11,10 +11,13 @@
     <string name="message_end_of_followees">End of Followees</string>
 
     <string name="message_no_tweets">No Tweets</string>
+    <string name="message_no_search_results">No Matching Tweets</string>
+
     <string name="message_no_followers">No Followers</string>
     <string name="message_no_following">No Friends</string>
     <string name="message_no_internet">Cannot connect to Internet</string>
     <string name="message_refresh_failed">Tweets refresh failed</string>
+    <string name="message_search_refresh_failed">Search refresh failed</string>
     <string name="message_past_tweets_failed">Unable to retrieve Past Tweets</string>
     <string name="message_profile_failed">Unable to retrieve Profile</string>
     <string name="message_favorite_failed">Liking tweet failed</string>
