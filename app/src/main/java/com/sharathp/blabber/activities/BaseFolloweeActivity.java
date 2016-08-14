@@ -126,6 +126,8 @@ public abstract class BaseFolloweeActivity extends AppCompatActivity implements 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_followee);
         mUserId = getIntent().getLongExtra(EXTRA_USER_ID, -1L);
         setSupportActionBar(mBinding.toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mBinding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
         initViews();
     }
 
