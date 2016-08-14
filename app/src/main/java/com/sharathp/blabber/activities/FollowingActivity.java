@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.sharathp.blabber.BlabberApplication;
+import com.sharathp.blabber.R;
 
 public class FollowingActivity extends BaseFolloweeActivity {
 
@@ -28,5 +29,10 @@ public class FollowingActivity extends BaseFolloweeActivity {
     @Override
     protected void doRefreshFollowees(final Long userId, final AsyncHttpResponseHandler handler) {
         mTwitterClient.getFollowing(userId, DEFAULT_COUNT, -1L, handler);
+    }
+
+    @Override
+    protected String getNoFolloweesMessage() {
+        return getResources().getString(R.string.message_no_following);
     }
 }

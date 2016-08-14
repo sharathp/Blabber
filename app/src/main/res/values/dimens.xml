@@ -72,6 +72,7 @@
     <dimen name="profile_followers_margin">24dp</dimen>
     <dimen name="profile_header_margin">18dp</dimen>
     <dimen name="text_error_profile">24sp</dimen>
+    <dimen name="text_no_followees">20sp</dimen>
 
 
 </resources>
