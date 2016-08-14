@@ -223,6 +223,12 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
     }
 
     @Override
+    public void onUnRetweeted(final ITweetWithUser tweet) {
+        final Intent intent = UpdateTimelineService.createIntentForUnRetweet(this, tweet.getId());
+        startService(intent);
+    }
+
+    @Override
     public void onProfileImageSelected(final ITweetWithUser tweet) {
         long userId = tweet.getUserId();
 

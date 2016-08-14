@@ -21,6 +21,7 @@ import com.sharathp.blabber.R;
 import com.sharathp.blabber.databinding.ActivityDetailTweetBinding;
 import com.sharathp.blabber.events.FavoritedEvent;
 import com.sharathp.blabber.events.RetweetedEvent;
+import com.sharathp.blabber.events.UnRetweetedEvent;
 import com.sharathp.blabber.events.UnfavoritedEvent;
 import com.sharathp.blabber.fragments.ComposeFragment;
 import com.sharathp.blabber.models.ITweetWithUser;
@@ -169,7 +170,7 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
 
         mBinding.ivRetweetAction.setOnClickListener(view -> {
             if (mRetweeted) {
-                // no-op for now
+                startService(UpdateTimelineService.createIntentForUnRetweet(this, mTweetWithUser.getId()));
             } else {
                 startService(UpdateTimelineService.createIntentForRetweet(this, mTweetWithUser.getId()));
             }
@@ -266,6 +267,20 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
 
         if (! event.isSuccess()) {
             Toast.makeText(this, R.string.message_retweet_failed, Toast.LENGTH_SHORT).show();
+        } else {
+            updateRetweet();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(final UnRetweetedEvent event) {
+        // not applicable for this tweet
+        if (! mTweetWithUser.getId().equals(event.getTweetId())) {
+            return;
+        }
+
+        if (! event.isSuccess()) {
+            Toast.makeText(this, R.string.message_unretweet_failed, Toast.LENGTH_SHORT).show();
         } else {
             updateRetweet();
         }

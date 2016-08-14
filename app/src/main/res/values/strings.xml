@@ -16,6 +16,7 @@
     <string name="message_favorite_failed">Liking tweet failed</string>
     <string name="message_unfavorite_failed">Unliking tweet failed</string>
     <string name="message_retweet_failed">Retweeting failed</string>
+    <string name="message_unretweet_failed">UnRetweeting failed</string>
 
     <string name="drawer_label_home">Home</string>
     <string name="drawer_label_profile">Profile</string>
