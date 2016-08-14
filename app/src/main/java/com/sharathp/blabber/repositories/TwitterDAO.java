@@ -64,6 +64,8 @@ public interface TwitterDAO {
 
     User getUser(Long userId);
 
+    User getUserByScreenName(String userScreenName);
+
     boolean updateTweet(Tweet tweet);
 
     Tweet getTweet(Long tweetId);

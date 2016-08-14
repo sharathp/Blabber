@@ -17,4 +17,8 @@ public interface TweetCallback {
     void onRetweeted(ITweetWithUser tweet);
 
     void onUnRetweeted(ITweetWithUser tweet);
+
+    void onUserScreenNameSelected(String userScreeName);
+
+    void onHashSpanSelected(String hash);
 }
