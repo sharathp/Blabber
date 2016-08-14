@@ -31,6 +31,7 @@ import com.sharathp.blabber.service.UpdateTimelineService;
 import com.sharathp.blabber.util.BlabberDateUtils;
 import com.sharathp.blabber.util.ImageUtils;
 import com.sharathp.blabber.util.ViewUtils;
+import com.sharathp.blabber.views.TweetContentCallback;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -40,7 +41,7 @@ import java.util.Date;
 
 import javax.inject.Inject;
 
-public class TweetDetailActivity  extends AppCompatActivity implements ComposeFragment.ComposeCallback {
+public class TweetDetailActivity  extends AppCompatActivity implements ComposeFragment.ComposeCallback, TweetContentCallback {
     public static final String EXTRA_TWEET = TweetDetailActivity.class.getSimpleName() + ":TWEET";
 
     @Inject
@@ -137,6 +138,8 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
         mBinding.tvScreenName.setText("@" + screenName);
         mBinding.tvTime.setText(BlabberDateUtils.getDetailPageTime(new Date(mTweetWithUser.getCreatedAt())));
         mBinding.tvContent.setText(mTweetWithUser.getText());
+
+        ViewUtils.addContentSpans(mBinding.tvContent, this);
 
         Glide.clear(mBinding.ivProfileImage);
         ImageUtils.loadTweetsListProfileImageWithRounderCorners(this, mBinding.ivProfileImage, profileImageUrl);
@@ -284,5 +287,17 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
         } else {
             updateRetweet();
         }
+    }
+
+    @Override
+    public void onUserScreenNameSelected(final String userScreenName) {
+        final Intent intent = UserProfileActivity.createIntent(this, userScreenName);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onHashSpanSelected(final String hash) {
+        final Intent intent = SearchActivity.createIntent(this, hash);
+        startActivity(intent);
     }
 }

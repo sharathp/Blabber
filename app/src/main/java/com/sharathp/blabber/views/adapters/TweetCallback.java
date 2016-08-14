@@ -1,8 +1,9 @@
 package com.sharathp.blabber.views.adapters;
 
 import com.sharathp.blabber.models.ITweetWithUser;
+import com.sharathp.blabber.views.TweetContentCallback;
 
-public interface TweetCallback {
+public interface TweetCallback extends TweetContentCallback {
 
     void onTweetSelected(ITweetWithUser tweet);
 
@@ -17,8 +18,4 @@ public interface TweetCallback {
     void onRetweeted(ITweetWithUser tweet);
 
     void onUnRetweeted(ITweetWithUser tweet);
-
-    void onUserScreenNameSelected(String userScreeName);
-
-    void onHashSpanSelected(String hash);
 }
