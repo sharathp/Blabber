@@ -1,7 +1,6 @@
 package com.sharathp.blabber.util;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -10,7 +9,7 @@ import android.widget.TextView;
 
 import com.sharathp.blabber.R;
 import com.sharathp.blabber.views.PatternEditableBuilder;
-import com.sharathp.blabber.views.adapters.TweetCallback;
+import com.sharathp.blabber.views.TweetContentCallback;
 
 import java.util.regex.Pattern;
 
@@ -25,17 +24,19 @@ public class ViewUtils {
         return spannableStringBuilder;
     }
 
-    public static void addContentSpans(final TextView textView, final TweetCallback tweetCallback) {
+    public static void addContentSpans(final TextView textView, final TweetContentCallback tweetContentCallback) {
+        final int linkColor = textView.getContext().getResources().getColor(R.color.text_color_link);
+
         new PatternEditableBuilder().
-                addPattern(Pattern.compile("\\@(\\w+)"), Color.BLUE,
+                addPattern(Pattern.compile("\\@(\\w+)"), linkColor,
                         userScreenName -> {
-                            tweetCallback.onUserScreenNameSelected(userScreenName);
+                            tweetContentCallback.onUserScreenNameSelected(userScreenName);
                         }).into(textView);
 
         new PatternEditableBuilder().
-                addPattern(Pattern.compile("\\#(\\w+)"), Color.BLUE,
+                addPattern(Pattern.compile("\\#(\\w+)"), linkColor,
                         hash -> {
-                            tweetCallback.onHashSpanSelected(hash);
+                            tweetContentCallback.onHashSpanSelected(hash);
                         }).into(textView);
     }
 }
