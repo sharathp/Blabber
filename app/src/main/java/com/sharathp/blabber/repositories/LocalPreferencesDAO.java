@@ -65,4 +65,9 @@ public class LocalPreferencesDAO {
     public String getUserProfileImageUrl() {
         return mSharedPreferences.getString(KEY_USER_PROFILE_IMAGE_URL, "");
     }
+
+    // clear all preferences
+    public void clearAll() {
+        mSharedPreferences.edit().clear().commit();
+    }
 }

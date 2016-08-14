@@ -1,5 +1,6 @@
 package com.sharathp.blabber.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -11,6 +12,10 @@ import com.sharathp.blabber.R;
 import com.sharathp.blabber.repositories.rest.TwitterClient;
 
 public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
+
+    public static Intent createIntent(final Context context) {
+        return new Intent(context, LoginActivity.class);
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {

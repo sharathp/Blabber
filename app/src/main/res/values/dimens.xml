@@ -75,4 +75,7 @@
     <dimen name="text_no_followees">20sp</dimen>
     <dimen name="text_followees_content">14sp</dimen>
 
+    <dimen name="text_settings_account_name">16sp</dimen>
+    <dimen name="text_settings_logout">18sp</dimen>
+
 </resources>
