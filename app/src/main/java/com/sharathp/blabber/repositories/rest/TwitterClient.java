@@ -10,6 +10,7 @@ import com.sharathp.blabber.BuildConfig;
 
 import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
+import org.scribe.model.Token;
 
 import java.util.List;
 
@@ -204,6 +205,15 @@ public class TwitterClient extends OAuthBaseClient {
             requestParams.put(REQ_PARAM_CURSOR, cursor);
         }
         client.get(apiUrl, requestParams, handler);
+    }
+
+    // this is required because of the weird way oauth token management
+    public Token getAccessToken() {
+        return getClient().getAccessToken();
+    }
+
+    public void setAccessToken(final Token token) {
+        getClient().setAccessToken(token);
     }
 
     public void getUsers(final List<Long> userIds, final AsyncHttpResponseHandler handler) {
