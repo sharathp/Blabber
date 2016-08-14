@@ -5,6 +5,7 @@ import com.sharathp.blabber.activities.FollowingActivity;
 import com.sharathp.blabber.activities.HomeActivity;
 import com.sharathp.blabber.activities.LoginActivity;
 import com.sharathp.blabber.activities.SearchActivity;
+import com.sharathp.blabber.activities.SettingsActivity;
 import com.sharathp.blabber.activities.TweetDetailActivity;
 import com.sharathp.blabber.activities.UserProfileActivity;
 import com.sharathp.blabber.di.modules.ApplicationModule;
@@ -50,4 +51,6 @@ public interface ApplicationComponent {
     void inject(FollowersActivity followersActivity);
 
     void inject(SearchActivity searchActivity);
+
+    void inject(SettingsActivity settingsActivity);
 }

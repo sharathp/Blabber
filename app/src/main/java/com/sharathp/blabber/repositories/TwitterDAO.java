@@ -73,4 +73,6 @@ public interface TwitterDAO {
     int deleteLikesByUser(Long userId, Long tweetId);
 
     int deleteAllSearchData();
+
+    void deleteDatabase();
 }

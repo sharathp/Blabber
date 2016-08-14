@@ -190,6 +190,11 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
                 startActivity(intent);
                 break;
             }
+            case R.id.nav_settings: {
+                final Intent intent = SettingsActivity.createIntent(this);
+                startActivity(intent);
+                break;
+            }
             default: {
                 Log.w(TAG, "Unknown menu item: " + menuItem.getTitle());
                 mComposeFab.setVisibility(View.VISIBLE);

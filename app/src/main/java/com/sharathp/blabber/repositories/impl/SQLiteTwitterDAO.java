@@ -360,6 +360,11 @@ public class SQLiteTwitterDAO implements TwitterDAO {
         return mDatabase.delete(Delete.from(Search.TABLE));
     }
 
+    @Override
+    public void deleteDatabase() {
+        mDatabase.recreate();
+    }
+
     private <T extends AndroidTableModel> boolean checkAndInsertElements(final Collection<T> models) {
         boolean success = true;
         mDatabase.beginTransaction();
