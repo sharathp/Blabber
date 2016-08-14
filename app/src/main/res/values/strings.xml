@@ -9,6 +9,8 @@
 
     <string name="message_end_of_tweets">End of Tweets</string>
     <string name="message_no_tweets">No Tweets</string>
+    <string name="message_no_followers">No Followers</string>
+    <string name="message_no_following">No Friends</string>
     <string name="message_no_internet">Cannot connect to Internet</string>
     <string name="message_refresh_failed">Tweets refresh failed</string>
     <string name="message_past_tweets_failed">Unable to retrieve Past Tweets</string>
@@ -17,6 +19,8 @@
     <string name="message_unfavorite_failed">Unliking tweet failed</string>
     <string name="message_retweet_failed">Retweeting failed</string>
     <string name="message_unretweet_failed">UnRetweeting failed</string>
+    <string name="message_refresh_followees_failed">Followees refresh failed</string>
+    <string name="message_past_followees_failed">Unable to retrieve Past Followees</string>
 
     <string name="drawer_label_home">Home</string>
     <string name="drawer_label_profile">Profile</string>

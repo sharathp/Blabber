@@ -232,11 +232,25 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
     private void setFollowing() {
         final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_following), mUser.getFriendsCount());
         mBinding.tvFollowing.setText(spannable);
+
+        if (mUser.getFriendsCount() > 0) {
+            mBinding.tvFollowing.setOnClickListener(view -> {
+                final Intent intent = FollowingActivity.createIntent(this, mUserId);
+                startActivity(intent);
+            });
+        }
     }
 
     private void setFollowers() {
         final SpannableStringBuilder spannable = ViewUtils.getSpannedText(this, getString(R.string.text_followers), mUser.getFollowersCount());
         mBinding.tvFollowers.setText(spannable);
+
+        if (mUser.getFollowersCount() > 0) {
+            mBinding.tvFollowers.setOnClickListener(view -> {
+                final Intent intent = FollowersActivity.createIntent(this, mUserId);
+                startActivity(intent);
+            });
+        }
     }
 
     private void openCompose(final ITweetWithUser tweetWithUser) {

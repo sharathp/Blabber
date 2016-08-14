@@ -1,6 +1,7 @@
 package com.sharathp.blabber.repositories.rest;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -9,6 +10,8 @@ import com.sharathp.blabber.BuildConfig;
 
 import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
+
+import java.util.List;
 
 /*
  * 
@@ -44,12 +47,19 @@ public class TwitterClient extends OAuthBaseClient {
     private static final String RELATIVE_URL_USER_LIKE = "/favorites/list.json";
     private static final String RELATIVE_URL_USER = "/users/show.json";
 
+    private static final String RELATIVE_URL_FOLLOWING = "/friends/ids.json";
+    private static final String RELATIVE_URL_FOLLOWERS = "/followers/ids.json";
+    private static final String RELATIVE_URL_USERS_LOOKUP = "/users/lookup.json";
+
     private static final String REQ_STATUS_ID = "id";
     private static final String REQ_PARAM_MAX_ID = "max_id";
     private static final String REQ_PARAM_SINCE_ID = "since_id";
     private static final String REQ_PARAM_STATUS = "status";
     private static final String REQ_PARAM_IN_REPLY_TO_STATUS_ID = "in_reply_to_status_id";
     private static final String REQ_PARAM_USER_ID = "user_id";
+    private static final String REQ_PARAM_COUNT = "count";
+    private static final String REQ_PARAM_CURSOR = "cursor";
+    private static final String REQ_PARAM_INCULDE_ENTITIES = "include_entities";
 
     public TwitterClient(final Context context) {
         super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
@@ -156,15 +166,42 @@ public class TwitterClient extends OAuthBaseClient {
         client.post(apiUrl, null, handler);
     }
 
-    public void unfavorite(final Long statusId, final AsyncHttpResponseHandler handler ) {
+    public void unfavorite(final Long statusId, final AsyncHttpResponseHandler handler) {
         final String apiUrl = getApiUrl(String.format(RELATIVE_URL_UNFAVORITE, statusId));
         client.post(apiUrl, null, handler);
     }
 
-    private RequestParams getStatusRequestParams(final Long statusId) {
+    public void getFollowers(final Long userId, final Integer count, final Long cursor,
+                             final  AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_FOLLOWERS);
         final RequestParams requestParams = new RequestParams();
-        requestParams.put(REQ_STATUS_ID, statusId);
-        return requestParams;
+        requestParams.put(REQ_PARAM_USER_ID, userId);
+        requestParams.put(REQ_PARAM_COUNT, count);
+        if (cursor != null && cursor > 0) {
+            requestParams.put(REQ_PARAM_CURSOR, cursor);
+        }
+        client.get(apiUrl, requestParams, handler);
+    }
+
+    public void getFollowing(final Long userId, final Integer count, final Long cursor,
+                             final  AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_FOLLOWING);
+        final RequestParams requestParams = new RequestParams();
+        requestParams.put(REQ_PARAM_USER_ID, userId);
+        requestParams.put(REQ_PARAM_COUNT, count);
+        if (cursor != null && cursor > 0) {
+            requestParams.put(REQ_PARAM_CURSOR, cursor);
+        }
+        client.get(apiUrl, requestParams, handler);
+    }
+
+    public void getUsers(final List<Long> userIds, final AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_USERS_LOOKUP);
+        final String userIdParam = TextUtils.join(",", userIds);
+        final RequestParams requestParams = new RequestParams();
+        requestParams.put(REQ_PARAM_USER_ID, userIdParam);
+        requestParams.put(REQ_PARAM_INCULDE_ENTITIES, false);
+        client.get(apiUrl, handler);
     }
 
     private RequestParams getUserRequestParams(final Long userId) {

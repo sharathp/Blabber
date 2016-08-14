@@ -1,5 +1,7 @@
 package com.sharathp.blabber.di;
 
+import com.sharathp.blabber.activities.FollowersActivity;
+import com.sharathp.blabber.activities.FollowingActivity;
 import com.sharathp.blabber.activities.HomeActivity;
 import com.sharathp.blabber.activities.LoginActivity;
 import com.sharathp.blabber.activities.TweetDetailActivity;
@@ -41,4 +43,8 @@ public interface ApplicationComponent {
     void inject(UserProfileActivity userProfileActivity);
 
     void inject(LikesFragment likesFragment);
+
+    void inject(FollowingActivity followingActivity);
+
+    void inject(FollowersActivity followersActivity);
 }
