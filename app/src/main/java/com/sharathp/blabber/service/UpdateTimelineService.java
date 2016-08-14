@@ -68,6 +68,7 @@ public class UpdateTimelineService extends BaseService {
 
     private static final String EXTRA_OPERATION_TYPE = UpdateTimelineService.class.getName() + ".OPERATION_TYPE";
     private static final String EXTRA_USER_ID = UpdateTimelineService.class.getName() + ".USER_ID";
+    private static final String EXTRA_USER_SCREEN_NAME = UpdateTimelineService.class.getName() + ".USER_SCREEN_NAME";
     private static final String EXTRA_STATUS_ID = UpdateTimelineService.class.getName() + ".STATUS_ID";
 
     private static final String EXTRA_STATUS = UpdateTimelineService.class.getName() + ".STATUS";
@@ -80,7 +81,8 @@ public class UpdateTimelineService extends BaseService {
     @IntDef({OP_HOME_TIMELINE_LATEST, OP_HOME_TIMELINE_PAST, OP_DELETE_EXISTING_AND_REFRESH,
             OP_TWEET, OP_TWEET_FAVORITE, OP_TWEET_UNFAVORITE,OP_RETWEET, OP_UNRETWEET,
             OP_MENTION_LATEST, OP_MENTION_PAST, OP_USER_TIMELINE_LATEST, OP_USER_TIMELINE_PAST,
-            OP_USER, OP_USER_LIKE_LATEST, OP_USER_LIKE_PAST,OP_SEARCH_LATEST, OP_SEARCH_PAST})
+            OP_USER, OP_USER_LIKE_LATEST, OP_USER_LIKE_PAST,OP_SEARCH_LATEST, OP_SEARCH_PAST,
+            OP_USER_SCREEN_NAME})
     private @interface OperationType {}
 
     private static final int OP_HOME_TIMELINE_LATEST = 1;
@@ -100,6 +102,7 @@ public class UpdateTimelineService extends BaseService {
     private static final int OP_USER_LIKE_PAST = 15;
     private static final int OP_SEARCH_LATEST= 16;
     private static final int OP_SEARCH_PAST = 17;
+    private static final int OP_USER_SCREEN_NAME = 18;
 
     @Inject
     EventBus mEventBus;
@@ -131,6 +134,12 @@ public class UpdateTimelineService extends BaseService {
     public static Intent createIntentForUserProfile(final Context context, final Long userId) {
         final Intent intent = createIntent(context, OP_USER);
         intent.putExtra(EXTRA_USER_ID, userId);
+        return intent;
+    }
+
+    public static Intent createIntentForUserProfileScreenName(final Context context, final String screenName) {
+        final Intent intent = createIntent(context, OP_USER_SCREEN_NAME);
+        intent.putExtra(EXTRA_USER_SCREEN_NAME, screenName);
         return intent;
     }
 
@@ -327,10 +336,35 @@ public class UpdateTimelineService extends BaseService {
                 retrievePastSearch(intentData.getString(EXTRA_QUERY), intentData.getLong(EXTRA_MAX_ID));
                 break;
             }
+            case OP_USER_SCREEN_NAME: {
+                Log.i(TAG, "Retrieving user using screen name");
+                retrieveUserProfile(intentData.getString(EXTRA_USER_SCREEN_NAME));
+            }
             default: {
                 Log.w(TAG, "Invalid value for: " + EXTRA_OPERATION_TYPE + ": " + operationType);
             }
         }
+    }
+
+    private void retrieveUserProfile(final String screenName) {
+        mTwitterClient.getLatestUserProfile(screenName, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(final int statusCode, final Header[] headers, final String responseString, final Throwable throwable) {
+                Log.e(TAG, "Error retrieving user profile: " + responseString, throwable);
+                mEventBus.post(new UserProfileRetrieved(0L, screenName, false));
+            }
+
+            @Override
+            public void onSuccess(final int statusCode, final Header[] headers, final String responseString) {
+                final UserResource userResource = mGson.fromJson(responseString, UserResource.class);
+                Log.i(TAG, "Retrieved user profile: " + screenName);
+
+                boolean success = saveUsers(Arrays.asList(userResource));
+
+                final UserProfileRetrieved userProfileRetrieved = new UserProfileRetrieved(userResource.getId(), screenName, success);
+                mEventBus.post(userProfileRetrieved);
+            }
+        });
     }
 
     private void retrieveUserProfile(final long userId) {
@@ -338,7 +372,7 @@ public class UpdateTimelineService extends BaseService {
             @Override
             public void onFailure(final int statusCode, final Header[] headers, final String responseString, final Throwable throwable) {
                 Log.e(TAG, "Error retrieving user profile: " + responseString, throwable);
-                mEventBus.post(new UserProfileRetrieved(userId, false));
+                mEventBus.post(new UserProfileRetrieved(userId, null, false));
             }
 
             @Override
@@ -348,7 +382,7 @@ public class UpdateTimelineService extends BaseService {
 
                 boolean success = saveUsers(Arrays.asList(userResource));
 
-                final UserProfileRetrieved userProfileRetrieved = new UserProfileRetrieved(userId, success);
+                final UserProfileRetrieved userProfileRetrieved = new UserProfileRetrieved(userId, userResource.getScreenName(), success);
                 mEventBus.post(userProfileRetrieved);
             }
         });

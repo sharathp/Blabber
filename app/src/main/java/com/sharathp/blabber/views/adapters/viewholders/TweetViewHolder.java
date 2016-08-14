@@ -9,6 +9,7 @@ import com.sharathp.blabber.R;
 import com.sharathp.blabber.models.ITweetWithUser;
 import com.sharathp.blabber.util.BlabberDateUtils;
 import com.sharathp.blabber.util.ImageUtils;
+import com.sharathp.blabber.util.ViewUtils;
 import com.sharathp.blabber.views.DynamicHeightImageView;
 import com.sharathp.blabber.views.adapters.TweetCallback;
 import com.yahoo.squidb.data.AbstractModel;
@@ -167,6 +168,8 @@ public class TweetViewHolder<T extends AbstractModel & ITweetWithUser> extends S
         } else {
             mMediaImageView.setVisibility(View.GONE);
         }
+
+        ViewUtils.addContentSpans(mContentTextView, mTweetCallback);
 
         setLikes();
         setRetweets();

@@ -255,6 +255,18 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
         startActivity(intent);
     }
 
+    @Override
+    public void onUserScreenNameSelected(final String userScreenName) {
+        final Intent intent = UserProfileActivity.createIntent(this, userScreenName);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onHashSpanSelected(final String hash) {
+        final Intent intent = SearchActivity.createIntent(this, hash);
+        startActivity(intent);
+    }
+
     private void openCompose(final ITweetWithUser tweetWithUser) {
         final FragmentManager fm = getSupportFragmentManager();
         final ComposeFragment composeFragment = ComposeFragment.createInstance(tweetWithUser);

@@ -333,6 +333,11 @@ public class SQLiteTwitterDAO implements TwitterDAO {
         return mDatabase.fetch(User.class, userId);
     }
 
+    public User getUserByScreenName(final String screenName) {
+        return mDatabase.fetchByQuery(User.class, Query.select(User.PROPERTIES)
+                .where(User.SCREEN_NAME.eq(screenName)));
+    }
+
     @Override
     public boolean updateTweet(final Tweet tweet) {
         return checkAndInsertTweets(Arrays.asList(tweet));

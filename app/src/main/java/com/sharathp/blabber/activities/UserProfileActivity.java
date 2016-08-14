@@ -43,7 +43,13 @@ import javax.inject.Inject;
 public class UserProfileActivity extends AppCompatActivity implements TweetCallback,
         ComposeFragment.ComposeCallback, AppBarLayout.OnOffsetChangedListener {
     private static final String EXTRA_USER_ID = UserProfileActivity.class.getSimpleName() + ":USER_ID";
+    private static final String EXTRA_SCREEN_NAME = UserProfileActivity.class.getSimpleName() + ":SCREEN_NAME";
+    private static final String EXTRA_ID_TYPE = UserProfileActivity.class.getSimpleName() + ":ID_TYPE";
+
     private static final int PERCENTAGE_TO_ANIMATE_AVATAR = 30;
+
+    private static final int ID_TYPE_ID = 1;
+    private static final int ID_TYPE_NAME = 2;
 
     @Inject
     TwitterDAO mTwitterDAO;
@@ -57,12 +63,24 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
     private int mMaxScrollSize;
     private boolean mIsAvatarShown = true;
     private ActivityUserProfileBinding mBinding;
-    private long mUserId;
+
+    private Long mUserId;
+    private String mUserScreenName;
+    private int mUserIdType;
+
     private User mUser;
 
     public static Intent createIntent(final Context context, final Long userId) {
         final Intent intent = new Intent(context, UserProfileActivity.class);
         intent.putExtra(EXTRA_USER_ID, userId);
+        intent.putExtra(EXTRA_ID_TYPE, ID_TYPE_ID);
+        return intent;
+    }
+
+    public static Intent createIntent(final Context context, final String screenName) {
+        final Intent intent = new Intent(context, UserProfileActivity.class);
+        intent.putExtra(EXTRA_SCREEN_NAME, screenName);
+        intent.putExtra(EXTRA_ID_TYPE, ID_TYPE_NAME);
         return intent;
     }
 
@@ -74,11 +92,19 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_user_profile);
 
         mUserId = getIntent().getLongExtra(EXTRA_USER_ID, -1);
+        mUserIdType = getIntent().getIntExtra(EXTRA_ID_TYPE, -1);
+        mUserScreenName = getIntent().getStringExtra(EXTRA_SCREEN_NAME);
+
 //        mBinding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         if (NetworkUtils.isOnline(this)) {
-            final Intent intent = UpdateTimelineService.createIntentForUserProfile(this, mUserId);
-            startService(intent);
+            if (ID_TYPE_ID == mUserIdType) {
+                final Intent intent = UpdateTimelineService.createIntentForUserProfile(this, mUserId);
+                startService(intent);
+            } else {
+                final Intent intent = UpdateTimelineService.createIntentForUserProfileScreenName(this, mUserScreenName);
+                startService(intent);
+            }
         } else {
             mBinding.pbLoadingProgressBar.setVisibility(View.GONE);
             Toast.makeText(this, R.string.message_no_internet, Toast.LENGTH_SHORT).show();
@@ -155,6 +181,18 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
     }
 
     @Override
+    public void onUserScreenNameSelected(final String userScreenName) {
+        final Intent intent = UserProfileActivity.createIntent(this, userScreenName);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onHashSpanSelected(final String hash) {
+        final Intent intent = SearchActivity.createIntent(this, hash);
+        startActivity(intent);
+    }
+
+    @Override
     public void onOffsetChanged(final AppBarLayout appBarLayout, final int i) {
         if (mMaxScrollSize == 0) {
             mMaxScrollSize = appBarLayout.getTotalScrollRange();
@@ -179,7 +217,7 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
     public void onEventMainThread(final UserProfileRetrieved event) {
         mBinding.pbLoadingProgressBar.setVisibility(View.GONE);
         if (event.isSuccess()) {
-            mUser = mTwitterDAO.getUser(mUserId);
+            mUser = mTwitterDAO.getUser(event.getUserId());
             populateUserProfile();
         } else {
             Toast.makeText(this, R.string.message_profile_failed, Toast.LENGTH_SHORT).show();
@@ -218,7 +256,11 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
     }
 
     private void tryRetrievingOfflineData() {
-        mUser = mTwitterDAO.getUser(mUserId);
+        if (ID_TYPE_ID == mUserIdType) {
+            mUser = mTwitterDAO.getUser(mUserId);
+        } else {
+            mUser = mTwitterDAO.getUserByScreenName(mUserScreenName);
+        }
 
         if (mUser == null) {
             mBinding.tvProfileError.setVisibility(View.VISIBLE);
@@ -235,7 +277,7 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
 
         if (mUser.getFriendsCount() > 0) {
             mBinding.tvFollowing.setOnClickListener(view -> {
-                final Intent intent = FollowingActivity.createIntent(this, mUserId);
+                final Intent intent = FollowingActivity.createIntent(this, mUser.getId());
                 startActivity(intent);
             });
         }
@@ -247,7 +289,7 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
 
         if (mUser.getFollowersCount() > 0) {
             mBinding.tvFollowers.setOnClickListener(view -> {
-                final Intent intent = FollowersActivity.createIntent(this, mUserId);
+                final Intent intent = FollowersActivity.createIntent(this, mUser.getId());
                 startActivity(intent);
             });
         }

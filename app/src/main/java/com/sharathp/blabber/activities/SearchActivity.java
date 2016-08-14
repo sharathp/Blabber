@@ -269,6 +269,18 @@ public class SearchActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
+    @Override
+    public void onUserScreenNameSelected(final String userScreenName) {
+        final Intent intent = UserProfileActivity.createIntent(this, userScreenName);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onHashSpanSelected(final String hash) {
+        final Intent intent = SearchActivity.createIntent(this, hash);
+        startActivity(intent);
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(final SearchResultsRefreshEvent event) {
         mBinding.srlTweets.setRefreshing(false);

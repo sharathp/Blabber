@@ -58,10 +58,12 @@ public class TwitterClient extends OAuthBaseClient {
     private static final String REQ_PARAM_STATUS = "status";
     private static final String REQ_PARAM_IN_REPLY_TO_STATUS_ID = "in_reply_to_status_id";
     private static final String REQ_PARAM_USER_ID = "user_id";
+    private static final String REQ_PARAM_USER_SCREEN_NAME = "screen_name";
     private static final String REQ_PARAM_COUNT = "count";
     private static final String REQ_PARAM_CURSOR = "cursor";
     private static final String REQ_PARAM_INCLUDE_ENTITIES = "include_entities";
     private static final String REQ_PARAM_QUERY = "q";
+
 
     public TwitterClient(final Context context) {
         super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
@@ -145,6 +147,13 @@ public class TwitterClient extends OAuthBaseClient {
     public void getLatestUserProfile(final Long userId, final AsyncHttpResponseHandler handler) {
         final String apiUrl = getApiUrl(RELATIVE_URL_USER);
         final RequestParams requestParams = getUserRequestParams(userId);
+        client.get(apiUrl, requestParams, handler);
+    }
+
+    public void getLatestUserProfile(final String screenName, final AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_USER);
+        final RequestParams requestParams = new RequestParams();
+        requestParams.put(REQ_PARAM_USER_SCREEN_NAME, screenName);
         client.get(apiUrl, requestParams, handler);
     }
 
