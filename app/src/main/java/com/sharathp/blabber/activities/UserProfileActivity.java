@@ -21,7 +21,6 @@ import com.sharathp.blabber.databinding.ActivityUserProfileBinding;
 import com.sharathp.blabber.events.UserProfileRetrieved;
 import com.sharathp.blabber.fragments.ComposeFragment;
 import com.sharathp.blabber.fragments.LikesFragment;
-import com.sharathp.blabber.fragments.MediaFragment;
 import com.sharathp.blabber.fragments.UserTimelineFragment;
 import com.sharathp.blabber.models.ITweetWithUser;
 import com.sharathp.blabber.models.User;
@@ -305,12 +304,10 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
 
     static class ProfilePagerAdapter extends FragmentPagerAdapter {
         private static final int POSITION_USER_TIMELINE = 0;
-        private static final int POSITION_MEDIA = 1;
-        private static final int POSITION_FAVORITES = 2;
+        private static final int POSITION_FAVORITES = 1;
 
-        private final int PAGE_COUNT = 3;
-        private int tabTitleIds[] = new int[]{R.string.profile_tab_title_tweets,
-                R.string.profile_tab_title_media, R.string.profile_tab_title_likes};
+        private final int PAGE_COUNT = 2;
+        private int tabTitleIds[] = new int[]{R.string.profile_tab_title_tweets, R.string.profile_tab_title_likes};
 
         private final Context mContext;
         private final long mUserId;
@@ -331,9 +328,6 @@ public class UserProfileActivity extends AppCompatActivity implements TweetCallb
             switch (position) {
                 case POSITION_USER_TIMELINE: {
                     return UserTimelineFragment.createInstance(mUserId);
-                }
-                case POSITION_MEDIA: {
-                    return MediaFragment.createInstance(mUserId);
                 }
                 case POSITION_FAVORITES: {
                     return LikesFragment.createInstance(mUserId);
