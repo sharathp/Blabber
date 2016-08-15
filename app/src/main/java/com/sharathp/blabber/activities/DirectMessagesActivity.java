@@ -237,7 +237,8 @@ public class DirectMessagesActivity extends AppCompatActivity implements Message
     }
 
     @Override
-    public void onMessageSelected(final MessageResource messageResource) {
-        Toast.makeText(this, "Message Selected", Toast.LENGTH_SHORT).show();
+    public void onMessageSelected(final MessageResource messageResource, final Long userId) {
+        final Intent intent = UserProfileActivity.createIntent(this, userId);
+        startActivity(intent);
     }
 }
