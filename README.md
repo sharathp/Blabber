@@ -45,7 +45,6 @@ The following **additional** features are implemented:
 * [x] User can logout
 * [x] Profile view of an user displays the corresponding likes
 * [x] All Users timelines and likes could be accesssed offline (persisted in SQLite)
-* [x] All Users timelines and likes could be accesssed offline (persisted in SQLite)
 
 
 ## Video Walkthrough
