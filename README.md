@@ -45,6 +45,8 @@ The following **additional** features are implemented:
 * [x] User can logout
 * [x] Profile view of an user displays the corresponding likes
 * [x] All Users timelines and likes could be accesssed offline (persisted in SQLite)
+* [x] User can retweet/favorite/unfavorite any tweet from any screen that displays list of tweets (likes, mentions, user timeline, search results etc..)
+* [x] User can navigate to the author's profile by tapping on profile image from any screen (likes, mentions, user timeline, search results, direct messages etc..)
 
 
 ## Video Walkthrough
