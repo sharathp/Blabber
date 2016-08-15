@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/space_content"
+                android:paddingRight="@dimen/space_content"
+                android:paddingTop="@dimen/space_content">
+
+    <com.sharathp.blabber.views.DynamicHeightImageView
+        android:id="@+id/iv_profile_image"
+        android:layout_width="@dimen/profile_width"
+        android:layout_height="@dimen/profile_height"
+        android:layout_marginLeft="@dimen/space_content"/>
+
+    <TextView
+        android:id="@+id/tv_real_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/iv_profile_image"
+        android:layout_marginLeft="@dimen/margin_content"
+        android:layout_marginTop="@dimen/space_content"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="@color/text_real_name"
+        android:textSize="@dimen/text_real_name"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_time"
+        android:textColor="@color/text_time"
+        android:layout_alignParentRight="true"/>
+
+    <ImageView
+        android:id="@+id/iv_message_direction"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/tv_time" />
+
+    <TextView
+        android:id="@+id/tv_screen_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/tv_real_name"
+        android:layout_below="@id/tv_real_name"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="@color/text_screen_name"
+        android:textSize="@dimen/text_screen_name"/>
+
+    <TextView
+        android:id="@+id/tv_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/tv_screen_name"
+        android:layout_below="@id/tv_screen_name"
+        android:lineSpacingMultiplier="1.1"
+        android:textColor="@color/text_content"
+        android:textSize="@dimen/text_followees_content"/>
+</RelativeLayout>
+

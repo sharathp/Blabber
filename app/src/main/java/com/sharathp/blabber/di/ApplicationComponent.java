@@ -1,5 +1,6 @@
 package com.sharathp.blabber.di;
 
+import com.sharathp.blabber.activities.DirectMessagesActivity;
 import com.sharathp.blabber.activities.FollowersActivity;
 import com.sharathp.blabber.activities.FollowingActivity;
 import com.sharathp.blabber.activities.HomeActivity;
@@ -53,4 +54,6 @@ public interface ApplicationComponent {
     void inject(SearchActivity searchActivity);
 
     void inject(SettingsActivity settingsActivity);
+
+    void inject(DirectMessagesActivity directMessagesActivity);
 }

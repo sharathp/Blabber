@@ -146,6 +146,11 @@ public class HomeActivity extends AppCompatActivity implements TweetCallback, Co
                 startActivity(searchIntent);
                 return true;
             }
+            case R.id.action_message: {
+                final Intent searchIntent = DirectMessagesActivity.createIntent(this);
+                startActivity(searchIntent);
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);
