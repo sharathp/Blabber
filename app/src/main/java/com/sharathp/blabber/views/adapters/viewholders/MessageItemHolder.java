@@ -44,7 +44,14 @@ public class MessageItemHolder extends RecyclerView.ViewHolder {
         @Override
         public void onClick(final View view) {
             if (mMessageCallback != null) {
-                mMessageCallback.onMessageSelected(mItem);
+                long userId;
+                if (mLoggedInUserId == mItem.getSender().getId()) {
+                    userId = mItem.getRecipient().getId();
+                } else {
+                    userId = mItem.getSender().getId();
+                }
+
+                mMessageCallback.onMessageSelected(mItem, userId);
             }
         }
     };
@@ -79,7 +86,7 @@ public class MessageItemHolder extends RecyclerView.ViewHolder {
             drawableResId = R.drawable.ic_arrow_in;
         }
 
-        mScreenNameTextView.setText(screenName);
+        mScreenNameTextView.setText("@" + screenName);
         mRealNameTextView.setText(realName);
         mMessageDirectionImageView.setImageResource(drawableResId);
 
