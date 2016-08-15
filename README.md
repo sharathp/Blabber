@@ -54,6 +54,9 @@ Here's a walkthrough of implemented user stories:
 
 ![Video Walkthrough](demo/blabber_part2_demo_1.gif)
 
+### No Internet Walkthrough
+![No Internet Walkthrough](demo/blabber_part2_demo_2.gif)
+
 
 # Project Week 3 - Blabber
 
