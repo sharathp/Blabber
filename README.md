@@ -52,7 +52,7 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-![Video Walkthrough](demo/blabber_demo_2.gif)
+![Video Walkthrough](demo/blabber_part2_demo_1.gif)
 
 
 # Project Week 3 - Blabber
