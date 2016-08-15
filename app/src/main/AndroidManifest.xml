@@ -49,6 +49,8 @@
 
         <activity android:name=".activities.SettingsActivity" />
 
+        <activity android:name=".activities.DirectMessagesActivity" />
+
         <activity android:name=".activities.TweetDetailActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

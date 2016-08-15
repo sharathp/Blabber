@@ -52,6 +52,7 @@ public class TwitterClient extends OAuthBaseClient {
     private static final String RELATIVE_URL_FOLLOWERS = "followers/ids.json";
     private static final String RELATIVE_URL_USERS_LOOKUP = "users/lookup.json";
     private static final String RELATIVE_URL_SEARCH = "search/tweets.json";
+    private static final String RELATIVE_URL_DIRECT_MESSAGES = "direct_messages.json";
 
     private static final String REQ_STATUS_ID = "id";
     private static final String REQ_PARAM_MAX_ID = "max_id";
@@ -204,6 +205,17 @@ public class TwitterClient extends OAuthBaseClient {
         if (cursor != null && cursor > 0) {
             requestParams.put(REQ_PARAM_CURSOR, cursor);
         }
+        client.get(apiUrl, requestParams, handler);
+    }
+
+    public void getDirectMessages(final Integer count, final Long max,
+                                  final  AsyncHttpResponseHandler handler) {
+        final String apiUrl = getApiUrl(RELATIVE_URL_DIRECT_MESSAGES);
+        final RequestParams requestParams = new RequestParams();
+        if (max != null && max > 0) {
+            requestParams.put(REQ_PARAM_MAX_ID, max);
+        }
+        requestParams.put(REQ_PARAM_COUNT, count);
         client.get(apiUrl, requestParams, handler);
     }
 
