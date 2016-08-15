@@ -188,6 +188,11 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
                 startService(UpdateTimelineService.createIntentForFavorite(this, mTweetWithUser.getId()));
             }
         });
+
+
+        mBinding.ivShareAction.setOnClickListener(view -> {
+            shareTweetLink();
+        });
     }
 
     private void setLikes(final Integer favoriteCount, final String retweetedUserName,
@@ -226,6 +231,29 @@ public class TweetDetailActivity  extends AppCompatActivity implements ComposeFr
         final Tweet tweet = mTwitterDAO.getTweet(mTweetWithUser.getId());
         mRetweeted = tweet.isRetweeted();
         setRetweets(tweet.isRetweeted(), tweet.getRetweetCount());
+    }
+
+    private void shareTweetLink() {
+        final Intent shareIntent = getShareIntent();
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_intent_title)));
+    }
+
+    private Intent getShareIntent() {
+        final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+
+        Long statusId = mTweetWithUser.getId();
+        String screenName = mTweetWithUser.getUserScreenName();
+
+        if (mTweetWithUser.getRetweetedStatusId() != null && mTweetWithUser.getRetweetedStatusId() > 0) {
+            screenName = mTweetWithUser.getRetweetedScreenName();
+            statusId = mTweetWithUser.getRetweetedStatusId();
+        }
+
+        final String url = "https://twitter.com/" + screenName + "/status/" + statusId + "?s=09";
+        shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, String.format(getResources().getString(R.string.share_intent_text), "@" + screenName, url));
+        shareIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, String.format(getResources().getString(R.string.share_intent_subject), "@" + screenName));
+        return shareIntent;
     }
 
     @Override

@@ -200,6 +200,13 @@
                         android:layout_height="@dimen/detail_action_height"
                         android:layout_weight="1"
                         android:src="@drawable/ic_like"/>
+
+                    <ImageView
+                        android:id="@+id/iv_share_action"
+                        android:layout_width="@dimen/detail_action_width"
+                        android:layout_height="@dimen/detail_action_height"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_share"/>
                 </LinearLayout>
 
             </RelativeLayout>
